@@ -114,8 +114,7 @@ _Last Updated: YYYY-MM-DD_
 
 ## 2024-01 Archived Issues
 
-### A001: Mobile login button unresponsive (RESOLVED 2024-01-15)
-- **Type**: Auto-Tracked
+### 001: Mobile login button unresponsive (RESOLVED 2024-01-15)
 - **Priority**: High
 - **Status**: Resolved
 - **Created**: 2024-01-10
@@ -124,14 +123,14 @@ _Last Updated: YYYY-MM-DD_
 - **Resolution Date**: 2024-01-15
 - **Files Changed**: src/components/Button.styles.ts
 
-### M003: Database timeout on large queries (RESOLVED 2024-01-20)
+### 003: Database timeout on large queries (RESOLVED 2024-01-20)
 ...
 
 ---
 
 ## 2024-02 Archived Issues
 
-### A005: Memory leak in websocket handler (RESOLVED 2024-02-05)
+### 005: Memory leak in websocket handler (RESOLVED 2024-02-05)
 ...
 
 ---

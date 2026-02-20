@@ -1,18 +1,24 @@
 ---
-description: Add a new issue to KNOWN_ISSUES.md with full control over title, description, priority, and context.
+description: Add a new issue to KNOWN_ISSUES.md with full control over title, description, priority, and context. Accepts text input or file paths containing issue descriptions.
 ---
 
 # Add Issue Command
 
-This command adds a new issue to the KNOWN_ISSUES.md file with precise details.
+This command adds a new issue to the KNOWN_ISSUES.md file with precise details. It can accept direct text input or read issue descriptions from files.
 
 ## Usage
 
+### Text Input
 ```
 /add-issue [title] -d [description] -p [priority] -c [context]
 ```
 
-Or simply:
+### File Input
+```
+/add-issue -f [filepath] -p [priority]
+```
+
+### Interactive Mode
 ```
 /add-issue [title]
 ```
@@ -22,11 +28,11 @@ Or simply:
 
 | Parameter | Short | Description | Required |
 |-----------|-------|-------------|----------|
-| title | - | Brief issue title | Yes |
+| title | - | Brief issue title | Yes (unless -f is used) |
 | -d, --description | -d | Detailed description of the problem | Recommended |
 | -p, --priority | -p | High, Medium, or Low (default: Medium) | No |
 | -c, --context | -c | Where/when the issue occurs | No |
-| --auto | -a | Add to auto-tracked section (default: manual) | No |
+| -f, --file | -f | Path to file containing issue description | No |
 
 ## Priority Guide
 
@@ -36,9 +42,50 @@ Or simply:
 | Medium | Functional issues with workarounds, performance problems |
 | Low | Cosmetic issues, technical debt, nice-to-fix |
 
+## File Input Mode
+
+When using `-f` or `--file`, Claude will:
+
+1. **Read the specified file** using the Read tool
+2. **Parse and structure the content** into a proper issue format:
+   - Extract or generate a title
+   - Identify the problem description
+   - Find relevant context clues
+   - Suggest priority if not specified
+3. **Enhance the description** with:
+   - Clear problem statement
+   - Expected vs actual behavior (if inferable)
+   - Reproduction steps (if mentioned)
+   - Additional context from file content
+
+### File Format Support
+
+The file can be in various formats:
+- **Plain text**: Free-form notes
+- **Markdown**: Structured notes with headers
+- **Code comments**: Error logs, stack traces, or commented issues
+
+Claude will intelligently parse and structure the content.
+
 ## Examples
 
-### Basic Usage
+### File Input (Plain Text Notes)
+```
+/add-issue -f ./notes/login-bug.txt
+```
+Claude reads the file, parses the content, and structures it into a complete issue entry.
+
+### File Input with Priority
+```
+/add-issue -f ./notes/critical-error.log -p High
+```
+
+### File Input (Markdown Notes)
+```
+/add-issue -f ./docs/bugs/api-timeout.md
+```
+
+### Text Input - Basic Usage
 ```
 /add-issue Login button not working on Safari
 ```
@@ -47,17 +94,17 @@ Claude will:
 2. Confirm priority (default: Medium)
 3. Add to KNOWN_ISSUES.md
 
-### Full Specification
+### Text Input - Full Specification
 ```
 /add-issue "API rate limiting too aggressive" -d "Users hitting 429 errors after 10 requests per minute" -p High -c "Production environment, affecting paid users"
 ```
 
-### Quick High Priority
+### Text Input - Quick High Priority
 ```
 /add-issue Database connection leak -p High -d "Connections not being released after queries"
 ```
 
-### Technical Debt
+### Text Input - Technical Debt
 ```
 /add-issue Refactor legacy auth module -p Low -d "Uses deprecated crypto functions, should migrate to modern approach"
 ```
@@ -93,7 +140,29 @@ Create directory if needed (docs/ or .claude/)
 Initialize with empty template (see skill documentation)
 ```
 
-### Step 3: Parse Arguments
+### Step 3: Process Input (Text or File)
+
+#### If File Parameter Provided (-f, --file):
+```
+1. Read the specified file using Read tool
+2. Parse file content to extract:
+   - Title (from first line, heading, or generate from content)
+   - Problem description (main content)
+   - Context clues (file paths, error messages, timestamps)
+   - Suggested priority (based on keywords like "critical", "minor")
+3. If priority not specified: Suggest based on content analysis
+4. Show parsed issue to user for confirmation:
+   "I found this issue in [filename]:
+   Title: [extracted title]
+   Description: [extracted description]
+   Context: [extracted context]
+   Priority: [suggested priority]
+
+   Does this look correct? (Y/n)"
+5. Proceed with confirmed/adjusted values
+```
+
+#### If Text Parameters Provided:
 ```
 Extract: title, description, priority, context
 If title missing: Ask user
@@ -110,18 +179,17 @@ If invalid: Default to Medium and notify user
 ### Step 5: Read KNOWN_ISSUES.md
 ```
 Read current content from the known path
-Find next available M### ID
+Find next available sequential ID (001, 002, etc.)
 ```
 
 ### Step 6: Add Issue (BOTH sections required)
 
 ```
 1. Add to Issue Index table:
-| M### | [Priority] | Open | [Title] | YYYY-MM-DD | - |
+| ### | [Priority] | Open | [Title] | YYYY-MM-DD | - |
 
 2. Add to Issue Details section:
-### M###: [Title]
-- **Type**: Manual
+### ###: [Title]
 - **Priority**: High / Medium / Low
 - **Status**: Open
 - **Created**: YYYY-MM-DD
@@ -138,7 +206,6 @@ Find next available M### ID
 ```
 Update counts:
 - Total: +1
-- Manual: +1
 - Open: +1
 - Update Highest Priority Open if applicable
 ```
@@ -147,22 +214,22 @@ Update counts:
 ```
 Write to the known file path
 Confirm to user:
-"Added M###: [Title] ([Priority]) to [file path]"
+"Added ###: [Title] ([Priority]) to [file path]"
 ```
 
 ## Output Example
 
+### Text Input Example
 ```
 User: /add-issue "Search results not paginating" -d "Shows all 10000 results on one page, causing browser to freeze" -p Medium -c "Gallery page when viewing all items"
 
 Added to KNOWN_ISSUES.md:
 
 Issue Index:
-| M005 | Medium | Open | Search results not paginating | 2024-01-20 | - |
+| 005 | Medium | Open | Search results not paginating | 2024-01-20 | - |
 
 Issue Details:
-### M005: Search results not paginating
-- **Type**: Manual
+### 005: Search results not paginating
 - **Priority**: Medium
 - **Status**: Open
 - **Created**: 2024-01-20
@@ -174,6 +241,30 @@ Issue Details:
 - **Proposed Solution**: Implement server-side pagination with 20 items per page
 
 Use /resolve-next-issue to work on this issue.
+```
+
+### File Input Example
+```
+User: /add-issue -f ./notes/bug-report.txt
+
+Reading file: ./notes/bug-report.txt
+---
+Found this content:
+"Login sometimes fails on mobile. Happens when user has special
+characters in password. Users report getting 'Invalid credentials'
+even with correct password. Affects about 5% of mobile logins.
+Seen on iOS Safari and Android Chrome."
+---
+
+Parsed Issue:
+Title: Login fails with special characters in password on mobile
+Description: Users with special characters in their passwords receive 'Invalid credentials' error even when entering correct credentials
+Context: Mobile browsers (iOS Safari, Android Chrome), affects ~5% of mobile logins
+Suggested Priority: High (login functionality broken for some users)
+
+Add this issue? (Y/n/edit): Y
+
+Added 006: Login fails with special characters in password on mobile (High)
 ```
 
 ## Interactive Mode
@@ -194,7 +285,7 @@ Claude: I'll add this issue. Please provide more details:
 3. Priority: High, Medium, or Low?
    [User: High]
 
-Adding M006: Images not loading on gallery page...
+Adding 006: Images not loading on gallery page...
 Done!
 ```
 

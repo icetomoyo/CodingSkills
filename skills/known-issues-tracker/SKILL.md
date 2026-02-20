@@ -1,6 +1,6 @@
 ---
 name: known-issues-tracker
-description: Maintain a KNOWN_ISSUES.md file to track, prioritize, and resolve issues in any project. Supports auto-tracking by Claude Code and manual entries by humans. Automatically activates when users mention bugs, issues, errors, or problems.
+description: Maintain a KNOWN_ISSUES.md file to track, prioritize, and resolve issues in any project. All issues are tracked uniformly with Claude's assistance for comprehensive documentation. Automatically activates when users mention bugs, issues, errors, or problems.
 ---
 
 # Known Issues Tracker
@@ -56,16 +56,15 @@ _Last Updated: YYYY-MM-DD HH:MM_
 
 | ID | Priority | Status | Title | Created | Resolved |
 |----|----------|--------|-------|---------|----------|
-| A001 | High | Open | [Issue title] | YYYY-MM-DD | - |
-| M001 | Medium | Resolved | [Issue title] | YYYY-MM-DD | YYYY-MM-DD |
+| 001 | High | Open | [Issue title] | YYYY-MM-DD | - |
+| 002 | Medium | Resolved | [Issue title] | YYYY-MM-DD | YYYY-MM-DD |
 
 ---
 
 ## Issue Details
 <!-- Full details for each issue - REQUIRED for all issues -->
 
-### A001: [Issue Title]
-- **Type**: Auto-Tracked
+### 001: [Issue Title]
 - **Priority**: High
 - **Status**: Open
 - **Created**: YYYY-MM-DD
@@ -76,8 +75,7 @@ _Last Updated: YYYY-MM-DD HH:MM_
 - **Resolution**: [How it was fixed - ONLY for resolved issues]
 - **Resolved**: YYYY-MM-DD [ONLY for resolved issues]
 
-### M001: [Issue Title] (RESOLVED)
-- **Type**: Manual
+### 002: [Issue Title] (RESOLVED)
 - **Priority**: Medium
 - **Status**: Resolved
 - **Created**: YYYY-MM-DD
@@ -93,9 +91,7 @@ _Last Updated: YYYY-MM-DD HH:MM_
 
 ## Summary
 - Total: X (Y Open, Z Resolved)
-- Auto-Tracked: A (B Open, C Resolved)
-- Manual: D (E Open, F Resolved)
-- Highest Priority Open: [Issue ID] - [Title]
+- Highest Priority Open: [Issue ID] - [Title] (or "None")
 ```
 
 ## CRITICAL: Issue Details Maintenance
@@ -108,7 +104,6 @@ The issue detail MUST include:
 
 ```markdown
 ### [ID]: [Issue Title]
-- **Type**: Auto-Tracked / Manual
 - **Priority**: High / Medium / Low
 - **Status**: Open
 - **Created**: YYYY-MM-DD
@@ -127,7 +122,6 @@ The issue detail MUST preserve the original problem AND add resolution info:
 
 ```markdown
 ### [ID]: [Issue Title] (RESOLVED)
-- **Type**: Auto-Tracked / Manual
 - **Priority**: High / Medium / Low
 - **Status**: Resolved
 - **Created**: YYYY-MM-DD
@@ -163,10 +157,9 @@ When resolving an issue:
 
 ## Issue ID Convention
 
-- **A###** = Auto-tracked (e.g., A001, A002)
-- **M###** = Manual (e.g., M001, M002)
+- **###** = Sequential number (e.g., 001, 002, 003)
 
-IDs are sequential and never reused.
+IDs are sequential and never reused. All issues follow the same format and process.
 
 ## Actions
 
@@ -238,8 +231,6 @@ _No issue details yet_
 
 ## Summary
 - Total: 0 (0 Open, 0 Resolved)
-- Auto-Tracked: 0 (0 Open, 0 Resolved)
-- Manual: 0 (0 Open, 0 Resolved)
 - Highest Priority Open: None
 ```
 
@@ -260,10 +251,9 @@ When triggered by user conversation (automatic activation):
 
 3. **Add to KNOWN_ISSUES.md (BOTH sections required):**
    - Read current file (create if not exists)
-   - Generate next A### ID
+   - Generate next sequential ID (001, 002, etc.)
    - Add entry to **Issue Index** table
    - Add full details to **Issue Details** section with:
-     - Type: Auto-Tracked
      - Priority, Status, Created
      - **Original Problem** (detailed description)
      - Context, Root Cause (if known)
@@ -272,43 +262,27 @@ When triggered by user conversation (automatic activation):
 
 4. **Confirm with user:**
    ```
-   Added issue A###: [Title] (Priority)
+   Added issue ###: [Title] (Priority)
    Use /add-issue for more control, or /resolve-next-issue to fix it.
    ```
 
-### 3. Add Auto-Tracked Issue (Claude Discovered)
+### 3. Add Issue (General Process)
 
-When Claude discovers an issue during code analysis:
+When adding an issue (via /add-issue command, auto-triggered from conversation, or Claude discovered):
 
 1. Read the current KNOWN_ISSUES.md
-2. Generate the next available A### ID
+2. Generate the next available sequential ID (001, 002, etc.)
 3. **Add to Issue Index table** (quick reference)
 4. **Add full details to Issue Details section:**
-   - Type: Auto-Tracked
    - Priority, Status, Created
    - **Original Problem**: Detailed description of what's wrong
    - Context: Where/when this occurs
    - Root Cause: Analysis (if known)
-5. Update timestamp and summary
-6. Write the updated file
-
-### 4. Add Manual Issue (Human Entry)
-
-When a human wants to add an issue (via /add-issue command):
-
-1. Read the current KNOWN_ISSUES.md
-2. Generate the next available M### ID
-3. **Add to Issue Index table** (quick reference)
-4. **Add full details to Issue Details section:**
-   - Type: Manual
-   - Priority, Status, Created
-   - **Original Problem**: Detailed description of what's wrong
-   - Context: Where/when this occurs
    - Proposed Solution (optional)
 5. Update timestamp and summary
 6. Write the updated file
 
-### 5. Mark Issue as Resolved
+### 4. Mark Issue as Resolved
 
 When an issue is fixed:
 
@@ -331,12 +305,12 @@ When an issue is fixed:
    - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
    - If file > 2000 lines or > 50KB: Notify user to consider archiving
 
-### 6. Auto-Resolve Highest Priority Issue
+### 5. Auto-Resolve Highest Priority Issue
 
 Use the /resolve-next-issue command to:
 
 1. Read KNOWN_ISSUES.md
-2. Find all Open issues (both auto-tracked and manual)
+2. Find all Open issues
 3. Sort by priority (High > Medium > Low)
 4. Select the highest priority issue (oldest if tie)
 5. Analyze the issue and implement a fix
@@ -561,10 +535,10 @@ _Archive Created: YYYY-MM-DD_
 
 ## 2024-01 Archived Issues
 
-### A001: [Issue Title] (RESOLVED 2024-01-15)
+### 001: [Issue Title] (RESOLVED 2024-01-15)
 [Full issue details preserved]
 
-### M003: [Issue Title] (RESOLVED 2024-01-18)
+### 003: [Issue Title] (RESOLVED 2024-01-18)
 [Full issue details preserved]
 
 ---

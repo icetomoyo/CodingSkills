@@ -26,7 +26,7 @@ CodingSkills/
 
 **功能：**
 - 自动维护 `KNOWN_ISSUES.md` 文件
-- 支持 Claude Code 自动追踪和人工手动添加两种方式
+- 统一的 Issue 格式（通过 `/add-issue` 命令添加）
 - High/Medium/Low 三级优先级
 - 自动检测并解决最高优先级 issue
 - **Issue 详情保留**：完整记录原问题和解决方案
@@ -40,7 +40,8 @@ CodingSkills/
 
 | 命令 | 说明 |
 |------|------|
-| `/add-issue [title] -d [desc] -p [priority]` | 添加新 issue |
+| `/add-issue [title] -d [desc] -p [priority]` | 添加新 issue（支持文本或文件参数） |
+| `/add-issue -f [filepath] -p [priority]` | 从文件读取内容并添加为 issue |
 | `/list-issues [--open/--resolved/--all]` | 查看 issues |
 | `/resolve-next-issue` | 自动修复最高优先级 issue |
 | `/archive-issues [--days N]` | 归档已解决的 issues |

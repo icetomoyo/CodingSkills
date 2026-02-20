@@ -48,11 +48,8 @@ Parse content
 
 ### Step 3: Parse Open Issues
 ```
-Extract from Auto-Tracked section:
+Extract from Issue Index and Issue Details sections:
 - ID, Priority, Status, Title, Description, Created
-
-Extract from Manual section:
-- ID, Priority (from section header), Status, Title, Description, Created
 ```
 
 ### Step 4: Sort and Select
@@ -162,7 +159,7 @@ NEVER:
 ```
 Found 5 open issues in KNOWN_ISSUES.md
 
-Selected: A003 (High Priority)
+Selected: 003 (High Priority)
 Title: Mobile login button unresponsive
 Created: 2024-01-20
 Description: Touch event not firing on iOS Safari
@@ -205,11 +202,10 @@ Regression check: No new issues detected ✓
 === UPDATING KNOWN_ISSUES.md ===
 
 Issue Index updated:
-| A003 | High | Resolved | Mobile login button unresponsive | 2024-01-20 | 2024-01-20 |
+| 003 | High | Resolved | Mobile login button unresponsive | 2024-01-20 | 2024-01-20 |
 
 Issue Details updated:
-### A003: Mobile login button unresponsive (RESOLVED)
-- **Type**: Auto-Tracked
+### 003: Mobile login button unresponsive (RESOLVED)
 - **Priority**: High
 - **Status**: Resolved
 - **Created**: 2024-01-20
@@ -227,7 +223,7 @@ Issue Details updated:
 - **Files Changed**: src/components/Button.styles.ts
 - **Tests Added**: None (CSS-only change, manually verified on iOS Simulator)
 
-Issue A003 resolved successfully!
+Issue 003 resolved successfully!
 ```
 
 ## Edge Cases
