@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(skills/known-issues-tracker/SKILL.md:*)",
+      "Bash(commands/resolve-next-issue.md:*)",
+      "Bash(commands/add-issue.md:*)",
+      "Bash(commands/list-issues.md:*)",
+      "Bash(README.md:*)"
+    ]
+  }
+}
