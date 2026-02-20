@@ -40,8 +40,8 @@ CodingSkills/
 
 | 命令 | 说明 |
 |------|------|
-| `/add-issue [title] -d [desc] -p [priority]` | 添加新 issue（支持文本或文件参数） |
-| `/add-issue -f [filepath] -p [priority]` | 从文件读取内容并添加为 issue |
+| `/add-issue "问题描述"` | 添加新 issue（Claude 自动生成标题和详情） |
+| `/add-issue -f [filepath]` | 从文件读取问题并添加为 issue |
 | `/list-issues [--open/--resolved/--all]` | 查看 issues |
 | `/resolve-next-issue` | 自动修复最高优先级 issue |
 | `/archive-issues [--days N]` | 归档已解决的 issues |

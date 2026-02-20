@@ -239,23 +239,26 @@ _No issue details yet_
 When triggered by user conversation (automatic activation):
 
 1. **Parse the user's message** to extract:
-   - Issue title (brief summary)
-   - Issue description (what's wrong)
+   - Problem description (what's wrong - the actual phenomenon)
    - Context (where/when it happens, if mentioned)
-   - Priority (infer from severity, or ask user)
 
-2. **Determine priority automatically:**
-   - **High**: User mentions "critical", "blocking", "urgent", "crash", "security", "data loss"
-   - **Medium**: Default for most bugs
-   - **Low**: User mentions "minor", "cosmetic", "nice to fix", "when you have time"
+2. **Automatically generate:**
+   - **Title**: Concise summary of the problem
+   - **Detailed description**: Current behavior, expected behavior, reproduction steps
+   - **Context**: Affected components, scenarios, environments
+   - **Priority** (based on severity keywords):
+     - **High**: "critical", "blocking", "urgent", "crash", "security", "data loss", "production down"
+     - **Medium**: Default for most bugs
+     - **Low**: "minor", "cosmetic", "nice to fix", "when you have time"
 
 3. **Add to KNOWN_ISSUES.md (BOTH sections required):**
    - Read current file (create if not exists)
    - Generate next sequential ID (001, 002, etc.)
    - Add entry to **Issue Index** table
    - Add full details to **Issue Details** section with:
+     - Generated title
      - Priority, Status, Created
-     - **Original Problem** (detailed description)
+     - **Original Problem** (structured description)
      - Context, Root Cause (if known)
    - Update timestamp and summary
    - Write the file
@@ -270,12 +273,25 @@ When triggered by user conversation (automatic activation):
 
 When adding an issue (via /add-issue command, auto-triggered from conversation, or Claude discovered):
 
+**Input**: Problem description / actual phenomenon (from text or file)
+
+**Claude automatically generates**:
+1. **Title**: Concise summary
+2. **Detailed description**:
+   - Current behavior (what's happening)
+   - Expected behavior (what should happen)
+   - Reproduction steps (if inferable)
+3. **Context**: Affected components, scenarios, environments
+4. **Priority**: Based on severity analysis (unless user specified)
+
+**Process**:
 1. Read the current KNOWN_ISSUES.md
 2. Generate the next available sequential ID (001, 002, etc.)
 3. **Add to Issue Index table** (quick reference)
 4. **Add full details to Issue Details section:**
+   - Generated title
    - Priority, Status, Created
-   - **Original Problem**: Detailed description of what's wrong
+   - **Original Problem**: Structured description
    - Context: Where/when this occurs
    - Root Cause: Analysis (if known)
    - Proposed Solution (optional)
@@ -597,7 +613,8 @@ Currently not required, but can be added if needed.
 
 | Command | Purpose |
 |---------|---------|
-| `/add-issue` | Add a new issue with full details |
+| `/add-issue "problem description"` | Add a new issue (Claude generates title, details, context) |
+| `/add-issue -f [file]` | Add issue from file content |
 | `/list-issues` | List issues with filtering |
 | `/resolve-next-issue` | Auto-fix highest priority issue |
 | `/archive-issues` | Archive resolved issues to reduce file size |

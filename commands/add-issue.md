@@ -1,189 +1,134 @@
 ---
-description: Add a new issue to KNOWN_ISSUES.md with full control over title, description, priority, and context. Accepts text input or file paths containing issue descriptions.
+description: Add a new issue to KNOWN_ISSUES.md. Provide a problem description (text or file), and Claude will automatically generate title, detailed description, and context.
 ---
 
 # Add Issue Command
 
-This command adds a new issue to the KNOWN_ISSUES.md file with precise details. It can accept direct text input or read issue descriptions from files.
+This command adds a new issue to the KNOWN_ISSUES.md file. Simply describe the problem, and Claude handles the rest.
+
+## Core Philosophy
+
+**User provides**: Problem description / Actual phenomenon (REQUIRED)
+**Claude handles**: Title, detailed description, context analysis, priority suggestion
 
 ## Usage
 
 ### Text Input
 ```
-/add-issue [title] -d [description] -p [priority] -c [context]
+/add-issue "问题描述/实际现象"
+/add-issue "问题描述/实际现象" -p [priority]
 ```
 
 ### File Input
 ```
+/add-issue -f [filepath]
 /add-issue -f [filepath] -p [priority]
 ```
-
-### Interactive Mode
-```
-/add-issue [title]
-```
-(Claude will ask for missing details)
 
 ## Parameters
 
 | Parameter | Short | Description | Required |
 |-----------|-------|-------------|----------|
-| title | - | Brief issue title | Yes (unless -f is used) |
-| -d, --description | -d | Detailed description of the problem | Recommended |
-| -p, --priority | -p | High, Medium, or Low (default: Medium) | No |
-| -c, --context | -c | Where/when the issue occurs | No |
-| -f, --file | -f | Path to file containing issue description | No |
+| description | - | Problem description / actual phenomenon | Yes (unless -f is used) |
+| -f, --file | -f | Path to file containing problem description | No |
+| -p, --priority | -p | High, Medium, or Low (optional override) | No |
 
-## Priority Guide
+## What Claude Does Automatically
 
-| Priority | When to Use |
-|----------|-------------|
-| High | Critical/blocking, security issues, data loss risk |
-| Medium | Functional issues with workarounds, performance problems |
-| Low | Cosmetic issues, technical debt, nice-to-fix |
+When you provide a problem description, Claude will:
 
-## File Input Mode
-
-When using `-f` or `--file`, Claude will:
-
-1. **Read the specified file** using the Read tool
-2. **Parse and structure the content** into a proper issue format:
-   - Extract or generate a title
-   - Identify the problem description
-   - Find relevant context clues
-   - Suggest priority if not specified
-3. **Enhance the description** with:
-   - Clear problem statement
-   - Expected vs actual behavior (if inferable)
-   - Reproduction steps (if mentioned)
-   - Additional context from file content
-
-### File Format Support
-
-The file can be in various formats:
-- **Plain text**: Free-form notes
-- **Markdown**: Structured notes with headers
-- **Code comments**: Error logs, stack traces, or commented issues
-
-Claude will intelligently parse and structure the content.
+1. **Generate Title** - Summarize the problem into a concise title
+2. **Structure Description** - Organize into:
+   - Current behavior (what's happening)
+   - Expected behavior (what should happen)
+   - Reproduction steps (if inferable)
+3. **Analyze Context** - Identify affected components, scenarios, environments
+4. **Suggest Priority** - Based on severity keywords:
+   - **High**: "critical", "blocking", "crash", "security", "data loss", "production down"
+   - **Medium**: Default for most bugs
+   - **Low**: "minor", "cosmetic", "nice to fix", "when you have time"
 
 ## Examples
 
-### File Input (Plain Text Notes)
+### Simple Text Input
 ```
-/add-issue -f ./notes/login-bug.txt
+/add-issue "登录页面的提交按钮点击后没反应，只在Safari浏览器上出现这个问题"
 ```
-Claude reads the file, parses the content, and structures it into a complete issue entry.
+Claude generates:
+- Title: Safari 登录页面提交按钮无响应
+- Description: 当前行为、预期行为、涉及浏览器
+- Context: 登录页面、Safari 浏览器
+- Priority: Medium (功能性问题)
 
-### File Input with Priority
+### Text with Priority Override
 ```
-/add-issue -f ./notes/critical-error.log -p High
-```
-
-### File Input (Markdown Notes)
-```
-/add-issue -f ./docs/bugs/api-timeout.md
-```
-
-### Text Input - Basic Usage
-```
-/add-issue Login button not working on Safari
-```
-Claude will:
-1. Ask for description and context if not provided
-2. Confirm priority (default: Medium)
-3. Add to KNOWN_ISSUES.md
-
-### Text Input - Full Specification
-```
-/add-issue "API rate limiting too aggressive" -d "Users hitting 429 errors after 10 requests per minute" -p High -c "Production environment, affecting paid users"
+/add-issue "生产环境的支付接口经常超时，导致用户订单失败" -p High
 ```
 
-### Text Input - Quick High Priority
+### File Input
 ```
-/add-issue Database connection leak -p High -d "Connections not being released after queries"
+/add-issue -f ./notes/bug-report.txt
+```
+Claude reads the file and extracts the problem description.
+
+### File with Priority Override
+```
+/add-issue -f ./logs/error.log -p High
 ```
 
-### Text Input - Technical Debt
-```
-/add-issue Refactor legacy auth module -p Low -d "Uses deprecated crypto functions, should migrate to modern approach"
-```
+## File Input Mode
+
+When using `-f` or `--file`:
+
+1. **Read the file** using Read tool
+2. **Extract problem description** from:
+   - Plain text notes
+   - Markdown files
+   - Error logs / stack traces
+   - Code comments
+3. **Generate structured issue** with title, description, context
+4. **Confirm with user** before adding
+
+## Priority Guide
+
+| Priority | When Claude Suggests |
+|----------|---------------------|
+| High | "critical", "blocking", "crash", "security", "data loss", "production" |
+| Medium | Default for most bugs |
+| Low | "minor", "cosmetic", "nice to fix", "technical debt" |
+
+Use `-p` to override Claude's suggestion.
 
 ## Workflow
 
-### Step 1: Scan for KNOWN_ISSUES.md
+### Step 1: Find or Create KNOWN_ISSUES.md
 ```
-Search entire project using Glob:
-- **/KNOWN_ISSUES.md
-- **/known_issues.md
-- Check docs/, documentation/, .claude/ directories explicitly
-
-If found: Remember the path and proceed to Step 3
-If not found: Proceed to Step 2
+Search project for KNOWN_ISSUES.md
+If not found: Ask user for location (docs/ or .claude/)
 ```
 
-### Step 2: Ask User for File Location (if not found)
+### Step 2: Process Input
 ```
-Ask user:
-"KNOWN_ISSUES.md not found. Where should I create it?
-1. docs/KNOWN_ISSUES.md (recommended for project documentation)
-2. .claude/KNOWN_ISSUES.md (keeps it private to Claude Code)
+Text Input:
+- Parse problem description
+- Generate title (concise summary)
+- Structure detailed description
+- Analyze context
 
-Reply 1 or 2, or specify a custom path."
-
-If user chooses "1" or "docs": Create at docs/KNOWN_ISSUES.md
-If user chooses "2" or ".claude": Create at .claude/KNOWN_ISSUES.md
-If user specifies custom path: Use that path
-If no response: Default to .claude/KNOWN_ISSUES.md
-
-Create directory if needed (docs/ or .claude/)
-Initialize with empty template (see skill documentation)
+File Input:
+- Read file content
+- Extract problem description
+- Generate title, description, context
+- Show parsed result for confirmation
 ```
 
-### Step 3: Process Input (Text or File)
-
-#### If File Parameter Provided (-f, --file):
+### Step 3: Determine Priority
 ```
-1. Read the specified file using Read tool
-2. Parse file content to extract:
-   - Title (from first line, heading, or generate from content)
-   - Problem description (main content)
-   - Context clues (file paths, error messages, timestamps)
-   - Suggested priority (based on keywords like "critical", "minor")
-3. If priority not specified: Suggest based on content analysis
-4. Show parsed issue to user for confirmation:
-   "I found this issue in [filename]:
-   Title: [extracted title]
-   Description: [extracted description]
-   Context: [extracted context]
-   Priority: [suggested priority]
-
-   Does this look correct? (Y/n)"
-5. Proceed with confirmed/adjusted values
+If -p specified: Use user's priority
+Otherwise: Suggest based on severity analysis
 ```
 
-#### If Text Parameters Provided:
-```
-Extract: title, description, priority, context
-If title missing: Ask user
-If description missing: Ask user or infer from title
-Priority default: Medium
-```
-
-### Step 4: Validate Priority
-```
-Must be: High, Medium, or Low (case-insensitive)
-If invalid: Default to Medium and notify user
-```
-
-### Step 5: Read KNOWN_ISSUES.md
-```
-Read current content from the known path
-Find next available sequential ID (001, 002, etc.)
-```
-
-### Step 6: Add Issue (BOTH sections required)
-
+### Step 4: Add to KNOWN_ISSUES.md
 ```
 1. Add to Issue Index table:
 | ### | [Priority] | Open | [Title] | YYYY-MM-DD | - |
@@ -194,105 +139,77 @@ Find next available sequential ID (001, 002, etc.)
 - **Status**: Open
 - **Created**: YYYY-MM-DD
 - **Original Problem**:
-  - Current behavior: [What's happening now]
+  - Current behavior: [What's happening]
   - Expected behavior: [What should happen]
   - Steps to reproduce: [If known]
-- **Context**: [Where/when this occurs]
+- **Context**: [Where/when this occurs, affected components]
 - **Root Cause**: [If known]
 - **Proposed Solution**: [Optional]
 ```
 
-### Step 7: Update Summary
+### Step 5: Confirm
 ```
-Update counts:
-- Total: +1
-- Open: +1
-- Update Highest Priority Open if applicable
-```
-
-### Step 8: Write and Confirm
-```
-Write to the known file path
-Confirm to user:
-"Added ###: [Title] ([Priority]) to [file path]"
+"Added ###: [Title] ([Priority])
+ Title generated from your description.
+ Use /resolve-next-issue to work on this issue."
 ```
 
 ## Output Example
 
-### Text Input Example
+### Text Input
 ```
-User: /add-issue "Search results not paginating" -d "Shows all 10000 results on one page, causing browser to freeze" -p Medium -c "Gallery page when viewing all items"
+User: /add-issue "搜索功能在数据量大的时候很慢，超过10万条记录的时候搜索要等5秒以上"
 
-Added to KNOWN_ISSUES.md:
+Analyzing problem description...
 
-Issue Index:
-| 005 | Medium | Open | Search results not paginating | 2024-01-20 | - |
-
-Issue Details:
-### 005: Search results not paginating
-- **Priority**: Medium
-- **Status**: Open
-- **Created**: 2024-01-20
-- **Original Problem**:
-  - Gallery page shows all 10000 results on a single page
-  - This causes browser to freeze and become unresponsive
-  - Expected: Results should be paginated (e.g., 20 per page)
-- **Context**: Gallery page when viewing all items
-- **Proposed Solution**: Implement server-side pagination with 20 items per page
-
-Use /resolve-next-issue to work on this issue.
-```
-
-### File Input Example
-```
-User: /add-issue -f ./notes/bug-report.txt
-
-Reading file: ./notes/bug-report.txt
+Generated Issue:
 ---
-Found this content:
-"Login sometimes fails on mobile. Happens when user has special
-characters in password. Users report getting 'Invalid credentials'
-even with correct password. Affects about 5% of mobile logins.
-Seen on iOS Safari and Android Chrome."
+Title: 搜索功能在大数据量下性能缓慢
+Priority: Medium (suggested)
+Description:
+  - Current: Search takes 5+ seconds on 100k+ records
+  - Expected: Search should complete within 1 second
+  - Affected: Search functionality with large datasets
+Context: Search feature, datasets > 100k records
 ---
-
-Parsed Issue:
-Title: Login fails with special characters in password on mobile
-Description: Users with special characters in their passwords receive 'Invalid credentials' error even when entering correct credentials
-Context: Mobile browsers (iOS Safari, Android Chrome), affects ~5% of mobile logins
-Suggested Priority: High (login functionality broken for some users)
 
 Add this issue? (Y/n/edit): Y
 
-Added 006: Login fails with special characters in password on mobile (High)
+Added 005: 搜索功能在大数据量下性能缓慢 (Medium)
 ```
 
-## Interactive Mode
-
-If user provides only title or incomplete info:
-
+### File Input
 ```
-User: /add-issue Something wrong with images
+User: /add-issue -f ./notes/mobile-login-issue.txt
 
-Claude: I'll add this issue. Please provide more details:
+Reading file: ./notes/mobile-login-issue.txt
+---
+Content: "手机上登录有时候会失败，特别是密码里有特殊字符的时候。
+用户说输入了正确的密码但是提示'密码错误'。
+大概影响5%左右的手机登录。iOS Safari 和 Android Chrome 都有这个问题。"
+---
 
-1. Description: What's wrong with the images?
-   [User: Images not loading on production]
+Generated Issue:
+---
+Title: 手机端密码含特殊字符时登录失败
+Priority: High (login functionality affected)
+Description:
+  - Current: Users with special characters in password get 'Invalid credentials' error
+  - Expected: All valid passwords should work
+  - Reproduction: Use password with special chars on mobile browser
+Context: Mobile browsers (iOS Safari, Android Chrome), ~5% of mobile logins
+---
 
-2. Context: Where does this happen?
-   [User: Only on the gallery page, works locally]
+Add this issue? (Y/n/edit): Y
 
-3. Priority: High, Medium, or Low?
-   [User: High]
-
-Adding 006: Images not loading on gallery page...
-Done!
+Added 006: 手机端密码含特殊字符时登录失败 (High)
 ```
 
 ## Related Commands
 
 - `/resolve-next-issue` - Fix the highest priority issue
-- `/list-issues` - View all open issues (if available)
+- `/list-issues` - View all issues
+- `/archive-issues` - Archive resolved issues
 
 ## Related Skills
 
