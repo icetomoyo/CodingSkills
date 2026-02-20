@@ -113,21 +113,32 @@ Read current content from the known path
 Find next available M### ID
 ```
 
-### Step 6: Add Issue
+### Step 6: Add Issue (BOTH sections required)
+
 ```
-Format entry:
-#### M###: [Title]
+1. Add to Issue Index table:
+| M### | [Priority] | Open | [Title] | YYYY-MM-DD | - |
+
+2. Add to Issue Details section:
+### M###: [Title]
+- **Type**: Manual
+- **Priority**: High / Medium / Low
 - **Status**: Open
 - **Created**: YYYY-MM-DD
-- **Description**: [Description]
-- **Context**: [Context] (if provided)
+- **Original Problem**:
+  - Current behavior: [What's happening now]
+  - Expected behavior: [What should happen]
+  - Steps to reproduce: [If known]
+- **Context**: [Where/when this occurs]
+- **Root Cause**: [If known]
 - **Proposed Solution**: [Optional]
 ```
 
 ### Step 7: Update Summary
 ```
 Update counts:
-- Total Manual: +1
+- Total: +1
+- Manual: +1
 - Open: +1
 - Update Highest Priority Open if applicable
 ```
@@ -142,15 +153,25 @@ Confirm to user:
 ## Output Example
 
 ```
-User: /add-issue "Search results not paginating" -d "Shows all 10000 results on one page" -p Medium
+User: /add-issue "Search results not paginating" -d "Shows all 10000 results on one page, causing browser to freeze" -p Medium -c "Gallery page when viewing all items"
 
 Added to KNOWN_ISSUES.md:
 
-ID: M005
-Title: Search results not paginating
-Priority: Medium
-Status: Open
-Created: 2024-01-20
+Issue Index:
+| M005 | Medium | Open | Search results not paginating | 2024-01-20 | - |
+
+Issue Details:
+### M005: Search results not paginating
+- **Type**: Manual
+- **Priority**: Medium
+- **Status**: Open
+- **Created**: 2024-01-20
+- **Original Problem**:
+  - Gallery page shows all 10000 results on a single page
+  - This causes browser to freeze and become unresponsive
+  - Expected: Results should be paginated (e.g., 20 per page)
+- **Context**: Gallery page when viewing all items
+- **Proposed Solution**: Implement server-side pagination with 20 items per page
 
 Use /resolve-next-issue to work on this issue.
 ```

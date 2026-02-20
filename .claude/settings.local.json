@@ -5,7 +5,10 @@
       "Bash(commands/resolve-next-issue.md:*)",
       "Bash(commands/add-issue.md:*)",
       "Bash(commands/list-issues.md:*)",
-      "Bash(README.md:*)"
+      "Bash(README.md:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(commands/archive-issues.md:*)"
     ]
   }
 }

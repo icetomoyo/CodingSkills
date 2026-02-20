@@ -11,7 +11,8 @@ CodingSkills/
 ├── commands/            # 自定义命令
 │   ├── add-issue.md          # 添加 issue
 │   ├── list-issues.md        # 列出 issues
-│   └── resolve-next-issue.md # 自动修复最高优先级 issue
+│   ├── resolve-next-issue.md # 自动修复最高优先级 issue
+│   └── archive-issues.md     # 归档已解决的 issues
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
@@ -28,6 +29,8 @@ CodingSkills/
 - 支持 Claude Code 自动追踪和人工手动添加两种方式
 - High/Medium/Low 三级优先级
 - 自动检测并解决最高优先级 issue
+- **Issue 详情保留**：完整记录原问题和解决方案
+- **文件大小管理**：自动检测文件大小，支持归档
 
 **自动触发条件：**
 - 用户提到 bug, issue, problem, error, crash, failure 等关键词
@@ -40,8 +43,16 @@ CodingSkills/
 | `/add-issue [title] -d [desc] -p [priority]` | 添加新 issue |
 | `/list-issues [--open/--resolved/--all]` | 查看 issues |
 | `/resolve-next-issue` | 自动修复最高优先级 issue |
+| `/archive-issues [--days N]` | 归档已解决的 issues |
 
-**KNOWN_ISSUES.md 文件位置：**
+**KNOWN_ISSUES.md 文件结构：**
+```
+## Issue Index        # 快速索引表
+## Issue Details      # 完整详情（包含原问题和解决方案）
+## Summary            # 统计摘要
+```
+
+**文件位置：**
 1. 自动扫描项目查找现有文件
 2. 未找到时询问用户：`docs/KNOWN_ISSUES.md` 或 `.claude/KNOWN_ISSUES.md`
 
@@ -52,6 +63,7 @@ CodingSkills/
 | `/add-issue` | 精准添加 issue 到 KNOWN_ISSUES.md |
 | `/list-issues` | 列出所有 issues，支持过滤 |
 | `/resolve-next-issue` | 自动查找并修复最高优先级 issue |
+| `/archive-issues` | 归档已解决的 issues 到 ISSUES_ARCHIVED.md |
 
 ## 安装使用
 
@@ -91,11 +103,25 @@ cp -r commands/* ~/.claude/commands/
 - 禁止添加超出 issue 范围的功能
 - 禁止修改测试让它通过（应该修代码）
 
+## 文件大小管理
+
+KNOWN_ISSUES.md 会随着时间变大，影响 LLM 上下文效率：
+
+**自动检测：**
+- 文件 > 2000 行或 > 50KB：提示用户归档
+- 文件 > 5000 行或 > 100KB：强烈建议归档
+
+**归档策略：**
+- 使用 `/archive-issues` 归档已解决的 issues
+- 归档文件：`ISSUES_ARCHIVED.md`（与 KNOWN_ISSUES.md 同目录）
+- 默认保留最近 30 天内解决的 issues
+
 ## 开发计划
 
 - [ ] 添加更多实用 skills
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules
+- [ ] 考虑为 issue 追踪添加专门的 agent（可选）
 
 ## License
 

@@ -134,13 +134,27 @@ NEVER:
 5. Use /code-review after implementation
 ```
 
-### Step 7: Update KNOWN_ISSUES.md
+### Step 7: Update KNOWN_ISSUES.md (BOTH sections)
+
 ```
-1. Update issue status to "Resolved"
-2. Add resolved date
-3. Add resolution notes
-4. Update summary section
-5. Write to the known file path
+1. Update Issue Index table:
+   - Change status to "Resolved"
+   - Add resolved date
+
+2. Update Issue Details section (CRITICAL):
+   - Change status to "Resolved"
+   - **PRESERVE** Original Problem (do NOT delete or summarize)
+   - **ADD** Resolution section with:
+     * Detailed explanation of the fix
+     * Why this approach was chosen
+     * Any trade-offs or limitations
+   - Add Resolution Date
+   - Add Files Changed list
+   - Add Tests Added (if any)
+
+3. Update Summary section
+
+4. Write to the known file path
 ```
 
 ## Example Output
@@ -189,24 +203,29 @@ Integration check: Original issue addressed ✓
 Regression check: No new issues detected ✓
 
 === UPDATING KNOWN_ISSUES.md ===
-- Status: Open -> Resolved
-- Resolved: 2024-01-20
-- Resolution: Added touch-action: manipulation to Button.styles.ts to prevent iOS Safari double-tap zoom interference
 
-Issue A003 resolved successfully!
-```
+Issue Index updated:
+| A003 | High | Resolved | Mobile login button unresponsive | 2024-01-20 | 2024-01-20 |
 
-=== IMPLEMENTING ===
-Modifying src/components/Button.styles.ts...
-Verifying: Code compiles ✓
-Running tests: 12 tests passed ✓
-Manual check: Original issue addressed ✓
-No regressions detected ✓
-
-=== UPDATING KNOWN_ISSUES.md ===
-- Status: Open -> Resolved
-- Resolved: 2024-01-20
-- Resolution: Added touch-action: manipulation to Button.styles.ts
+Issue Details updated:
+### A003: Mobile login button unresponsive (RESOLVED)
+- **Type**: Auto-Tracked
+- **Priority**: High
+- **Status**: Resolved
+- **Created**: 2024-01-20
+- **Original Problem**: (PRESERVED)
+  - Touch event not firing on iOS Safari
+  - Users cannot tap the login button on iPhone/iPad
+  - Expected: Button should respond to touch immediately
+- **Context**: Login page on iOS Safari mobile browsers
+- **Root Cause**: iOS Safari has a 300ms delay for double-tap zoom detection
+- **Resolution**:
+  - Added `touch-action: manipulation` CSS property to button base styles
+  - This tells iOS Safari to bypass the 300ms double-tap detection
+  - Touch events now fire immediately without delay
+- **Resolution Date**: 2024-01-20
+- **Files Changed**: src/components/Button.styles.ts
+- **Tests Added**: None (CSS-only change, manually verified on iOS Simulator)
 
 Issue A003 resolved successfully!
 ```

@@ -42,7 +42,7 @@ This skill should be automatically activated when the user message contains:
 
 ## KNOWN_ISSUES.md File Structure
 
-The file is divided into two sections:
+The file is divided into THREE sections:
 
 ```markdown
 # Known Issues
@@ -51,39 +51,107 @@ _Last Updated: YYYY-MM-DD HH:MM_
 
 ---
 
-## Auto-Tracked Issues (Managed by Claude Code)
-<!-- DO NOT EDIT THIS SECTION MANUALLY - Claude Code manages this -->
-<!-- AUTO_TRACKED_START -->
+## Issue Index
+<!-- Quick reference table for all issues -->
 
-| ID | Priority | Status | Title | Description | Created | Resolved |
-|----|----------|--------|-------|-------------|---------|----------|
-| A001 | High | Open | [Issue title] | [Brief description] | YYYY-MM-DD | - |
-
-<!-- AUTO_TRACKED_END -->
+| ID | Priority | Status | Title | Created | Resolved |
+|----|----------|--------|-------|---------|----------|
+| A001 | High | Open | [Issue title] | YYYY-MM-DD | - |
+| M001 | Medium | Resolved | [Issue title] | YYYY-MM-DD | YYYY-MM-DD |
 
 ---
 
-## Manual Issues (Human-Managed)
-<!-- You can add/edit issues in this section -->
+## Issue Details
+<!-- Full details for each issue - REQUIRED for all issues -->
 
-### High Priority
-
-#### M001: [Issue Title]
-- **Status**: Open / In Progress / Resolved
+### A001: [Issue Title]
+- **Type**: Auto-Tracked
+- **Priority**: High
+- **Status**: Open
 - **Created**: YYYY-MM-DD
-- **Description**: [Detailed description]
-- **Context**: [Where/when this occurs]
+- **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
+- **Context**: [Where/when this occurs, affected components]
+- **Root Cause**: [Analysis of why this happens - if known]
 - **Proposed Solution**: [Optional: how to fix it]
-- **Resolved**: YYYY-MM-DD (if applicable)
-- **Resolution**: [How it was fixed] (if applicable)
+- **Resolution**: [How it was fixed - ONLY for resolved issues]
+- **Resolved**: YYYY-MM-DD [ONLY for resolved issues]
+
+### M001: [Issue Title] (RESOLVED)
+- **Type**: Manual
+- **Priority**: Medium
+- **Status**: Resolved
+- **Created**: YYYY-MM-DD
+- **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
+- **Context**: [Where/when this occurs, affected components]
+- **Root Cause**: [Analysis of why this happens]
+- **Resolution**: [DETAILED explanation of how it was fixed - REQUIRED for resolved issues]
+- **Resolution Date**: YYYY-MM-DD
+- **Files Changed**: [List of files modified to fix this issue]
+- **Tests Added**: [Any tests added to prevent regression]
 
 ---
 
 ## Summary
-- Total Auto-Tracked: X (Y Open, Z Resolved)
-- Total Manual: A (B Open, C Resolved)
+- Total: X (Y Open, Z Resolved)
+- Auto-Tracked: A (B Open, C Resolved)
+- Manual: D (E Open, F Resolved)
 - Highest Priority Open: [Issue ID] - [Title]
 ```
+
+## CRITICAL: Issue Details Maintenance
+
+**Every issue MUST have a corresponding entry in the "Issue Details" section.**
+
+### For OPEN Issues (Unresolved)
+
+The issue detail MUST include:
+
+```markdown
+### [ID]: [Issue Title]
+- **Type**: Auto-Tracked / Manual
+- **Priority**: High / Medium / Low
+- **Status**: Open
+- **Created**: YYYY-MM-DD
+- **Original Problem**: [REQUIRED - Detailed description of what's wrong]
+  - What is the current (broken) behavior?
+  - What is the expected behavior?
+  - How to reproduce the issue?
+- **Context**: [Where/when this occurs]
+- **Root Cause**: [If known - analysis of why this happens]
+- **Proposed Solution**: [Optional - suggested fix approach]
+```
+
+### For RESOLVED Issues
+
+The issue detail MUST preserve the original problem AND add resolution info:
+
+```markdown
+### [ID]: [Issue Title] (RESOLVED)
+- **Type**: Auto-Tracked / Manual
+- **Priority**: High / Medium / Low
+- **Status**: Resolved
+- **Created**: YYYY-MM-DD
+- **Original Problem**: [MUST be preserved - do NOT delete or summarize]
+  - What was wrong?
+  - What was the expected behavior?
+- **Context**: [Where/when it occurred]
+- **Root Cause**: [Analysis of why it happened]
+- **Resolution**: [REQUIRED - Detailed explanation of the fix]
+  - What was changed?
+  - Why this approach was chosen?
+  - Any trade-offs or limitations?
+- **Resolution Date**: YYYY-MM-DD
+- **Files Changed**: [List of files modified]
+- **Tests Added**: [Any tests to prevent regression]
+```
+
+### IMPORTANT: Never Delete Original Problem
+
+When resolving an issue:
+- **PRESERVE** the Original Problem description completely
+- **DO NOT** summarize or shorten it
+- **ADD** Resolution section below it
+- This ensures future readers understand both the problem AND the solution
 
 ## Priority Levels
 
@@ -152,35 +220,26 @@ _Last Updated: [Current DateTime]_
 
 ---
 
-## Auto-Tracked Issues (Managed by Claude Code)
-<!-- DO NOT EDIT THIS SECTION MANUALLY - Claude Code manages this -->
-<!-- AUTO_TRACKED_START -->
+## Issue Index
+<!-- Quick reference table for all issues -->
 
-| ID | Priority | Status | Title | Description | Created | Resolved |
-|----|----------|--------|-------|-------------|---------|----------|
+| ID | Priority | Status | Title | Created | Resolved |
+|----|----------|--------|-------|---------|----------|
 _No issues tracked yet_
-
-<!-- AUTO_TRACKED_END -->
 
 ---
 
-## Manual Issues (Human-Managed)
-<!-- You can add/edit issues in this section -->
+## Issue Details
+<!-- Full details for each issue - REQUIRED for all issues -->
 
-### High Priority
-_No high priority issues_
-
-### Medium Priority
-_No medium priority issues_
-
-### Low Priority
-_No low priority issues_
+_No issue details yet_
 
 ---
 
 ## Summary
-- Total Auto-Tracked: 0 (0 Open, 0 Resolved)
-- Total Manual: 0 (0 Open, 0 Resolved)
+- Total: 0 (0 Open, 0 Resolved)
+- Auto-Tracked: 0 (0 Open, 0 Resolved)
+- Manual: 0 (0 Open, 0 Resolved)
 - Highest Priority Open: None
 ```
 
@@ -199,10 +258,15 @@ When triggered by user conversation (automatic activation):
    - **Medium**: Default for most bugs
    - **Low**: User mentions "minor", "cosmetic", "nice to fix", "when you have time"
 
-3. **Add to KNOWN_ISSUES.md:**
+3. **Add to KNOWN_ISSUES.md (BOTH sections required):**
    - Read current file (create if not exists)
    - Generate next A### ID
-   - Add to Auto-Tracked table
+   - Add entry to **Issue Index** table
+   - Add full details to **Issue Details** section with:
+     - Type: Auto-Tracked
+     - Priority, Status, Created
+     - **Original Problem** (detailed description)
+     - Context, Root Cause (if known)
    - Update timestamp and summary
    - Write the file
 
@@ -218,9 +282,15 @@ When Claude discovers an issue during code analysis:
 
 1. Read the current KNOWN_ISSUES.md
 2. Generate the next available A### ID
-3. Add the issue to the Auto-Tracked table
-4. Update the timestamp and summary
-5. Write the updated file
+3. **Add to Issue Index table** (quick reference)
+4. **Add full details to Issue Details section:**
+   - Type: Auto-Tracked
+   - Priority, Status, Created
+   - **Original Problem**: Detailed description of what's wrong
+   - Context: Where/when this occurs
+   - Root Cause: Analysis (if known)
+5. Update timestamp and summary
+6. Write the updated file
 
 ### 4. Add Manual Issue (Human Entry)
 
@@ -228,21 +298,35 @@ When a human wants to add an issue (via /add-issue command):
 
 1. Read the current KNOWN_ISSUES.md
 2. Generate the next available M### ID
-3. Add the issue under the appropriate priority section
-4. Update the timestamp and summary
-5. Write the updated file
+3. **Add to Issue Index table** (quick reference)
+4. **Add full details to Issue Details section:**
+   - Type: Manual
+   - Priority, Status, Created
+   - **Original Problem**: Detailed description of what's wrong
+   - Context: Where/when this occurs
+   - Proposed Solution (optional)
+5. Update timestamp and summary
+6. Write the updated file
 
 ### 5. Mark Issue as Resolved
 
 When an issue is fixed:
 
 1. Read the current KNOWN_ISSUES.md
-2. Find the issue by ID
-3. Update status to Resolved
-4. Add resolved date
-5. For manual issues, add resolution notes
-6. Update timestamp and summary
-7. Write the updated file
+2. Find the issue by ID in BOTH sections
+3. **Update Issue Index:** Change status to "Resolved", add resolved date
+4. **Update Issue Details (CRITICAL):**
+   - Change status to "Resolved"
+   - **PRESERVE** Original Problem description (do NOT delete)
+   - **ADD** Resolution section with:
+     - Detailed explanation of the fix
+     - Why this approach was chosen
+     - Any trade-offs
+   - Add Resolution Date
+   - Add Files Changed list
+   - Add Tests Added (if any)
+5. Update timestamp and summary
+6. Write the updated file
 
 ### 6. Auto-Resolve Highest Priority Issue
 
@@ -253,7 +337,10 @@ Use the /resolve-next-issue command to:
 3. Sort by priority (High > Medium > Low)
 4. Select the highest priority issue (oldest if tie)
 5. Analyze the issue and implement a fix
-6. Mark the issue as resolved with resolution notes
+6. **Mark resolved in BOTH sections:**
+   - Update Issue Index: status → Resolved, add resolved date
+   - Update Issue Details: **PRESERVE** Original Problem, **ADD** Resolution details
+   - Include: what was fixed, why, files changed, tests added
 
 ## CRITICAL: Cautious Fix Implementation
 
@@ -392,3 +479,100 @@ Good: API returns 500 on /users endpoint - GET /api/users fails with 500 when qu
 - Works with /tdd for test-driven bug fixes
 - Works with /code-review for reviewing fixes
 - Works with /security-scan for security-related issues
+
+## File Size Management
+
+### Automatic Size Check
+
+After each operation, check if KNOWN_ISSUES.md needs archiving:
+
+```
+If file size > 2000 lines OR > 50KB:
+  - Notify user: "KNOWN_ISSUES.md is getting large ([size]). Consider using /archive-issues to archive resolved issues."
+
+If file size > 5000 lines OR > 100KB:
+  - Strongly recommend: "KNOWN_ISSUES.md is too large. Archiving is recommended to maintain performance."
+```
+
+### Archiving Strategy
+
+Resolved issues should be archived to maintain file size:
+
+**Archive File**: `ISSUES_ARCHIVED.md` (same directory as KNOWN_ISSUES.md)
+
+**Archive Structure**:
+```markdown
+# Archived Issues
+
+_Archive Created: YYYY-MM-DD_
+
+---
+
+## 2024-01 Archived Issues
+
+### A001: [Issue Title] (RESOLVED 2024-01-15)
+[Full issue details preserved]
+
+### M003: [Issue Title] (RESOLVED 2024-01-18)
+[Full issue details preserved]
+
+---
+
+## 2024-02 Archived Issues
+...
+```
+
+### Retention Policy
+
+When archiving:
+1. **Keep in KNOWN_ISSUES.md**:
+   - All OPEN issues (never archive)
+   - Recently resolved issues (last 7 days)
+   - Issues resolved in current month (configurable)
+
+2. **Move to ISSUES_ARCHIVED.md**:
+   - Issues resolved more than [X] days ago
+   - Default: 30 days
+
+### Manual Archive Command
+
+Use `/archive-issues` to manually trigger archiving:
+- Archive all resolved issues older than [days]
+- Default: archive all resolved issues
+- Option to keep recent ones
+
+### After Archiving
+
+Update KNOWN_ISSUES.md:
+1. Remove archived issues from Issue Index table
+2. Remove archived issues from Issue Details section
+3. Update Summary counts
+4. Add note: "X issues archived to ISSUES_ARCHIVED.md on [date]"
+
+## Context Optimization
+
+### For Large Projects
+
+If the project has many issues, consider:
+
+1. **Use focused commands**: `/list-issues --open` instead of reading full file
+2. **Regular archiving**: Archive resolved issues weekly/monthly
+3. **Separate by component**: For very large projects, consider component-specific issue files
+
+### Future: Dedicated Agent (Optional)
+
+For projects with heavy issue tracking needs, a dedicated agent could:
+- Handle all KNOWN_ISSUES.md operations
+- Keep main conversation context clean
+- Manage archiving automatically
+
+Currently not required, but can be added if needed.
+
+## Commands Summary
+
+| Command | Purpose |
+|---------|---------|
+| `/add-issue` | Add a new issue with full details |
+| `/list-issues` | List issues with filtering |
+| `/resolve-next-issue` | Auto-fix highest priority issue |
+| `/archive-issues` | Archive resolved issues to reduce file size |
