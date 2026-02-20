@@ -327,6 +327,9 @@ When an issue is fixed:
    - Add Tests Added (if any)
 5. Update timestamp and summary
 6. Write the updated file
+7. **Check file size and auto-archive if needed:**
+   - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
+   - If file > 2000 lines or > 50KB: Notify user to consider archiving
 
 ### 6. Auto-Resolve Highest Priority Issue
 
@@ -341,6 +344,9 @@ Use the /resolve-next-issue command to:
    - Update Issue Index: status → Resolved, add resolved date
    - Update Issue Details: **PRESERVE** Original Problem, **ADD** Resolution details
    - Include: what was fixed, why, files changed, tests added
+7. **Check file size and auto-archive if needed:**
+   - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
+   - If file > 2000 lines or > 50KB: Notify user to consider archiving
 
 ## CRITICAL: Cautious Fix Implementation
 
@@ -482,17 +488,62 @@ Good: API returns 500 on /users endpoint - GET /api/users fails with 500 when qu
 
 ## File Size Management
 
-### Automatic Size Check
+### Automatic Size Check and Auto-Archive
 
-After each operation, check if KNOWN_ISSUES.md needs archiving:
+After each operation (add, resolve, etc.), check if KNOWN_ISSUES.md needs archiving:
+
+#### Size Thresholds
+
+| Threshold | Lines | Size | Action |
+|-----------|-------|------|--------|
+| Warning | > 2000 | > 50KB | Notify user, suggest archiving |
+| Critical | > 5000 | > 100KB | **Auto-archive** resolved issues older than 30 days |
+
+#### Auto-Archive Logic
+
+When file exceeds critical threshold (>5000 lines or >100KB):
 
 ```
-If file size > 2000 lines OR > 50KB:
-  - Notify user: "KNOWN_ISSUES.md is getting large ([size]). Consider using /archive-issues to archive resolved issues."
-
-If file size > 5000 lines OR > 100KB:
-  - Strongly recommend: "KNOWN_ISSUES.md is too large. Archiving is recommended to maintain performance."
+1. Calculate file size
+2. If exceeds critical threshold:
+   a. Parse all resolved issues
+   b. Identify issues resolved > 30 days ago
+   c. If found:
+      - Execute auto-archive (same as /archive-issues --days 30)
+      - Log: "Auto-archived X issues to ISSUES_ARCHIVED.md (file size: A → B)"
+   d. If no issues to archive (all recent):
+      - Notify user: "File is large but all resolved issues are recent. Consider manual review."
+3. If exceeds warning threshold only:
+   - Notify user: "KNOWN_ISSUES.md is getting large ([size]). Consider /archive-issues."
 ```
+
+#### Auto-Archive Execution
+
+When auto-archiving triggers:
+
+```
+1. Create/append to ISSUES_ARCHIVED.md:
+   - Group by month: ## YYYY-MM Archived Issues
+   - Preserve full issue details
+
+2. Update KNOWN_ISSUES.md:
+   - Remove archived issues from Issue Index
+   - Remove archived issues from Issue Details
+   - Add note: "Auto-archived X issues on YYYY-MM-DD"
+   - Update Summary
+
+3. Confirm to user:
+   "Auto-archived X resolved issues (>30 days old) to ISSUES_ARCHIVED.md
+    File size reduced: [before] → [after]
+    Remaining: Y open issues, Z recent resolved issues"
+```
+
+#### Important Notes
+
+- **Never auto-archive OPEN issues** - Only resolved issues
+- **Always keep recent resolutions** - Last 30 days by default
+- **Preserve all details** - No information loss
+- **Log the action** - User should know what happened
 
 ### Archiving Strategy
 
