@@ -28,6 +28,7 @@ CodingSkills/
 - 自动维护 `KNOWN_ISSUES.md` 文件
 - 统一的 Issue 格式（通过 `/add-issue` 命令添加）
 - High/Medium/Low 三级优先级
+- **版本自动追踪**：自动检测并记录 Introduced/Fixed 版本
 - 自动检测并解决最高优先级 issue
 - **Issue 详情保留**：完整记录原问题和解决方案
 - **文件大小管理**：自动检测文件大小，支持归档
@@ -48,10 +49,16 @@ CodingSkills/
 
 **KNOWN_ISSUES.md 文件结构：**
 ```
-## Issue Index        # 快速索引表
+## Issue Index        # 快速索引表（含版本信息）
 ## Issue Details      # 完整详情（包含原问题和解决方案）
 ## Summary            # 统计摘要
 ```
+
+**版本追踪：**
+- **Introduced**：Issue 添加时自动检测当前版本
+- **Fixed**：Issue 修复时自动检测当前版本
+- 支持从 package.json、VERSION、pyproject.toml、Cargo.toml、Git tag 自动检测
+- 无需用户手动填写版本信息
 
 **文件位置：**
 1. 自动扫描项目查找现有文件
@@ -119,6 +126,7 @@ KNOWN_ISSUES.md 会随着时间变大，影响 LLM 上下文效率：
 
 ## 开发计划
 
+- [x] 版本追踪功能（Introduced/Fixed 自动检测）
 - [ ] 添加更多实用 skills
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules

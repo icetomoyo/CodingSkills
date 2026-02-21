@@ -13,7 +13,8 @@ This command finds and resolves the highest priority open issue from the KNOWN_I
 3. **Sort by Priority** - Order by High > Medium > Low
 4. **Pick Highest** - Select the top priority issue (oldest if tie)
 5. **Analyze & Fix** - Investigate and implement a solution
-6. **Mark Resolved** - Update KNOWN_ISSUES.md with resolution
+6. **Detect Version** - Auto-detect current version for Fixed field
+7. **Mark Resolved** - Update KNOWN_ISSUES.md with resolution and Fixed version
 
 ## Priority Order
 
@@ -131,15 +132,30 @@ NEVER:
 5. Use /code-review after implementation
 ```
 
-### Step 7: Update KNOWN_ISSUES.md (BOTH sections)
+### Step 7: Detect Current Version
+```
+Search for version source files in order:
+1. package.json → version field
+2. VERSION file (single line)
+3. pyproject.toml → project.version
+4. Cargo.toml → package.version
+5. Git tag (git describe --tags --abbrev=0)
+6. Fallback: "unknown"
+
+Log detected version to user
+```
+
+### Step 8: Update KNOWN_ISSUES.md (BOTH sections)
 
 ```
 1. Update Issue Index table:
    - Change status to "Resolved"
+   - Add Fixed version
    - Add resolved date
 
 2. Update Issue Details section (CRITICAL):
    - Change status to "Resolved"
+   - Add **Fixed** version (auto-detected)
    - **PRESERVE** Original Problem (do NOT delete or summarize)
    - **ADD** Resolution section with:
      * Detailed explanation of the fix
@@ -161,6 +177,7 @@ Found 5 open issues in KNOWN_ISSUES.md
 
 Selected: 003 (High Priority)
 Title: Mobile login button unresponsive
+Introduced: v1.1.0
 Created: 2024-01-20
 Description: Touch event not firing on iOS Safari
 
@@ -199,15 +216,20 @@ Running tests: 12 tests passed ✓
 Integration check: Original issue addressed ✓
 Regression check: No new issues detected ✓
 
+=== VERSION DETECTION ===
+Detecting version... Found: v1.3.0 (from package.json)
+
 === UPDATING KNOWN_ISSUES.md ===
 
 Issue Index updated:
-| 003 | High | Resolved | Mobile login button unresponsive | 2024-01-20 | 2024-01-20 |
+| 003 | High | Resolved | Mobile login button unresponsive | v1.1.0 | v1.3.0 | 2024-01-20 | 2024-01-20 |
 
 Issue Details updated:
 ### 003: Mobile login button unresponsive (RESOLVED)
 - **Priority**: High
 - **Status**: Resolved
+- **Introduced**: v1.1.0
+- **Fixed**: v1.3.0
 - **Created**: 2024-01-20
 - **Original Problem**: (PRESERVED)
   - Touch event not firing on iOS Safari
@@ -224,6 +246,7 @@ Issue Details updated:
 - **Tests Added**: None (CSS-only change, manually verified on iOS Simulator)
 
 Issue 003 resolved successfully!
+Fixed in: v1.3.0
 ```
 
 ## Edge Cases

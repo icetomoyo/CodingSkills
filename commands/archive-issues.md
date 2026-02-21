@@ -93,6 +93,8 @@ Group archived issues by month/year:
 4. Add archive note:
    > X issues archived to ISSUES_ARCHIVED.md on YYYY-MM-DD
 5. Write updated file
+
+NOTE: Version fields (Introduced/Fixed) and Resolved date are preserved in archive.
 ```
 
 ### Step 7: Confirm
@@ -117,6 +119,8 @@ _Last Updated: YYYY-MM-DD_
 ### 001: Mobile login button unresponsive (RESOLVED 2024-01-15)
 - **Priority**: High
 - **Status**: Resolved
+- **Introduced**: v1.1.0
+- **Fixed**: v1.2.0
 - **Created**: 2024-01-10
 - **Original Problem**: Touch event not firing on iOS Safari...
 - **Resolution**: Added touch-action: manipulation...
@@ -124,6 +128,8 @@ _Last Updated: YYYY-MM-DD_
 - **Files Changed**: src/components/Button.styles.ts
 
 ### 003: Database timeout on large queries (RESOLVED 2024-01-20)
+- **Introduced**: v1.0.0
+- **Fixed**: v1.3.0
 ...
 
 ---
@@ -131,6 +137,8 @@ _Last Updated: YYYY-MM-DD_
 ## 2024-02 Archived Issues
 
 ### 005: Memory leak in websocket handler (RESOLVED 2024-02-05)
+- **Introduced**: v1.2.0
+- **Fixed**: v1.4.0
 ...
 
 ---

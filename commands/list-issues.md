@@ -58,31 +58,38 @@ Last Updated: 2024-01-20 15:30
 --- OPEN ISSUES (5) ---
 
 [HIGH] 001: API returns 500 on /users endpoint
+  Introduced: v1.2.0
   Created: 2024-01-15
   Description: GET /api/users fails with 500 when query param filter contains special characters
 
 [HIGH] 003: Payment gateway timeout
+  Introduced: v1.1.0
   Created: 2024-01-18
   Description: Payments fail after 30s timeout on slow connections
 
 [MEDIUM] 002: Search results slow on large datasets
+  Introduced: v1.0.0
   Created: 2024-01-16
   Description: Search takes 5+ seconds when filtering 100k+ records
 
 [MEDIUM] 004: Dashboard charts not rendering on Firefox
+  Introduced: v1.2.0
   Created: 2024-01-19
   Description: SVG charts show blank on Firefox 120+
 
 [LOW] 005: Button alignment off by 2px
+  Introduced: v1.2.1
   Created: 2024-01-20
   Description: Submit button slightly misaligned with input fields
 
 --- RESOLVED ISSUES (2) ---
 
 [MEDIUM] 006: Mobile login button unresponsive (RESOLVED 2024-01-20)
+  Introduced: v1.1.0 → Fixed: v1.3.0
   Resolution: Added touch-action CSS property
 
 [HIGH] 007: Database connection pool exhausted (RESOLVED 2024-01-17)
+  Introduced: v1.0.0 → Fixed: v1.2.0
   Resolution: Increased pool size and added connection timeout
 
 === SUMMARY ===

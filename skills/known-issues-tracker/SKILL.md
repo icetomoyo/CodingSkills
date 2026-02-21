@@ -54,10 +54,10 @@ _Last Updated: YYYY-MM-DD HH:MM_
 ## Issue Index
 <!-- Quick reference table for all issues -->
 
-| ID | Priority | Status | Title | Created | Resolved |
-|----|----------|--------|-------|---------|----------|
-| 001 | High | Open | [Issue title] | YYYY-MM-DD | - |
-| 002 | Medium | Resolved | [Issue title] | YYYY-MM-DD | YYYY-MM-DD |
+| ID | Priority | Status | Title | Introduced | Fixed | Created | Resolved |
+|----|----------|--------|-------|------------|-------|---------|----------|
+| 001 | High | Open | [Issue title] | v1.2.0 | - | YYYY-MM-DD | - |
+| 002 | Medium | Resolved | [Issue title] | v1.1.0 | v1.3.0 | YYYY-MM-DD | YYYY-MM-DD |
 
 ---
 
@@ -67,17 +67,18 @@ _Last Updated: YYYY-MM-DD HH:MM_
 ### 001: [Issue Title]
 - **Priority**: High
 - **Status**: Open
+- **Introduced**: v1.2.0 (auto-detected)
 - **Created**: YYYY-MM-DD
 - **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
 - **Context**: [Where/when this occurs, affected components]
 - **Root Cause**: [Analysis of why this happens - if known]
 - **Proposed Solution**: [Optional: how to fix it]
-- **Resolution**: [How it was fixed - ONLY for resolved issues]
-- **Resolved**: YYYY-MM-DD [ONLY for resolved issues]
 
 ### 002: [Issue Title] (RESOLVED)
 - **Priority**: Medium
 - **Status**: Resolved
+- **Introduced**: v1.1.0 (auto-detected)
+- **Fixed**: v1.3.0 (auto-detected)
 - **Created**: YYYY-MM-DD
 - **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
 - **Context**: [Where/when this occurs, affected components]
@@ -94,6 +95,63 @@ _Last Updated: YYYY-MM-DD HH:MM_
 - Highest Priority Open: [Issue ID] - [Title] (or "None")
 ```
 
+## Version Tracking
+
+This skill automatically tracks version information for all issues:
+
+### Version Fields
+
+| Field | When Set | Description |
+|-------|----------|-------------|
+| **Introduced** | When issue is added | The version where this bug first appeared |
+| **Fixed** | When issue is resolved | The version where this bug was fixed |
+
+### Automatic Version Detection
+
+Version is **automatically detected** from project configuration files. Users do NOT need to manually specify versions.
+
+#### Detection Priority (in order)
+
+1. **package.json** → `version` field
+   ```json
+   { "version": "1.2.0" }
+   ```
+
+2. **VERSION** file (single line, semver format)
+   ```
+   1.2.0
+   ```
+
+3. **pyproject.toml** → `project.version`
+   ```toml
+   [project]
+   version = "1.2.0"
+   ```
+
+4. **Cargo.toml** → `package.version`
+   ```toml
+   [package]
+   version = "1.2.0"
+   ```
+
+5. **Git tag** (nearest tag on current branch)
+   ```bash
+   git describe --tags --abbrev=0
+   ```
+
+6. **Fallback**: If no version can be detected, use `unknown`
+
+#### Detection Workflow
+
+```
+When adding/resolving an issue:
+1. Search for version source files (package.json, VERSION, etc.)
+2. Read and parse the version
+3. If found: Use detected version
+4. If not found: Use "unknown"
+5. Log the detection result to user
+```
+
 ## CRITICAL: Issue Details Maintenance
 
 **Every issue MUST have a corresponding entry in the "Issue Details" section.**
@@ -106,6 +164,7 @@ The issue detail MUST include:
 ### [ID]: [Issue Title]
 - **Priority**: High / Medium / Low
 - **Status**: Open
+- **Introduced**: [Auto-detected version, e.g., v1.2.0]
 - **Created**: YYYY-MM-DD
 - **Original Problem**: [REQUIRED - Detailed description of what's wrong]
   - What is the current (broken) behavior?
@@ -124,6 +183,8 @@ The issue detail MUST preserve the original problem AND add resolution info:
 ### [ID]: [Issue Title] (RESOLVED)
 - **Priority**: High / Medium / Low
 - **Status**: Resolved
+- **Introduced**: [Auto-detected version when issue was added]
+- **Fixed**: [Auto-detected version when issue was resolved]
 - **Created**: YYYY-MM-DD
 - **Original Problem**: [MUST be preserved - do NOT delete or summarize]
   - What was wrong?
@@ -216,8 +277,8 @@ _Last Updated: [Current DateTime]_
 ## Issue Index
 <!-- Quick reference table for all issues -->
 
-| ID | Priority | Status | Title | Created | Resolved |
-|----|----------|--------|-------|---------|----------|
+| ID | Priority | Status | Title | Introduced | Fixed | Created | Resolved |
+|----|----------|--------|-------|------------|-------|---------|----------|
 _No issues tracked yet_
 
 ---
@@ -251,21 +312,27 @@ When triggered by user conversation (automatic activation):
      - **Medium**: Default for most bugs
      - **Low**: "minor", "cosmetic", "nice to fix", "when you have time"
 
-3. **Add to KNOWN_ISSUES.md (BOTH sections required):**
+3. **Detect current version** (for Introduced field):
+   - Search for version source files
+   - Parse and extract version
+   - Use "unknown" if detection fails
+
+4. **Add to KNOWN_ISSUES.md (BOTH sections required):**
    - Read current file (create if not exists)
    - Generate next sequential ID (001, 002, etc.)
-   - Add entry to **Issue Index** table
+   - Add entry to **Issue Index** table (with Introduced version)
    - Add full details to **Issue Details** section with:
      - Generated title
-     - Priority, Status, Created
+     - Priority, Status, Introduced, Created
      - **Original Problem** (structured description)
      - Context, Root Cause (if known)
    - Update timestamp and summary
    - Write the file
 
-4. **Confirm with user:**
+5. **Confirm with user:**
    ```
    Added issue ###: [Title] (Priority)
+   Version: Introduced in [detected version]
    Use /add-issue for more control, or /resolve-next-issue to fix it.
    ```
 
@@ -283,20 +350,22 @@ When adding an issue (via /add-issue command, auto-triggered from conversation, 
    - Reproduction steps (if inferable)
 3. **Context**: Affected components, scenarios, environments
 4. **Priority**: Based on severity analysis (unless user specified)
+5. **Introduced version**: Auto-detected from project
 
 **Process**:
-1. Read the current KNOWN_ISSUES.md
-2. Generate the next available sequential ID (001, 002, etc.)
-3. **Add to Issue Index table** (quick reference)
-4. **Add full details to Issue Details section:**
+1. **Detect current version** for Introduced field
+2. Read the current KNOWN_ISSUES.md
+3. Generate the next available sequential ID (001, 002, etc.)
+4. **Add to Issue Index table** (quick reference with Introduced)
+5. **Add full details to Issue Details section:**
    - Generated title
-   - Priority, Status, Created
+   - Priority, Status, Introduced, Created
    - **Original Problem**: Structured description
    - Context: Where/when this occurs
    - Root Cause: Analysis (if known)
    - Proposed Solution (optional)
-5. Update timestamp and summary
-6. Write the updated file
+6. Update timestamp and summary
+7. Write the updated file
 
 ### 4. Mark Issue as Resolved
 
@@ -304,9 +373,14 @@ When an issue is fixed:
 
 1. Read the current KNOWN_ISSUES.md
 2. Find the issue by ID in BOTH sections
-3. **Update Issue Index:** Change status to "Resolved", add resolved date
-4. **Update Issue Details (CRITICAL):**
+3. **Detect current version** (for Fixed field):
+   - Search for version source files
+   - Parse and extract version
+   - Use "unknown" if detection fails
+4. **Update Issue Index:** Change status to "Resolved", add Fixed version, add Resolved date
+5. **Update Issue Details (CRITICAL):**
    - Change status to "Resolved"
+   - Add **Fixed** version (auto-detected)
    - **PRESERVE** Original Problem description (do NOT delete)
    - **ADD** Resolution section with:
      - Detailed explanation of the fix
@@ -315,9 +389,9 @@ When an issue is fixed:
    - Add Resolution Date
    - Add Files Changed list
    - Add Tests Added (if any)
-5. Update timestamp and summary
-6. Write the updated file
-7. **Check file size and auto-archive if needed:**
+6. Update timestamp and summary
+7. Write the updated file
+8. **Check file size and auto-archive if needed:**
    - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
    - If file > 2000 lines or > 50KB: Notify user to consider archiving
 
@@ -330,11 +404,12 @@ Use the /resolve-next-issue command to:
 3. Sort by priority (High > Medium > Low)
 4. Select the highest priority issue (oldest if tie)
 5. Analyze the issue and implement a fix
-6. **Mark resolved in BOTH sections:**
-   - Update Issue Index: status → Resolved, add resolved date
-   - Update Issue Details: **PRESERVE** Original Problem, **ADD** Resolution details
+6. **Detect current version** (for Fixed field)
+7. **Mark resolved in BOTH sections:**
+   - Update Issue Index: status → Resolved, add Fixed version, add Resolved date
+   - Update Issue Details: **PRESERVE** Original Problem, **ADD** Fixed version and Resolution details
    - Include: what was fixed, why, files changed, tests added
-7. **Check file size and auto-archive if needed:**
+8. **Check file size and auto-archive if needed:**
    - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
    - If file > 2000 lines or > 50KB: Notify user to consider archiving
 

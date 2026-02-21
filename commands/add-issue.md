@@ -47,6 +47,13 @@ When you provide a problem description, Claude will:
    - **High**: "critical", "blocking", "crash", "security", "data loss", "production down"
    - **Medium**: Default for most bugs
    - **Low**: "minor", "cosmetic", "nice to fix", "when you have time"
+5. **Auto-Detect Version** - Detect current version for "Introduced" field from:
+   - package.json → version
+   - VERSION file
+   - pyproject.toml → project.version
+   - Cargo.toml → package.version
+   - Git tag (nearest)
+   - Fallback: "unknown"
 
 ## Examples
 
@@ -128,15 +135,29 @@ If -p specified: Use user's priority
 Otherwise: Suggest based on severity analysis
 ```
 
-### Step 4: Add to KNOWN_ISSUES.md
+### Step 4: Auto-Detect Version
+```
+Search for version source files in order:
+1. package.json → version field
+2. VERSION file (single line)
+3. pyproject.toml → project.version
+4. Cargo.toml → package.version
+5. Git tag (git describe --tags --abbrev=0)
+6. Fallback: "unknown"
+
+Log detected version to user
+```
+
+### Step 5: Add to KNOWN_ISSUES.md
 ```
 1. Add to Issue Index table:
-| ### | [Priority] | Open | [Title] | YYYY-MM-DD | - |
+| ### | [Priority] | Open | [Title] | [Introduced] | - | YYYY-MM-DD | - |
 
 2. Add to Issue Details section:
 ### ###: [Title]
 - **Priority**: High / Medium / Low
 - **Status**: Open
+- **Introduced**: [Auto-detected version]
 - **Created**: YYYY-MM-DD
 - **Original Problem**:
   - Current behavior: [What's happening]
@@ -147,10 +168,10 @@ Otherwise: Suggest based on severity analysis
 - **Proposed Solution**: [Optional]
 ```
 
-### Step 5: Confirm
+### Step 6: Confirm
 ```
 "Added ###: [Title] ([Priority])
- Title generated from your description.
+ Introduced in: [detected version]
  Use /resolve-next-issue to work on this issue."
 ```
 
@@ -161,11 +182,13 @@ Otherwise: Suggest based on severity analysis
 User: /add-issue "搜索功能在数据量大的时候很慢，超过10万条记录的时候搜索要等5秒以上"
 
 Analyzing problem description...
+Detecting version... Found: v1.2.0 (from package.json)
 
 Generated Issue:
 ---
 Title: 搜索功能在大数据量下性能缓慢
 Priority: Medium (suggested)
+Introduced: v1.2.0
 Description:
   - Current: Search takes 5+ seconds on 100k+ records
   - Expected: Search should complete within 1 second
@@ -176,6 +199,7 @@ Context: Search feature, datasets > 100k records
 Add this issue? (Y/n/edit): Y
 
 Added 005: 搜索功能在大数据量下性能缓慢 (Medium)
+Introduced in: v1.2.0
 ```
 
 ### File Input
@@ -189,10 +213,13 @@ Content: "手机上登录有时候会失败，特别是密码里有特殊字符�
 大概影响5%左右的手机登录。iOS Safari 和 Android Chrome 都有这个问题。"
 ---
 
+Detecting version... Found: v1.2.0 (from package.json)
+
 Generated Issue:
 ---
 Title: 手机端密码含特殊字符时登录失败
 Priority: High (login functionality affected)
+Introduced: v1.2.0
 Description:
   - Current: Users with special characters in password get 'Invalid credentials' error
   - Expected: All valid passwords should work
@@ -203,6 +230,7 @@ Context: Mobile browsers (iOS Safari, Android Chrome), ~5% of mobile logins
 Add this issue? (Y/n/edit): Y
 
 Added 006: 手机端密码含特殊字符时登录失败 (High)
+Introduced in: v1.2.0
 ```
 
 ## Related Commands
