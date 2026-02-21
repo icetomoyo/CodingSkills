@@ -1,20 +1,37 @@
 ---
-description: Automatically find and resolve the highest priority issue from KNOWN_ISSUES.md
+description: Resolve an issue from KNOWN_ISSUES.md. Specify an issue ID to resolve that specific issue, or omit to automatically resolve the highest priority issue.
 ---
 
 # Resolve Next Issue Command
 
-This command finds and resolves the highest priority open issue from the KNOWN_ISSUES.md file.
+This command resolves an issue from the KNOWN_ISSUES.md file.
+
+## Usage
+
+```
+/resolve-next-issue [id]
+```
+
+## Parameters
+
+| Parameter | Description | Required |
+|-----------|-------------|----------|
+| id | Issue ID to resolve (e.g., 001) | No |
+
+## Behavior
+
+| Scenario | Action |
+|----------|--------|
+| **With ID** (e.g., `/resolve-next-issue 003`) | Resolve the specified issue |
+| **Without ID** (e.g., `/resolve-next-issue`) | Auto-select and resolve highest priority issue |
 
 ## What This Command Does
 
 1. **Read KNOWN_ISSUES.md** - Load the issues file
-2. **Find Open Issues** - Collect all issues with status "Open"
-3. **Sort by Priority** - Order by High > Medium > Low
-4. **Pick Highest** - Select the top priority issue (oldest if tie)
-5. **Analyze & Fix** - Investigate and implement a solution
-6. **Detect Version** - Auto-detect current version for Fixed field
-7. **Mark Resolved** - Update KNOWN_ISSUES.md with resolution and Fixed version
+2. **Select Issue** - Use specified ID or auto-select highest priority
+3. **Analyze & Fix** - Investigate and implement a solution
+4. **Detect Version** - Auto-detect current version for Fixed field
+5. **Mark Resolved** - Update KNOWN_ISSUES.md with resolution and Fixed version
 
 ## Priority Order
 
@@ -53,10 +70,22 @@ Extract from Issue Index and Issue Details sections:
 - ID, Priority, Status, Title, Description, Created
 ```
 
-### Step 4: Sort and Select
+### Step 4: Select Issue
+
+**If ID specified:**
 ```
-Sort by: Priority (desc) -> Created (asc) -> ID (asc)
-Select: First item in sorted list
+1. Find issue by ID in Issue Index and Issue Details
+2. Validate status is "Open"
+3. If not found: Report "Issue [id] not found"
+4. If already Resolved: Report "Issue [id] is already resolved"
+```
+
+**If no ID specified (auto-select):**
+```
+1. Find all issues with status "Open"
+2. Sort by: Priority (desc) -> Created (asc) -> ID (asc)
+3. Select: First item in sorted list
+4. If no open issues: Report "No open issues found"
 ```
 
 ### Step 5: Analyze Issue
@@ -172,8 +201,13 @@ Log detected version to user
 
 ## Example Output
 
+### Auto-Select (No ID)
+
 ```
+/resolve-next-issue
+
 Found 5 open issues in KNOWN_ISSUES.md
+Auto-selecting highest priority...
 
 Selected: 003 (High Priority)
 Title: Mobile login button unresponsive
@@ -249,9 +283,43 @@ Issue 003 resolved successfully!
 Fixed in: v1.3.0
 ```
 
+### Specify Issue ID
+
+```
+/resolve-next-issue 005
+
+Finding issue 005 in KNOWN_ISSUES.md...
+
+=== SELECTED ISSUE ===
+ID: 005
+Title: Database connection timeout
+Priority: Medium
+Status: Open
+Introduced: v1.2.0
+Created: 2024-02-15
+Description: Connection to database times out after 30 seconds of inactivity
+
+=== ANALYSIS ===
+... (continues with fix workflow)
+```
+
 ## Edge Cases
 
-### No Open Issues
+### Issue Not Found (When ID Specified)
+```
+If the specified ID doesn't exist:
+- Report "Issue [id] not found in KNOWN_ISSUES.md"
+- Suggest using /list-issues to see available issues
+```
+
+### Issue Already Resolved (When ID Specified)
+```
+If the specified issue is already resolved:
+- Report "Issue [id] is already resolved"
+- Show resolution date and fixed version
+```
+
+### No Open Issues (Auto-Select)
 ```
 If all issues are resolved:
 - Report "No open issues found"

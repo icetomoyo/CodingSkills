@@ -395,14 +395,31 @@ When an issue is fixed:
    - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
    - If file > 2000 lines or > 50KB: Notify user to consider archiving
 
-### 5. Auto-Resolve Highest Priority Issue
+### 5. Resolve Issue
 
-Use the /resolve-next-issue command to:
+Use the /resolve-next-issue command:
 
+```
+/resolve-next-issue [id]
+```
+
+- **With ID**: Resolve the specified issue
+- **Without ID**: Auto-select and resolve highest priority Open issue
+
+**Selection Logic:**
+
+**If ID specified:**
+1. Find issue by ID
+2. Validate status is "Open"
+3. If not found/resolved: Report appropriate error
+
+**If no ID specified (auto-select):**
 1. Read KNOWN_ISSUES.md
 2. Find all Open issues
 3. Sort by priority (High > Medium > Low)
 4. Select the highest priority issue (oldest if tie)
+
+**After selection:**
 5. Analyze the issue and implement a fix
 6. **Detect current version** (for Fixed field)
 7. **Mark resolved in BOTH sections:**
@@ -691,5 +708,5 @@ Currently not required, but can be added if needed.
 | `/add-issue "problem description"` | Add a new issue (Claude generates title, details, context) |
 | `/add-issue -f [file]` | Add issue from file content |
 | `/list-issues` | List issues with filtering |
-| `/resolve-next-issue` | Auto-fix highest priority issue |
+| `/resolve-next-issue [id]` | Resolve issue (omit ID for auto-select highest priority) |
 | `/archive-issues` | Archive resolved issues to reduce file size |
