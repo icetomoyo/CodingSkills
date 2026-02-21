@@ -1,5 +1,5 @@
 ---
-description: Mark a feature as completed with auto-detected release version. Updates status, sets completion date, and adds implementation notes.
+description: Mark a feature as completed with auto-detected release version. Updates status in FEATURE_LIST.md and design document, sets completion date, and adds implementation notes.
 ---
 
 # Complete Feature
@@ -25,9 +25,9 @@ Mark a feature as completed after implementation and testing are done.
 1. **Find Feature** - Locate feature by ID
 2. **Validate Status** - Must be InProgress
 3. **Detect Version** - Auto-detect current version for Released field
-4. **Update Status** - Change to Completed
-5. **Set Dates** - Record completion date
-6. **Add Notes** - Document implementation details
+4. **Update FEATURE_LIST.md** - Status, dates, notes
+5. **Update Design Document** - Change feature status to Completed
+6. **Check Version Completion** - Notify if all features in version are completed
 7. **Check Archive** - Notify if file size exceeds threshold
 
 ## Workflow
@@ -42,6 +42,7 @@ Mark a feature as completed after implementation and testing are done.
 ```
 1. Find feature by ID in both Index and Details sections
 2. If not found: "Feature [id] not found."
+3. Get feature's Planned version and Design link
 ```
 
 ### Step 3: Validate Status
@@ -61,33 +62,55 @@ Mark a feature as completed after implementation and testing are done.
    - Cargo.toml → package.version
    - Git tag
 2. If found: Use detected version for Released field
-3. If not found: Use "unknown"
+3. If not found: Use Planned version as Released version
 ```
 
-### Step 5: Update Feature Index
+### Step 5: Update FEATURE_LIST.md
 ```
-Change:
+Feature Index:
 - Status: InProgress → Completed
 - Released: - → [detected version]
 - Completed: - → [today's date]
-```
 
-### Step 6: Update Feature Details
-```
-Change:
+Feature Details:
 - Status: Completed
 - Released: [detected version]
 - Completed: [today's date]
+- Implementation Notes: [user notes or auto-generated summary]
 
-Add (if provided):
-- Implementation Notes: [user notes or summary]
+Version Summary:
+- Update progress for the version
+- If all features completed: status → Released
 ```
 
-### Step 7: Update Summary
+### Step 6: Update Design Document
 ```
-Update counts:
-- InProgress: -1
-- Completed: +1
+1. Parse Design link to get file path and anchor
+   e.g., docs/features/v1.1.0.md#001
+
+2. Read the design file
+
+3. Find the feature section (## FEATURE_001: ...)
+
+4. Update Status: InProgress → Completed
+
+5. Add completion info:
+   **Completed**: [date]
+   **Released**: [version]
+
+6. Write the updated file
+```
+
+### Step 7: Check Version Completion
+```
+1. Check Version Summary for the feature's version
+2. Count completed vs total features
+3. If all features are Completed:
+   "🎉 版本 {version} 所有 features 已完成！"
+   "建议执行以下操作："
+   "1. 更新 package.json 版本号为 {version}"
+   "2. 创建 git tag {version}"
+   "3. 推送代码和 tag"
 ```
 
 ### Step 8: Check File Size
@@ -106,37 +129,30 @@ User: /complete-feature 001
 
 Finding feature 001...
 Current status: InProgress
+Planned version: v1.1.0
 
-Detecting version... Found: v1.2.0 (from package.json)
+Detecting version... Found: v1.1.0 (from package.json)
 
 Updating FEATURE_LIST.md...
+Updating design document: docs/features/v1.1.0.md...
 
 === FEATURE COMPLETED ===
 
 ID: 001
 Title: 用户登录系统
 Status: InProgress → Completed
-Released: v1.2.0
+Released: v1.1.0
 Completed: 2024-02-21
 
-Feature Index updated:
-| 001 | New | Completed | Critical | 用户登录系统 | v1.2.0 | v1.2.0 | 2024-02-15 | 2024-02-18 | 2024-02-21 |
+Feature Index updated.
+Feature Details updated.
+Design document updated.
 
-Feature Details updated:
-### 001: 用户登录系统 (COMPLETED)
-- **Category**: New
-- **Status**: Completed
-- **Priority**: Critical
-- **Planned**: v1.2.0
-- **Released**: v1.2.0
-- **Created**: 2024-02-15
-- **Started**: 2024-02-18
-- **Completed**: 2024-02-21
-
+Version v1.1.0 progress: 1/3 (33%)
 =========================
 
 Feature 001 marked as completed!
-Released in: v1.2.0
+Released in: v1.1.0
 ```
 
 ### With Implementation Notes
@@ -145,26 +161,46 @@ User: /complete-feature 001 -n "使用 JWT 认证，支持 Google 和 GitHub OAu
 
 Finding feature 001...
 Current status: InProgress
+Planned version: v1.1.0
 
-Detecting version... Found: v1.2.0 (from package.json)
+Detecting version... Found: v1.1.0 (from package.json)
 
 Updating FEATURE_LIST.md...
+Updating design document: docs/features/v1.1.0.md...
 
 === FEATURE COMPLETED ===
 
 ID: 001
 Title: 用户登录系统
 Status: InProgress → Completed
-Released: v1.2.0
+Released: v1.1.0
 Completed: 2024-02-21
 
 Implementation Notes Added:
 使用 JWT 认证，支持 Google 和 GitHub OAuth。测试覆盖率 91%。
 
+Version v1.1.0 progress: 1/3 (33%)
 =========================
 
 Feature 001 marked as completed!
-Released in: v1.2.0
+Released in: v1.1.0
+```
+
+### Version Complete Notification
+```
+User: /complete-feature 003
+
+... (normal completion output) ...
+
+🎉 版本 v1.1.0 所有 features 已完成！
+
+建议执行以下操作：
+1. 更新 package.json 版本号为 v1.1.0
+2. 创建 git tag v1.1.0
+3. 推送代码和 tag
+
+Version Summary:
+| v1.1.0 | Released | 3 | 3/3 (100%) |
 ```
 
 ### Error Cases
@@ -219,8 +255,9 @@ User: /complete-feature 004
 - **Category**: New
 - **Status**: Completed
 - **Priority**: Critical
-- **Planned**: v1.2.0
-- **Released**: v1.2.0
+- **Planned**: v1.1.0
+- **Released**: v1.1.0
+- **Design**: [v1.1.0.md#001](features/v1.1.0.md#001)
 - **Created**: 2024-02-15
 - **Started**: 2024-02-18
 - **Completed**: 2024-02-21
@@ -238,11 +275,32 @@ User: /complete-feature 004
 - 人工测试指导: docs/test-guides/FEATURE_001_TEST_GUIDE.md
 ```
 
+## Design Document After Completion
+
+```markdown
+## FEATURE_001: 用户登录系统
+
+**Status**: Completed
+**Priority**: Critical
+**Category**: New
+**Completed**: 2024-02-21
+**Released**: v1.1.0
+
+### 1. 需求概述
+...
+
+### 6. 验收标准
+- [x] 用户可以用邮箱密码注册
+- [x] 用户可以用邮箱密码登录
+- [x] 用户可以用 OAuth 登录
+- [x] 登录态可以持久化
+```
+
 ## Related Commands
 
 - `/add-feature` - Add a new feature
 - `/list-features` - View all features
-- `/start-next-feature` - Begin implementing highest priority feature
+- `/start-next-feature` - Begin implementing a feature
 - `/archive-features` - Archive completed features
 
 ## Related Skills

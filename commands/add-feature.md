@@ -1,10 +1,10 @@
 ---
-description: Add a new feature to FEATURE_LIST.md. Provide a feature description (text or file), and Claude will automatically generate title, detailed description, suggest priority and version.
+description: Add a new feature to FEATURE_LIST.md. Provide a feature description (text or file), and Claude will automatically generate title, detailed description, suggest priority, and handle version assignment.
 ---
 
 # Add Feature
 
-Add a new feature to the FEATURE_LIST.md file.
+Add a new feature to the FEATURE_LIST.md file and create design document entry.
 
 ## Usage
 
@@ -12,6 +12,7 @@ Add a new feature to the FEATURE_LIST.md file.
 /add-feature "feature description"
 /add-feature "feature description" -c [category] -p [priority] -v [version]
 /add-feature -f [filepath]
+/add-feature -f [filepath] -v [version]
 ```
 
 ## Parameters
@@ -22,7 +23,7 @@ Add a new feature to the FEATURE_LIST.md file.
 | -f, --file | Path to file containing feature description | No |
 | -c, --category | Category: New, Enhancement, Refactor, Internal | No (auto-suggested) |
 | -p, --priority | Priority: Critical, High, Medium, Low | No (auto-suggested) |
-| -v, --version | Target release version | No (auto-detected) |
+| -v, --version | Target release version | No (see version logic below) |
 
 ## What Claude Does Automatically
 
@@ -43,13 +44,44 @@ When you provide a feature description, Claude will:
    - **High**: Major user-facing feature
    - **Medium**: Valuable improvement
    - **Low**: Nice-to-have
-5. **Auto-Detect Version** - Detect current version for Planned field from:
-   - package.json → version
-   - VERSION file
-   - pyproject.toml → project.version
-   - Cargo.toml → package.version
-   - Git tag (nearest)
-   - Fallback: "unknown"
+5. **Handle Version Assignment** - See version logic below
+
+## Version Assignment Logic
+
+### Scenario A: User specifies version with -v
+```
+/add-feature "搜索功能" -v v1.2.0
+→ Use v1.2.0 directly, no questions asked
+```
+
+### Scenario B: Planned version exists
+```
+/add-feature "搜索功能"
+
+Check FEATURE_LIST.md Version Summary:
+- Found Planned version: v1.1.0 (status: Planned)
+
+→ "检测到规划版本: v1.1.0"
+→ "新 feature 将加入 v1.1.0"
+→ "（使用 -v 可指定其他版本）"
+→ Proceed with v1.1.0
+```
+
+### Scenario C: No Planned version
+```
+/add-feature "搜索功能"
+
+Check FEATURE_LIST.md Version Summary:
+- No Planned versions found
+- Current Release: v1.0.0 (from package.json/git tag)
+
+→ "当前发布版本: v1.0.0"
+→ "建议下一版本: v1.1.0（新 feature，建议 minor 升级）"
+→ "请确认版本号 [输入版本号或回车使用 v1.1.0]:"
+
+User input: v1.2.0 (or Enter for v1.1.0)
+→ Use confirmed version
+```
 
 ## Workflow
 
@@ -63,29 +95,39 @@ When you provide a feature description, Claude will:
    2. .claude/FEATURE_LIST.md (private)"
 ```
 
-### Step 2: Process Input
+### Step 2: Determine Version
+```
+1. If -v specified: Use that version
+2. Else check Version Summary in FEATURE_LIST.md
+3. If Planned version exists: Use it (notify user)
+4. If no Planned version:
+   - Detect current release version (package.json/git tag)
+   - Suggest next version based on semantic versioning
+   - Ask user to confirm
+```
+
+### Step 3: Process Input
 ```
 If text: Parse feature description
 If file (-f): Read and parse file content
 ```
 
-### Step 3: Analyze and Generate
+### Step 4: Analyze and Generate
 ```
 1. Generate Title from description
 2. Structure Description with details
 3. Suggest Category based on feature type
 4. Suggest Priority based on importance keywords
-5. Detect version for Planned field
 ```
 
-### Step 4: Confirm with User
+### Step 5: Confirm with User
 ```
 Display generated feature:
 ---
 Title: [Generated Title]
 Category: [Suggested Category]
 Priority: [Suggested Priority]
-Planned: [Detected Version]
+Planned: [Determined Version]
 
 Description:
 [Structured description]
@@ -94,83 +136,127 @@ Description:
 Add this feature? (Y/n/edit):
 ```
 
-### Step 5: Add to FEATURE_LIST.md
+### Step 6: Add to FEATURE_LIST.md
 ```
 1. Read current file
 2. Generate next sequential ID (001, 002, etc.)
-3. Add to Feature Index table:
-| ### | [Category] | Planned | [Priority] | [Title] | [Version] | - | YYYY-MM-DD | - | - |
+3. Create Design link: docs/features/v{VERSION}.md#{ID}
+4. Add to Feature Index table:
+| ID | Category | Status | Priority | Title | Planned | Released | Design | Created | Started | Completed |
 
-4. Add to Feature Details section:
-### ###: [Title]
+5. Add to Feature Details section:
+### ID: [Title]
 - **Category**: [Category]
 - **Status**: Planned
 - **Priority**: [Priority]
 - **Planned**: [Version]
+- **Design**: [Link]
 - **Created**: YYYY-MM-DD
 
 **Description**:
 [Structured description]
 
-5. Update Summary section
-6. Write file
+6. Update Version Summary (add version if new)
+7. Update Version Info if this is first Planned version
+8. Write file
 ```
 
-### Step 6: Confirm
+### Step 7: Create/Update Design Document
 ```
-"Added ###: [Title] ([Category], [Priority])
- Planned for: [version]
- Use /start-next-feature to begin implementation."
+1. Check if docs/features/ directory exists
+   - If not, create it
+
+2. Determine design file:
+   - If version specified: docs/features/v{VERSION}.md
+   - If no version: docs/features/unplanned.md
+
+3. If file doesn't exist, create with header:
+   # v{VERSION} Feature Designs
+   **版本**: {VERSION}
+   **状态**: Planned
+   **Feature 数量**: 0
+
+4. Append feature section:
+   ## FEATURE_{ID}: {Title}
+
+   **Status**: Planned
+   **Priority**: {Priority}
+   **Category**: {Category}
+
+   ### 1. 需求概述
+   {Description}
+
+   ### 2. 影响范围
+   _待 /start-next-feature Phase 2 填充_
+
+   ### 3. 技术方案
+   _待 /start-next-feature Phase 2 填充_
+
+   ### 4. 接口契约
+   _待 /start-next-feature Phase 2 填充_
+
+   ### 5. 实现步骤
+   _待 /start-next-feature Phase 2 填充_
+
+   ### 6. 验收标准
+   _待 /start-next-feature Phase 2 填充_
+
+5. Update feature count in header
+```
+
+### Step 8: Confirm
+```
+"Added {ID}: {Title} ({Category}, {Priority})"
+"Planned for: {version}"
+"Design: docs/features/v{version}.md#{ID}"
+"Use /start-next-feature to begin implementation."
 ```
 
 ## Output Example
 
-### Text Input
+### Scenario: Planned Version Exists
 ```
-User: /add-feature "需要添加用户登录功能，支持邮箱密码登录和OAuth第三方登录（Google、GitHub）"
+User: /add-feature "需要添加用户登录功能，支持邮箱密码登录和OAuth第三方登录"
 
 Analyzing feature description...
-Detecting version... Found: v1.2.0 (from package.json)
+Checking version planning...
+检测到规划版本: v1.1.0
+新 feature 将加入 v1.1.0
+（使用 -v 可指定其他版本）
 
 Generated Feature:
 ---
 Title: 用户登录系统
 Category: New (suggested)
 Priority: High (suggested - core functionality)
-Planned: v1.2.0
+Planned: v1.1.0
 
 Description:
 实现完整的用户登录系统，包括：
 - 邮箱密码注册/登录
-- 密码安全加密存储（bcrypt）
-- OAuth2 第三方登录集成
-  - Google 登录
-  - GitHub 登录
+- OAuth2 第三方登录（Google、GitHub）
 - 登录态管理（JWT Token）
-- 记住登录状态功能
 ---
 
 Add this feature? (Y/n/edit): Y
 
 Added 001: 用户登录系统 (New, High)
-Planned for: v1.2.0
+Planned for: v1.1.0
+Design: docs/features/v1.1.0.md#001
 Use /start-next-feature to begin implementation.
 ```
 
-### File Input
+### Scenario: No Planned Version
 ```
-User: /add-feature -f ./docs/payment-feature-spec.md
+User: /add-feature "支付功能，支持支付宝和微信支付"
 
-Reading file: ./docs/payment-feature-spec.md
----
-Content: "支付功能需求：
-1. 支持支付宝和微信支付
-2. 订单创建后30分钟未支付自动取消
-3. 支付成功后发送通知
-4. 支持退款功能"
----
+Analyzing feature description...
+Checking version planning...
+No Planned versions found.
 
-Detecting version... Found: v1.2.0 (from package.json)
+当前发布版本: v1.0.0 (from package.json)
+建议下一版本: v1.1.0（新 feature，建议 minor 升级）
+请确认版本号 [输入版本号或回车使用 v1.1.0]: v1.2.0
 
 Generated Feature:
 ---
@@ -180,61 +266,57 @@ Priority: Critical (suggested - core business feature)
 Planned: v1.2.0
 
 Description:
-集成第三方支付系统，支持多种支付方式：
-- 支付渠道
-  - 支付宝支付
-  - 微信支付
-- 订单管理
-  - 订单创建
-  - 30分钟未支付自动取消
-- 通知机制
-  - 支付成功通知
+集成第三方支付系统：
+- 支付渠道：支付宝、微信支付
+- 订单管理与自动取消
+- 支付通知
 - 退款功能
-  - 全额退款
-  - 部分退款
 ---
 
 Add this feature? (Y/n/edit): Y
 
-Added 002: 支付系统集成 (New, Critical)
+Added 001: 支付系统集成 (New, Critical)
 Planned for: v1.2.0
+Design: docs/features/v1.2.0.md#001
+Use /start-next-feature to begin implementation.
 ```
 
-### With Override Options
+### Scenario: User Specifies Version
 ```
-User: /add-feature "暗黑模式支持" -c Enhancement -p Medium -v v1.3.0
+User: /add-feature "暗黑模式支持" -v v1.3.0
 
-Detecting version... Found: v1.2.0 (from package.json)
-User override: v1.3.0
+Analyzing feature description...
+User specified version: v1.3.0
 
 Generated Feature:
 ---
 Title: 暗黑模式支持
-Category: Enhancement (user specified)
-Priority: Medium (user specified)
-Planned: v1.3.0 (user specified)
+Category: Enhancement (suggested)
+Priority: Medium (suggested)
+Planned: v1.3.0
 
 Description:
 为应用添加暗黑模式主题支持：
 - 跟随系统主题设置
 - 手动切换开关
-- 持久化用户偏好设置
-- 所有 UI 组件适配暗黑主题
+- 持久化用户偏好
 ---
 
 Add this feature? (Y/n/edit): Y
 
-Added 003: 暗黑模式支持 (Enhancement, Medium)
+Added 002: 暗黑模式支持 (Enhancement, Medium)
 Planned for: v1.3.0
+Design: docs/features/v1.3.0.md#002
 ```
 
 ## Related Commands
 
 - `/list-features` - View all features
-- `/start-next-feature` - Begin implementing highest priority feature
+- `/start-next-feature [id]` - Begin implementing a feature
 - `/complete-feature [id]` - Mark feature as completed
 - `/archive-features` - Archive completed features
 
 ## Related Skills
 
+- [feature-list-tracker](../skills/feature-list-tracker/SKILL.md) - Feature tracking skill
 - [known-issues-tracker](../skills/known-issues-tracker/SKILL.md) - For tracking bugs and issues

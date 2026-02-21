@@ -8,20 +8,33 @@ Claude Code 自定义 Skills、Commands、Agents 和 Rules 仓库。
 CodingSkills/
 ├── skills/              # 自定义技能
 │   ├── known-issues-tracker/  # Issue 追踪管理
-│   └── feature-list-tracker/  # Feature 功能管理
+│   ├── feature-list-tracker/  # Feature 功能管理
+│   └── human-test-guide/      # 人工测试指导生成
 ├── commands/            # 自定义命令
 │   ├── add-issue.md          # 添加 issue
 │   ├── list-issues.md        # 列出 issues
-│   ├── resolve-next-issue.md # 自动修复最高优先级 issue
+│   ├── resolve-next-issue.md # 修复 issue
 │   ├── archive-issues.md     # 归档已解决的 issues
 │   ├── add-feature.md        # 添加 feature
 │   ├── list-features.md      # 列出 features
-│   ├── start-next-feature.md # 自动开发下一个 feature
+│   ├── start-next-feature.md # 自动开发 feature
 │   ├── complete-feature.md   # 完成 feature
 │   └── archive-features.md   # 归档已完成的 features
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
+
+# 使用 skill 后生成的文件结构：
+docs/
+├── FEATURE_LIST.md        # Feature 索引和状态
+├── features/              # Feature 设计文档
+│   ├── v1.0.0.md         # v1.0.0 版本设计
+│   ├── v1.1.0.md         # v1.1.0 版本设计
+│   └── unplanned.md      # 未确定版本的设计草案
+├── test-guides/          # 测试指导文档
+│   └── FEATURE_001_TEST_GUIDE.md
+├── KNOWN_ISSUES.md       # Issue 索引
+└── ISSUES_ARCHIVED.md    # 归档的 issues
 ```
 
 ## 已有 Skills
@@ -75,11 +88,18 @@ CodingSkills/
 项目功能的追踪、规划和自动化开发技能。
 
 **功能：**
-- 自动维护 `FEATURE_LIST.md` 文件
+- 自动维护 `FEATURE_LIST.md` 文件和 `docs/features/` 设计文档
 - 统一的 Feature 格式（通过 `/add-feature` 命令添加）
 - Critical/High/Medium/Low 四级优先级
 - Planned/InProgress/Completed 三状态生命周期
-- **版本自动追踪**：自动检测并记录 Planned/Released 版本
+- **版本规划与管理**：
+  - 智能版本分配（有 Planned 版本时自动加入，无则提示用户确认）
+  - 版本状态追踪（Planned/InDevelopment/Released）
+  - 跨版本实现提醒（自动询问是否移动 feature）
+- **设计文档管理**：
+  - `docs/features/v{VERSION}.md` 按版本组织设计文档
+  - 包含：需求概述、影响范围、技术方案、接口契约、实现步骤、验收标准
+  - `/start-next-feature` 时自动填充详细设计
 - **自动化开发流程**：Plan → TDD → 测试 → 生成测试指导
 - **人工测试指导**：自动生成包含测试用例和预期效果的测试文档
 - **文件大小管理**：自动检测文件大小，支持归档
@@ -93,26 +113,55 @@ CodingSkills/
 
 | 命令 | 说明 |
 |------|------|
-| `/add-feature "功能描述"` | 添加新 feature（LLM 细化描述，建议优先级/版本） |
+| `/add-feature "功能描述"` | 添加新 feature（智能版本分配） |
+| `/add-feature -v [version]` | 添加 feature 并指定版本 |
 | `/add-feature -f [filepath]` | 从文件读取功能需求 |
 | `/list-features [--planned/--in-progress/--completed]` | 查看 features |
-| `/start-next-feature [id]` | **自动化开发流程**：Plan → TDD → 测试 → 生成测试指导（指定 ID 或自动选择） |
-| `/complete-feature [id]` | 完成 feature（自动检测版本） |
+| `/start-next-feature [id]` | **自动化开发流程**（可跨版本，会提示确认） |
+| `/complete-feature [id]` | 完成 feature（更新设计和状态） |
 | `/archive-features [--days N]` | 归档已完成的 features |
 
 **FEATURE_LIST.md 文件结构：**
 ```
-## Feature Index    # 快速索引表（含版本、状态、优先级）
-## Feature Details  # 完整详情（包含描述和实现笔记）
-## Summary          # 统计摘要
+## Version Info       # 版本信息（Current Release, Planned Version）
+## Version Summary    # 版本概览（状态、进度）
+## Feature Index      # 快速索引表（含 Design 链接）
+## Feature Details    # 完整详情
+## Summary            # 统计摘要
 ```
 
+**docs/features/ 设计文档结构：**
+```
+docs/features/
+├── v1.1.0.md         # v1.1.0 版本所有 feature 设计
+├── v1.2.0.md         # v1.2.0 版本所有 feature 设计
+└── unplanned.md      # 未确定版本的设计草案
+```
+
+**每个 Feature 设计包含：**
+1. 需求概述
+2. 影响范围（需创建/修改的文件）
+3. 技术方案（依赖、架构模式）
+4. 接口契约（API、数据模型）
+5. 实现步骤
+6. 验收标准
+
+**/add-feature 版本分配逻辑：**
+- 用户指定 `-v`：直接使用
+- 有 Planned 版本：自动加入，提示可指定其他
+- 无 Planned 版本：显示当前版本，建议下一版本，用户确认
+
 **/start-next-feature 自动化流程：**
-1. **Phase 1**: 选择最高优先级的 Planned feature
-2. **Phase 2**: 自动进入 Plan 模式，生成实现计划
+1. **Phase 1**: 选择 feature（检查版本兼容性，必要时提示移动）
+2. **Phase 2**: Plan 并更新设计文档（填充详细设计）
 3. **Phase 3**: TDD 开发（RED → GREEN → REFACTOR）
 4. **Phase 4**: 运行自动化测试，确保 100% 通过
-5. **Phase 5**: 生成人工测试指导文档（`docs/test-guides/FEATURE_XXX_TEST_GUIDE.md`）
+5. **Phase 5**: 生成人工测试指导文档
+
+**/complete-feature 功能：**
+- 更新 FEATURE_LIST.md 状态
+- 更新设计文档状态
+- 检查版本完成度（全部完成时提醒发布）
 
 **文件位置：**
 1. 自动扫描项目查找现有文件
@@ -168,10 +217,12 @@ CodingSkills/
 
 | 命令 | 说明 |
 |------|------|
-| `/add-feature` | 添加新 feature（LLM 细化描述和建议） |
-| `/list-features` | 列出所有 features，支持状态/优先级过滤 |
-| `/start-next-feature [id]` | 自动化开发：Plan → TDD → 测试 → 生成测试指导（指定 ID 或自动选择） |
-| `/complete-feature` | 完成 feature，记录版本和实现笔记 |
+| `/add-feature "描述"` | 添加新 feature（智能版本分配） |
+| `/add-feature -v [version]` | 添加 feature 并指定版本 |
+| `/add-feature -f [file]` | 从文件添加 feature |
+| `/list-features` | 列出所有 features，支持状态/优先级/版本过滤 |
+| `/start-next-feature [id]` | 自动化开发：Plan → 设计 → TDD → 测试 → 测试指导 |
+| `/complete-feature [id]` | 完成 feature，更新设计和版本状态 |
 | `/archive-features` | 归档已完成的 features 到 FEATURES_ARCHIVED.md |
 
 ## 安装使用
