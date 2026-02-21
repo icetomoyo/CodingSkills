@@ -262,9 +262,26 @@ Test the feature across different platforms and browsers.
 ```
 
 ### Output Location
+
+**文件路径**:
 - Feature 测试指导: `docs/test-guides/FEATURE_XXX_TEST_GUIDE.md`
 - Bug 回归测试指导: `docs/test-guides/BUG_XXX_REGRESSION_GUIDE.md`
 - 通用测试指导: `docs/test-guides/[NAME]_TEST_GUIDE.md`
+
+**目录创建逻辑**:
+```
+1. 检查 docs/test-guides/ 目录是否存在
+2. 如果不存在：
+   - 先检查 docs/ 目录是否存在
+   - 如果 docs/ 不存在，创建 docs/ 目录
+   - 创建 docs/test-guides/ 目录
+3. 在 docs/test-guides/ 目录下创建测试指导文件
+```
+
+**文件命名规则**:
+- Feature: `FEATURE_{ID}_TEST_GUIDE.md`（如 `FEATURE_001_TEST_GUIDE.md`）
+- Bug: `BUG_{ID}_REGRESSION_GUIDE.md`（如 `BUG_003_REGRESSION_GUIDE.md`）
+- 通用: `{NAME}_TEST_GUIDE.md`（如 `LOGIN_TEST_GUIDE.md`）
 
 ## Best Practices
 
