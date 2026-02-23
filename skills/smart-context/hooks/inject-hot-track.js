@@ -71,10 +71,14 @@ async function main() {
   try {
     const content = fs.readFileSync(hotTrackPath, 'utf8');
 
-    // 输出到 stdout - 这会被自动注入到压缩后的会话
-    console.log(content);
+    // 日志输出（用户可见）
+    console.error('[Smart Context] 压缩后恢复上下文，注入热轨快照...');
 
-    // 可选：记录日志
+    // 输出到 stdout - 这会被自动注入到压缩后的会话
+    // 添加前缀标题让 Claude 知道这是什么
+    console.log(`热轨快照（上下文恢复）:\n${content}`);
+
+    // 记录日志
     const logPath = path.join(cwd, CONTEXT_DIR, 'COMPACT_LOG.md');
     logInjection(logPath, data.session_id);
 
