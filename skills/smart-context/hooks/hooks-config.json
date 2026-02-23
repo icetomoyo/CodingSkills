@@ -2,7 +2,7 @@
   "hooks": {
     "PreCompact": [
       {
-        "matcher": "manual",
+        "matcher": "*",
         "description": "压缩前执行三步清洗法，生成热轨快照和冷轨归档",
         "hooks": [
           {
