@@ -1,11 +1,11 @@
 ---
 name: smart-context
-description: 智能上下文管理，通过双轨记忆（热轨/冷轨）和三步清洗法解决注意力稀释问题。压缩时自动生成高信噪比快照并注入到压缩后的会话。自动激活于压缩相关场景。
+description: 智能上下文管理，通过双轨记忆（热轨/冷轨）和三步清洗法解决注意力稀释问题。手动生成高信噪比快照，压缩后自动注入到新会话。自动激活于压缩相关场景。
 ---
 
 # Smart Context - 智能上下文管理
 
-通过 Claude Code 的 Hooks 机制实现完全自动化的上下文管理，解决长对话中的注意力稀释问题。
+通过双轨记忆和三步清洗法解决长对话中的注意力稀释问题。
 
 ## 核心理念
 
@@ -24,19 +24,20 @@ This skill should be automatically activated when:
 **Keywords:**
 - compact, 压缩, 上下文, context
 - 快照, snapshot, checkpoint
-- 墓碑, tombstone, 死胡同
+- 墓碑, tombstone, 死胡同, 避坑
 - 注意力稀释, context window
 - 热轨, 冷轨, hot track, cold track
+- 之前试过, 历史方案, 为什么不行, 失败原因
 
 **Example User Messages:**
-- "上下文太长了"
-- "执行压缩"
-- "/compact"
-- "生成一个快照"
-- "之前试过什么方案？"
+- "上下文太长了" / "执行压缩" / "/compact"
+- "生成一个快照" / "/context-snapshot"
+- "之前试过什么方案？" / "我们尝试过什么？"
+- "那个方案为什么不行？" / "XX方案失败的原因是？"
+- "查一下冷轨" / "/query-cold"
 
 **When NOT to Activate:**
-- 用户只是问问题，不涉及上下文管理
+- 用户只是问问题，不涉及上下文管理或历史查询
 - 用户在讨论其他不相关的话题
 
 ## 双轨制记忆
@@ -65,8 +66,8 @@ This skill should be automatically activated when:
 # 项目目录（每个项目独立，运行时自动创建）
 your-project/.claude/
 └── context/                   # 首次压缩时自动创建
-    ├── HOT_TRACK.md           # 热轨快照（自动生成）
-    ├── COLD_TRACK.md          # 冷轨归档（自动生成）
+    ├── HOT_TRACK.md           # 热轨快照（手动生成）
+    ├── COLD_TRACK.md          # 冷轨归档（手动生成）
     └── COMPACT_LOG.md         # 压缩日志（自动生成，可选）
 ```
 
@@ -74,21 +75,23 @@ your-project/.claude/
 
 ## 工作流程
 
-### 完整自动化流程
+### 推荐流程
 
 ```
-用户执行 /compact
+用户执行 /context-snapshot（手动生成快照）
        │
        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 1. PreCompact Hook 触发（Agent Hook）                       │
-│                                                             │
-│    子 Agent "smart-context-snapshot" 执行：                 │
-│    • 读取 transcript（对话历史）                             │
-│    • 执行三步清洗法                                          │
+│ 1. 三步清洗法执行                                           │
+│    • 读取对话历史                                           │
+│    • 无损提取接口骨架                                       │
+│    • 有损修剪生成墓碑                                       │
 │    • 生成热轨快照 → HOT_TRACK.md                            │
 │    • 追加冷轨归档 → COLD_TRACK.md                           │
 └─────────────────────────────────────────────────────────────┘
+       │
+       ▼
+用户执行 /compact
        │
        ▼
    压缩执行（Claude Code 内置）
@@ -106,6 +109,8 @@ your-project/.claude/
        ▼
    压缩完成，热轨快照已自动注入
 ```
+
+> **注意**：由于 PreCompact Agent Hook 在非 REPL 环境下不支持，快照生成改为手动触发。
 
 ## 三步清洗法
 
@@ -301,18 +306,6 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 ```json
 {
   "hooks": {
-    "PreCompact": [
-      {
-        "matcher": "manual",
-        "hooks": [
-          {
-            "type": "agent",
-            "name": "smart-context-snapshot",
-            "prompt": "详见 hooks/hooks-config.json"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": "compact",
@@ -328,18 +321,19 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 }
 ```
 
-> **注意**：完整的 PreCompact prompt 较长，请直接复制 `hooks/hooks-config.json` 中的内容。
-
 ### 2. 执行压缩
 
 ```
-用户: /compact
+# 先生成快照
+/context-snapshot
+
+# 再执行压缩
+/compact
 
 自动执行:
-1. PreCompact Hook → 子 Agent 生成快照
-2. 压缩执行
-3. SessionStart Hook → 脚本注入快照
-4. 完成，上下文已恢复
+1. 压缩执行
+2. SessionStart Hook → 脚本注入快照
+3. 完成，上下文已恢复
 ```
 
 ### 3. 查询冷轨
@@ -357,7 +351,7 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 如果需要在压缩前预览快照：
 
 ```
-/smart-context
+/context-snapshot
 
 执行:
 1. 分析当前上下文
@@ -367,27 +361,6 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 ```
 
 ## Hooks 详细说明
-
-### PreCompact Hook（Agent Hook）
-
-**触发条件**：用户执行 `/compact` 时
-
-**输入参数**：
-```json
-{
-  "session_id": "abc123",
-  "transcript_path": "/path/to/transcript.jsonl",
-  "cwd": "/current/working/directory",
-  "hook_event_name": "PreCompact",
-  "trigger": "manual",
-  "custom_instructions": ""
-}
-```
-
-**Agent 任务**：
-1. 读取 `transcript_path` 获取对话历史
-2. 执行三步清洗法
-3. 写入 `HOT_TRACK.md` 和 `COLD_TRACK.md`
 
 ### SessionStart Hook（Command Hook）
 
@@ -451,13 +424,14 @@ Good: Session 存储登录态 → 分布式部署时同步问题，改用 JWT
 
 | 命令 | 用途 | 自动化程度 |
 |------|------|-----------|
-| `/compact` | 压缩 + 自动快照 + 自动注入 | 100% 自动 |
+| `/context-snapshot` | 生成快照（三步清洗法） | 手动 |
+| `/compact` | 压缩 + 自动注入快照 | 半自动 |
 | `/query-cold "关键词"` | 查询冷轨历史 | 手动 |
-| `/smart-context` | 手动生成快照（预览） | 手动 |
 
 ## 技术限制
 
-1. **PostCompact Hook 不存在** - 无法在压缩后执行 Agent 逻辑
-2. **SessionStart stdout 限制** - 只能注入文本，不能执行代码
-3. **Token 估算不精确** - 使用字符估算，非精确计算
-4. **冷轨查询基于 Grep** - 不支持语义搜索
+1. **PreCompact Agent Hook 不支持** - 在非 REPL 环境下无法使用 agent 类型 hook，快照生成改为手动
+2. **PostCompact Hook 不存在** - 无法在压缩后执行 Agent 逻辑
+3. **SessionStart stdout 限制** - 只能注入文本，不能执行代码
+4. **Token 估算不精确** - 使用字符估算，非精确计算
+5. **冷轨查询基于 Grep** - 不支持语义搜索

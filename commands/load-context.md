@@ -26,7 +26,7 @@ triggers:
 
 1. 读取 `.claude/context/HOT_TRACK.md`
 2. 如果存在，输出快照内容
-3. 如果不存在，提示用户先执行 /compact 或 /smart-context
+3. 如果不存在，提示用户先执行 /compact 或 /context-snapshot
 
 ## 输出示例
 
@@ -72,8 +72,8 @@ function validateToken(token: string): boolean
 未找到热轨快照。
 
 请先执行以下操作之一：
-- /compact - 压缩并自动生成快照
-- /smart-context - 仅生成快照（不压缩）
+- /compact - 压缩（需先执行 /context-snapshot 生成快照）
+- /context-snapshot - 仅生成快照（不压缩）
 ```
 
 ## 与自动注入的区别
@@ -87,5 +87,5 @@ function validateToken(token: string): boolean
 ## 注意事项
 
 - 此命令只显示快照内容，不会修改会话历史
-- 快照内容由 PreCompact Agent 生成，质量取决于对话内容
-- 如果快照过期，建议重新执行 /compact
+- 快照内容由 /context-snapshot 命令生成，质量取决于对话内容
+- 如果快照过期，建议重新执行 /context-snapshot

@@ -67,12 +67,14 @@ your-project/
 ## 工作原理
 
 ```
-用户执行 /compact
+用户执行 /context-snapshot
        │
        ▼
-1. PreCompact Hook 触发
-   • Agent 执行三步清洗法
+1. 三步清洗法执行
    • 生成 HOT_TRACK.md 和 COLD_TRACK.md
+       │
+       ▼
+用户执行 /compact
        │
        ▼
 2. 压缩执行（Claude Code 内置）

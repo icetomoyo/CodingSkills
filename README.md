@@ -21,7 +21,7 @@ CodingSkills/
 │   ├── start-next-feature.md # 自动开发 feature
 │   ├── complete-feature.md   # 完成 feature
 │   ├── archive-features.md   # 归档已完成的 features
-│   ├── smart-context.md      # 手动生成快照
+│   ├── context-snapshot.md   # 手动生成快照
 │   ├── load-context.md       # 手动加载快照
 │   └── query-cold.md         # 查询冷轨历史
 ├── agents/              # 自定义 Agents（预留）
@@ -213,7 +213,7 @@ docs/features/
 **功能：**
 - **双轨制记忆**：热轨（< 6k Token）+ 冷轨（无限）
 - **三步清洗法**：无损提取接口骨架 → 有损修剪生成墓碑 → 生成快照
-- **100% 自动化**：用户只需 `/compact`，Hooks 自动完成快照生成和注入
+- **半自动化流程**：手动生成快照 + 自动注入
 - **避坑墓碑**：记录失败尝试，避免重复踩坑
 
 **核心概念：**
@@ -234,8 +234,8 @@ docs/features/
 
 | 命令 | 说明 |
 |------|------|
-| `/compact` | 压缩 + 自动生成快照 + 自动注入（100% 自动） |
-| `/smart-context` | 手动生成快照（预览/调试用） |
+| `/context-snapshot` | 手动生成快照（三步清洗法） |
+| `/compact` | 压缩 + 自动注入快照（半自动） |
 | `/load-context` | 手动加载快照到当前会话 |
 | `/query-cold "关键词"` | 查询冷轨历史 |
 
@@ -316,8 +316,8 @@ function logout(): void
 
 | 命令 | 说明 |
 |------|------|
-| `/compact` | 压缩上下文 + 自动生成快照 + 自动注入（100% 自动） |
-| `/smart-context` | 手动生成快照（预览/调试用） |
+| `/context-snapshot` | 手动生成快照（三步清洗法） |
+| `/compact` | 压缩上下文 + 自动注入快照（半自动） |
 | `/load-context` | 手动加载快照到当前会话 |
 | `/query-cold "关键词"` | 查询冷轨历史（墓碑和详细记录） |
 

@@ -1,37 +1,30 @@
+# Context Snapshot - 手动生成快照
+
 ---
-name: smart-context-snapshot
-description: 上下文快照专家。压缩前执行三步清洗法，生成热轨快照和冷轨归档。由 PreCompact hook 自动调用。
-tools: ["Read", "Write", "Grep", "Glob"]
-model: sonnet
+name: context-snapshot
+description: 手动生成上下文快照，通过三步清洗法压缩对话为高信噪比快照
+triggers:
+  - context-snapshot|生成快照|预览快照|手动快照
 ---
 
-你是上下文快照专家。请分析当前对话上下文，执行三步清洗法生成高信噪比快照。
-
-## 核心理念
-
-**问题**：增量日志积累 → 90% 噪音 → 注意力稀释 → 忘记目标 / 重复踩坑
-
-**解法**：折叠 + 快照，而非简单压缩
+## 使用方式
 
 ```
-增量日志（几万 Token）──Squash──▶ 热轨快照（< 6k Token）
+/context-snapshot
 ```
 
-## 双轨制记忆
+## 功能
 
-### 热轨 (Hot Track)
-- **容量**：< 6,000 Token
-- **形式**：`.claude/context/HOT_TRACK.md`
-- **内容**：项目状态 + 接口骨架 + 避坑墓碑 + 关键决策
-- **特点**：压缩后自动注入（通过 SessionStart Hook）
+手动触发三步清洗法，生成热轨快照和冷轨归档，但不执行压缩。
 
-### 冷轨 (Cold Track)
-- **容量**：无限
-- **形式**：`.claude/context/COLD_TRACK.md`
-- **内容**：完整历史 + 墓碑详情
-- **特点**：按需查询（通过 /query-cold）
+**适用场景**：
+- 预览快照内容
+- 在压缩前生成快照
+- 调试三步清洗法效果
 
-## 工作流程
+---
+
+## 执行步骤
 
 ### Step 1: 无损提取 — 抽骨架
 
@@ -39,7 +32,7 @@ model: sonnet
 
 **提取规则**：
 
-| 内容类型 | 提取方式 | 保留 |
+| 内容类型 | 提取方式 | 示例 |
 |----------|----------|------|
 | 函数定义 | 只保留签名 | `def calc(a: int, b: int) -> int` |
 | 类定义 | 只保留属性和方法签名 | 删除方法体 |
@@ -52,15 +45,13 @@ model: sonnet
 3. 提取函数签名、类型定义、API 路由
 4. 生成骨架，不包含实现细节
 
-**只保留签名，不保留实现细节。**
-
 ### Step 2: 有损修剪 — 立墓碑
 
 **目标**：识别失败尝试，生成避坑指南
 
 **死胡同识别模式**：
 
-```markdown
+```
 信号词：
 - 假设提出："试试"、"也许"、"尝试一下"
 - 尝试实施："我改了"、"修改为"、"实现了一下"
@@ -90,17 +81,15 @@ model: sonnet
 
 **Token 估算规则**：
 
-```python
-def estimate_tokens(text: str) -> int:
-    """
-    混合 Token 估算：
-    - 英文/代码/符号：1 Token ≈ 4 字符
-    - 中文/日文/韩文：1 Token ≈ 1.5 字符
-    """
-    chinese_chars = count_chinese(text)  # Unicode: \u4e00-\u9fff
-    other_chars = len(text) - chinese_chars
-    tokens = (chinese_chars / 1.5) + (other_chars / 4)
-    return int(tokens)
+```
+混合 Token 估算：
+- 英文/代码/符号：1 Token ≈ 4 字符
+- 中文/日文/韩文：1 Token ≈ 1.5 字符
+
+估算公式：
+  chinese_chars = count_chinese(text)
+  other_chars = len(text) - chinese_chars
+  tokens = (chinese_chars / 1.5) + (other_chars / 4)
 ```
 
 **裁剪优先级**（接近 6,000 Token 上限时）：
@@ -120,20 +109,15 @@ def estimate_tokens(text: str) -> int:
 4. 写入 `.claude/context/HOT_TRACK.md`
 5. 追加完整历史到 `.claude/context/COLD_TRACK.md`
 
-## 输出文件
-
-1. **热轨快照** → `.claude/context/HOT_TRACK.md`
-2. **冷轨归档**（追加）→ `.claude/context/COLD_TRACK.md`
-
-如果目录不存在，自动创建。
+---
 
 ## 热轨快照模板
 
 ```markdown
 # 热轨快照
 
-_生成时间: {当前时间}_
-_快照版本: v{递增版本号}_
+_生成时间: YYYY-MM-DD HH:MM_
+_快照版本: v{N}_
 
 ---
 
@@ -157,7 +141,7 @@ _快照版本: v{递增版本号}_
 
 ### {文件名}
 ```
-[接口签名，不含实现]
+[接口签名，无实现体]
 ```
 
 ---
@@ -166,7 +150,7 @@ _快照版本: v{递增版本号}_
 
 | 死胡同 | 失败原因 | 日期 |
 |--------|----------|------|
-| ... | ... | ... |
+| [方案] | [一句话] | [日期] |
 
 ---
 
@@ -174,15 +158,15 @@ _快照版本: v{递增版本号}_
 
 | 决策 | 理由 | 日期 |
 |------|------|------|
-| ... | ... | ... |
+| [选择] | [原因] | [日期] |
 
 ---
-*Token 数: ~{估算值}*
+*Token 数: ~{N}*
 ```
 
-## 冷轨归档格式
+---
 
-追加到 `.claude/context/COLD_TRACK.md`：
+## 冷轨归档模板
 
 ```markdown
 # 冷轨归档
@@ -209,42 +193,48 @@ _创建时间: YYYY-MM-DD_
 **User**: [内容]
 **Assistant**: [内容]
 **Tools**: [工具调用]
+```
 
 ---
 
-## 统计
-- 总交互数: {N}
-- 墓碑数: {M}
-- 最早记录: YYYY-MM-DD
+## 输出示例
+
+```
+快照生成完成！
+
+文件位置：
+- 热轨快照: .claude/context/HOT_TRACK.md (~1,500 Token)
+- 冷轨归档: .claude/context/COLD_TRACK.md
+
+包含内容：
+- 项目状态: 1 个目标, 1 个阻塞
+- 接口骨架: 3 个文件
+- 避坑墓碑: 2 条
+- 关键决策: 1 条
+
+下一步: 执行 /compact 进行压缩，快照将自动注入到压缩后的会话。
 ```
 
-## 错误处理
+---
 
-| 场景 | 处理方式 |
-|------|----------|
-| HOT_TRACK.md 不存在 | 创建新文件 |
-| COLD_TRACK.md 不存在 | 创建新文件 |
-| context 目录不存在 | 自动创建 |
-| Token 超限 | 按优先级裁剪 |
-| 写入失败 | 静默失败，不中断压缩流程 |
+## 与 /compact 的区别
 
-## 最佳实践
+| 操作 | /context-snapshot | /compact |
+|------|-------------------|----------|
+| 生成快照 | ✓ | ✗ |
+| 执行压缩 | ✗ | ✓ |
+| 自动注入 | ✗ | ✓ |
+| 适用场景 | 预览/手动生成 | 正常压缩流程 |
 
-### 如何写高质量墓碑
+**推荐流程**：
+1. `/context-snapshot` - 生成快照
+2. `/compact` - 压缩并自动注入快照
 
-Bad: 用 Session 不行
-Good: Session 存储登录态 → 分布式部署时同步问题，改用 JWT
-
-### 如何维护热轨
-
-- 每次压缩自动更新
-- 手动编辑添加重要信息
-- 定期清理过时的决策
+---
 
 ## 注意事项
 
-1. **确保目录存在**：写入前检查 `.claude/context/` 目录
-2. **版本递增**：每次生成快照时版本号 +1
-3. **追加冷轨**：不要覆盖，只追加
-4. **静默执行**：出错时优雅处理，不中断压缩流程
-5. **Token 估算不精确**：使用字符估算，非精确计算
+- 手动生成的快照会被后续压缩流程使用
+- Token 限制：热轨快照 < 6,000 Token
+- 冷轨无大小限制，完整记录历史
+- 如果快照已存在，会覆盖旧版本

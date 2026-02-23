@@ -1,18 +1,5 @@
 {
   "hooks": {
-    "PreCompact": [
-      {
-        "matcher": "*",
-        "description": "压缩前执行三步清洗法，生成热轨快照和冷轨归档",
-        "hooks": [
-          {
-            "type": "agent",
-            "name": "smart-context-snapshot",
-            "prompt": "请先读取 ~/.claude/agents/smart-context-snapshot.md 文件，然后按照其中的指导执行上下文快照生成。"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": "compact",
