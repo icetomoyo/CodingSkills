@@ -3,10 +3,12 @@
     "PreCompact": [
       {
         "matcher": "manual",
+        "description": "压缩前执行三步清洗法，生成热轨快照和冷轨归档",
         "hooks": [
           {
             "type": "agent",
             "name": "smart-context-snapshot",
+            "description": "上下文快照专家：无损提取接口骨架 → 有损修剪生成墓碑 → 生成快照",
             "prompt": "你是上下文快照专家。请分析当前对话上下文，执行三步清洗法：\n\n## Step 1: 无损提取 — 抽骨架\n识别所有代码相关内容，提取最终版本的接口签名（函数名、参数、返回类型）、API 端点、数据模型。\n\n## Step 2: 有损修剪 — 立墓碑\n识别\"假设 → 尝试 → 失败 → 放弃\"的死胡同，生成墓碑（一句话说明失败原因），详细过程写入冷轨。\n\n## Step 3: 生成快照\n组装热轨快照，确保小于 6000 Token（英文/代码 1 Token ≈ 4 字符，中文 1 Token ≈ 1.5 字符）。\n\n## 输出文件\n1. 热轨快照 → .claude/context/HOT_TRACK.md\n2. 冷轨归档（追加）→ .claude/context/COLD_TRACK.md\n\n## 热轨快照格式\n```markdown\n# 热轨快照\n\n_生成时间: {当前时间}_\n_快照版本: v{递增版本号}_\n\n---\n\n## 1. 项目状态\n\n### 当前目标\n[一句话描述]\n\n### 进度概览\n| 模块 | 状态 | 说明 |\n|------|------|------|\n\n### 当下阻塞\n- **问题**: [描述]\n- **下一步**: [计划]\n\n---\n\n## 2. 已确定接口（骨架）\n\n### {文件名}\n```\n[接口签名]\n```\n\n---\n\n## 3. 避坑墓碑\n\n| 死胡同 | 失败原因 | 日期 |\n|--------|----------|------|\n\n---\n\n## 4. 关键决策\n\n| 决策 | 理由 | 日期 |\n|------|------|------|\n\n---\n*Token 数: ~{估算值}*\n```\n\n现在请分析当前上下文并生成快照。"
           }
         ]
@@ -15,9 +17,11 @@
     "SessionStart": [
       {
         "matcher": "compact",
+        "description": "压缩后自动注入热轨快照到新会话",
         "hooks": [
           {
             "type": "command",
+            "description": "检测 compact_session 标识，读取热轨快照并注入到 stdout",
             "command": "node \"${CLAUDE_CONFIG_DIR}/hooks/inject-hot-track.js\""
           }
         ]
