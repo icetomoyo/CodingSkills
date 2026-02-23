@@ -1,17 +1,3 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "compact",
-        "description": "压缩后自动注入热轨快照到新会话",
-        "hooks": [
-          {
-            "type": "command",
-            "description": "检测 compact_session 标识，读取热轨快照并注入到 stdout",
-            "command": "node \"${CLAUDE_CONFIG_DIR}/hooks/inject-hot-track.js\""
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }

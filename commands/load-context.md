@@ -18,7 +18,7 @@ triggers:
 手动读取并显示热轨快照内容。
 
 **适用场景**：
-- 新会话开始时快速恢复上下文
+- 压缩后的新会话恢复上下文
 - 查看当前快照内容
 - 调试快照生成结果
 
@@ -26,7 +26,7 @@ triggers:
 
 1. 读取 `.claude/context/HOT_TRACK.md`
 2. 如果存在，输出快照内容
-3. 如果不存在，提示用户先执行 /compact 或 /context-snapshot
+3. 如果不存在，提示用户先执行 /context-snapshot
 
 ## 输出示例
 
@@ -71,21 +71,19 @@ function validateToken(token: string): boolean
 ```
 未找到热轨快照。
 
-请先执行以下操作之一：
-- /compact - 压缩（需先执行 /context-snapshot 生成快照）
-- /context-snapshot - 仅生成快照（不压缩）
+请先执行 /context-snapshot 生成快照。
 ```
 
-## 与自动注入的区别
+## 工作流程
 
-| 场景 | 自动注入 | /load-context |
-|------|----------|---------------|
-| 压缩后 | 自动执行 | 不需要 |
-| 新会话 | 需手动 | 手动调用 |
-| 查看快照 | 不适用 | 适合 |
+```
+1. /context-snapshot  →  生成快照
+2. /compact           →  执行压缩
+3. /load-context      →  新会话需要时加载快照
+```
 
 ## 注意事项
 
 - 此命令只显示快照内容，不会修改会话历史
-- 快照内容由 /context-snapshot 命令生成，质量取决于对话内容
+- 快照内容由 /context-snapshot 命令生成
 - 如果快照过期，建议重新执行 /context-snapshot

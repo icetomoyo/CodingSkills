@@ -1,6 +1,6 @@
 ---
 name: smart-context
-description: 智能上下文管理，通过双轨记忆（热轨/冷轨）和三步清洗法解决注意力稀释问题。手动生成高信噪比快照，压缩后自动注入到新会话。自动激活于压缩相关场景。
+description: 智能上下文管理，通过双轨记忆（热轨/冷轨）和三步清洗法解决注意力稀释问题。手动生成高信噪比快照，需要时手动加载。自动激活于压缩相关场景。
 ---
 
 # Smart Context - 智能上下文管理
@@ -46,7 +46,7 @@ This skill should be automatically activated when:
 - **容量**：< 6,000 Token
 - **形式**：`.claude/context/HOT_TRACK.md`
 - **内容**：项目状态 + 接口骨架 + 避坑墓碑 + 关键决策
-- **特点**：压缩后自动注入（通过 SessionStart Hook）
+- **特点**：手动生成，手动加载
 
 ### 冷轨 (Cold Track)
 - **容量**：无限
@@ -57,60 +57,24 @@ This skill should be automatically activated when:
 ## 文件结构
 
 ```
-# 用户目录（全局，需手动安装）
-~/.claude/
-├── settings.json              # Hooks 配置（从 hooks-config.json 合并）
-└── hooks/
-    └── inject-hot-track.js    # SessionStart Hook 脚本
-
-# 项目目录（每个项目独立，运行时自动创建）
+# 项目目录（每个项目独立）
 your-project/.claude/
-└── context/                   # 首次压缩时自动创建
+└── context/                   # 手动创建
     ├── HOT_TRACK.md           # 热轨快照（手动生成）
-    ├── COLD_TRACK.md          # 冷轨归档（手动生成）
-    └── COMPACT_LOG.md         # 压缩日志（自动生成，可选）
+    └── COLD_TRACK.md          # 冷轨归档（手动生成）
 ```
-
-> **注意**：用户只需安装 hooks 配置，context 目录及其文件会在首次执行 `/compact` 时自动创建。
 
 ## 工作流程
 
-### 推荐流程
+### 完全手动流程
 
 ```
-用户执行 /context-snapshot（手动生成快照）
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 1. 三步清洗法执行                                           │
-│    • 读取对话历史                                           │
-│    • 无损提取接口骨架                                       │
-│    • 有损修剪生成墓碑                                       │
-│    • 生成热轨快照 → HOT_TRACK.md                            │
-│    • 追加冷轨归档 → COLD_TRACK.md                           │
-└─────────────────────────────────────────────────────────────┘
-       │
-       ▼
-用户执行 /compact
-       │
-       ▼
-   压缩执行（Claude Code 内置）
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 2. SessionStart Hook 触发（Command Hook）                   │
-│                                                             │
-│    inject-hot-track.js 脚本执行：                           │
-│    • 检测 compact_session: true                             │
-│    • 读取 HOT_TRACK.md                                      │
-│    • 输出到 stdout → 自动注入到压缩后的会话                  │
-└─────────────────────────────────────────────────────────────┘
-       │
-       ▼
-   压缩完成，热轨快照已自动注入
+1. /context-snapshot  →  生成快照（三步清洗法）
+2. /compact           →  执行压缩
+3. /load-context      →  新会话需要时手动加载快照
 ```
 
-> **注意**：由于 PreCompact Agent Hook 在非 REPL 环境下不支持，快照生成改为手动触发。
+> **注意**：采用完全手动流程，避免旧快照污染新会话。
 
 ## 三步清洗法
 
@@ -290,35 +254,16 @@ _创建时间: YYYY-MM-DD_
 
 ## Actions
 
-### 1. 安装配置
+### 1. 生成快照
 
-**Step 1: 复制 Hook 脚本**
-```bash
-mkdir -p ~/.claude/hooks
-cp skills/smart-context/hooks/inject-hot-track.js ~/.claude/hooks/
-chmod +x ~/.claude/hooks/inject-hot-track.js
 ```
+/context-snapshot
 
-**Step 2: 配置 Hooks**
-
-将 `hooks/hooks-config.json` 中的配置合并到 `.claude/settings.json`（项目级）或 `~/.claude/settings.json`（用户级）：
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_CONFIG_DIR}/hooks/inject-hot-track.js\""
-          }
-        ]
-      }
-    ]
-  }
-}
+执行:
+1. 分析当前上下文
+2. 执行三步清洗法
+3. 生成快照文件（HOT_TRACK.md 和 COLD_TRACK.md）
+4. 输出统计信息
 ```
 
 ### 2. 执行压缩
@@ -330,10 +275,8 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 # 再执行压缩
 /compact
 
-自动执行:
-1. 压缩执行
-2. SessionStart Hook → 脚本注入快照
-3. 完成，上下文已恢复
+# 新会话需要时加载快照
+/load-context
 ```
 
 ### 3. 查询冷轨
@@ -346,50 +289,24 @@ chmod +x ~/.claude/hooks/inject-hot-track.js
 2. 返回匹配的墓碑和历史片段
 ```
 
-### 4. 手动生成快照（可选）
-
-如果需要在压缩前预览快照：
+### 4. 加载快照
 
 ```
-/context-snapshot
+/load-context
 
 执行:
-1. 分析当前上下文
-2. 执行三步清洗法
-3. 生成快照文件
-4. 输出统计信息
+1. 读取 HOT_TRACK.md
+2. 输出快照内容到当前会话
 ```
-
-## Hooks 详细说明
-
-### SessionStart Hook（Command Hook）
-
-**触发条件**：压缩后的会话启动时（`compact_session: true`）
-
-**输入参数**：
-```json
-{
-  "session_id": "abc123",
-  "cwd": "/current/working/directory",
-  "hook_event_name": "SessionStart",
-  "compact_session": true
-}
-```
-
-**脚本任务**：
-1. 检测 `compact_session: true`
-2. 读取 `HOT_TRACK.md`
-3. 输出到 stdout（自动注入到会话）
 
 ## 错误处理
 
 | 场景 | 处理方式 |
 |------|----------|
-| HOT_TRACK.md 不存在 | SessionStart 静默退出，不注入 |
+| HOT_TRACK.md 不存在 | 提示先执行 /context-snapshot |
 | COLD_TRACK.md 不存在 | 创建新文件 |
 | context 目录不存在 | 自动创建 |
 | Token 超限 | 按优先级裁剪 |
-| 脚本执行失败 | 静默失败，不影响压缩流程 |
 
 ## 与其他 Skill 的集成
 
@@ -416,7 +333,7 @@ Good: Session 存储登录态 → 分布式部署时同步问题，改用 JWT
 
 ### 如何维护热轨
 
-- 每次压缩自动更新
+- 每次压缩前手动更新快照
 - 手动编辑添加重要信息
 - 定期清理过时的决策
 
@@ -425,13 +342,13 @@ Good: Session 存储登录态 → 分布式部署时同步问题，改用 JWT
 | 命令 | 用途 | 自动化程度 |
 |------|------|-----------|
 | `/context-snapshot` | 生成快照（三步清洗法） | 手动 |
-| `/compact` | 压缩 + 自动注入快照 | 半自动 |
+| `/load-context` | 加载快照到当前会话 | 手动 |
 | `/query-cold "关键词"` | 查询冷轨历史 | 手动 |
+| `/compact` | 执行压缩（Claude Code 内置） | 手动 |
 
 ## 技术限制
 
-1. **PreCompact Agent Hook 不支持** - 在非 REPL 环境下无法使用 agent 类型 hook，快照生成改为手动
-2. **PostCompact Hook 不存在** - 无法在压缩后执行 Agent 逻辑
-3. **SessionStart stdout 限制** - 只能注入文本，不能执行代码
-4. **Token 估算不精确** - 使用字符估算，非精确计算
-5. **冷轨查询基于 Grep** - 不支持语义搜索
+1. **PreCompact Agent Hook 不支持** - 在非 REPL 环境下无法使用 agent 类型 hook
+2. **无自动注入** - 为避免旧快照污染新会话，采用完全手动流程
+3. **Token 估算不精确** - 使用字符估算，非精确计算
+4. **冷轨查询基于 Grep** - 不支持语义搜索

@@ -213,7 +213,7 @@ docs/features/
 **功能：**
 - **双轨制记忆**：热轨（< 6k Token）+ 冷轨（无限）
 - **三步清洗法**：无损提取接口骨架 → 有损修剪生成墓碑 → 生成快照
-- **半自动化流程**：手动生成快照 + 自动注入
+- **完全手动流程**：手动生成快照 + 手动加载
 - **避坑墓碑**：记录失败尝试，避免重复踩坑
 
 **核心概念：**
@@ -234,34 +234,24 @@ docs/features/
 
 | 命令 | 说明 |
 |------|------|
-| `/context-snapshot` | 手动生成快照（三步清洗法） |
-| `/compact` | 压缩 + 自动注入快照（半自动） |
-| `/load-context` | 手动加载快照到当前会话 |
+| `/context-snapshot` | 生成快照（三步清洗法） |
+| `/load-context` | 加载快照到当前会话 |
 | `/query-cold "关键词"` | 查询冷轨历史 |
 
-**安装步骤：**
-```bash
-# 1. 复制脚本到用户目录
-mkdir -p ~/.claude/hooks
-cp skills/smart-context/hooks/inject-hot-track.js ~/.claude/hooks/
-chmod +x ~/.claude/hooks/inject-hot-track.js
-
-# 2. 将 hooks-config.json 中的配置合并到 ~/.claude/settings.json
+**工作流程：**
+```
+1. /context-snapshot  →  生成快照
+2. /compact           →  执行压缩
+3. /load-context      →  新会话需要时加载快照
 ```
 
 **文件结构：**
 ```
-# 用户目录（全局配置）
-~/.claude/
-├── settings.json              # Hooks 配置
-└── hooks/
-    └── inject-hot-track.js    # SessionStart Hook 脚本
-
-# 项目目录（运行时自动创建）
+# 项目目录
 your-project/.claude/
-└── context/                   # 首次压缩时自动创建
+└── context/                   # 手动创建
     ├── HOT_TRACK.md           # 热轨快照（< 6k Token）
-    ├── COLD_TRACK.md          # 冷轨归档（完整历史）
+    └── COLD_TRACK.md          # 冷轨归档（完整历史）
     └── COMPACT_LOG.md         # 压缩日志（可选）
 ```
 
@@ -316,9 +306,8 @@ function logout(): void
 
 | 命令 | 说明 |
 |------|------|
-| `/context-snapshot` | 手动生成快照（三步清洗法） |
-| `/compact` | 压缩上下文 + 自动注入快照（半自动） |
-| `/load-context` | 手动加载快照到当前会话 |
+| `/context-snapshot` | 生成快照（三步清洗法） |
+| `/load-context` | 加载快照到当前会话 |
 | `/query-cold "关键词"` | 查询冷轨历史（墓碑和详细记录） |
 
 ## 安装使用
