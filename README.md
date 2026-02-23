@@ -9,7 +9,8 @@ CodingSkills/
 ├── skills/              # 自定义技能
 │   ├── known-issues-tracker/  # Issue 追踪管理
 │   ├── feature-list-tracker/  # Feature 功能管理
-│   └── human-test-guide/      # 人工测试指导生成
+│   ├── human-test-guide/      # 人工测试指导生成
+│   └── smart-context/         # 智能上下文管理
 ├── commands/            # 自定义命令
 │   ├── add-issue.md          # 添加 issue
 │   ├── list-issues.md        # 列出 issues
@@ -19,7 +20,10 @@ CodingSkills/
 │   ├── list-features.md      # 列出 features
 │   ├── start-next-feature.md # 自动开发 feature
 │   ├── complete-feature.md   # 完成 feature
-│   └── archive-features.md   # 归档已完成的 features
+│   ├── archive-features.md   # 归档已完成的 features
+│   ├── smart-context.md      # 手动生成快照
+│   ├── load-context.md       # 手动加载快照
+│   └── query-cold.md         # 查询冷轨历史
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
@@ -202,6 +206,89 @@ docs/features/
 - 被 `feature-list-tracker` 的 `/start-next-feature` 命令调用
 - 可与 `known-issues-tracker` 配合生成 Bug 回归测试
 
+### smart-context
+
+智能上下文管理技能，通过双轨记忆解决长对话中的注意力稀释问题。
+
+**功能：**
+- **双轨制记忆**：热轨（< 6k Token）+ 冷轨（无限）
+- **三步清洗法**：无损提取接口骨架 → 有损修剪生成墓碑 → 生成快照
+- **100% 自动化**：用户只需 `/compact`，Hooks 自动完成快照生成和注入
+- **避坑墓碑**：记录失败尝试，避免重复踩坑
+
+**核心概念：**
+```
+增量日志（几万 Token）──压缩──▶ 热轨快照（< 6k Token）
+                                    │
+                                    ├── 项目状态（目标、阻塞）
+                                    ├── 接口骨架（签名，无实现）
+                                    ├── 避坑墓碑（死胡同记录）
+                                    └── 关键决策
+```
+
+**自动触发条件：**
+- 用户执行 `/compact` 命令
+- 用户提到"压缩"、"上下文"、"快照"、"墓碑"等关键词
+
+**Commands：**
+
+| 命令 | 说明 |
+|------|------|
+| `/compact` | 压缩 + 自动生成快照 + 自动注入（100% 自动） |
+| `/smart-context` | 手动生成快照（预览/调试用） |
+| `/load-context` | 手动加载快照到当前会话 |
+| `/query-cold "关键词"` | 查询冷轨历史 |
+
+**安装步骤：**
+```bash
+# 1. 复制脚本到用户目录
+mkdir -p ~/.claude/hooks
+cp skills/smart-context/hooks/inject-hot-track.js ~/.claude/hooks/
+chmod +x ~/.claude/hooks/inject-hot-track.js
+
+# 2. 将 hooks-config.json 中的配置合并到 ~/.claude/settings.json
+```
+
+**文件结构：**
+```
+# 用户目录（全局配置）
+~/.claude/
+├── settings.json              # Hooks 配置
+└── hooks/
+    └── inject-hot-track.js    # SessionStart Hook 脚本
+
+# 项目目录（运行时自动创建）
+your-project/.claude/
+└── context/                   # 首次压缩时自动创建
+    ├── HOT_TRACK.md           # 热轨快照（< 6k Token）
+    ├── COLD_TRACK.md          # 冷轨归档（完整历史）
+    └── COMPACT_LOG.md         # 压缩日志（可选）
+```
+
+**热轨快照示例：**
+```markdown
+# 热轨快照
+
+## 1. 项目状态
+### 当前目标：实现用户登录系统
+### 当下阻塞：OAuth-GitHub 403 错误
+
+## 2. 已确定接口（骨架）
+### auth.ts
+function login(provider: string): Promise<User>
+function logout(): void
+
+## 3. 避坑墓碑
+| 死胡同 | 失败原因 | 日期 |
+|--------|----------|------|
+| Session 存储 | 分布式同步问题 | 2026-02-21 |
+
+## 4. 关键决策
+| 决策 | 理由 | 日期 |
+|------|------|------|
+| 使用 JWT | 无状态，易扩展 | 2026-02-22 |
+```
+
 ## 已有 Commands
 
 ### Issue 管理
@@ -224,6 +311,15 @@ docs/features/
 | `/start-next-feature [id]` | 自动化开发：Plan → 设计 → TDD → 测试 → 测试指导 |
 | `/complete-feature [id]` | 完成 feature，更新设计和版本状态 |
 | `/archive-features` | 归档已完成的 features 到 FEATURES_ARCHIVED.md |
+
+### 上下文管理
+
+| 命令 | 说明 |
+|------|------|
+| `/compact` | 压缩上下文 + 自动生成快照 + 自动注入（100% 自动） |
+| `/smart-context` | 手动生成快照（预览/调试用） |
+| `/load-context` | 手动加载快照到当前会话 |
+| `/query-cold "关键词"` | 查询冷轨历史（墓碑和详细记录） |
 
 ## 安装使用
 
@@ -282,6 +378,7 @@ KNOWN_ISSUES.md 会随着时间变大，影响 LLM 上下文效率：
 - [x] Feature 管理技能（feature-list-tracker）
 - [x] 自动化开发流程（/start-next-feature）
 - [x] 人工测试指导文档生成
+- [x] 智能上下文管理（smart-context）
 - [ ] 添加更多实用 skills
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules
