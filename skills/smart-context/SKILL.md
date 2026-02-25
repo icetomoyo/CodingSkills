@@ -44,22 +44,22 @@ This skill should be automatically activated when:
 
 ### 热轨 (Hot Track)
 - **容量**：< 6,000 Token
-- **形式**：`.claude/context/HOT_TRACK.md`
+- **形式**：`docs/context/HOT_TRACK.md`
 - **内容**：项目状态 + 接口骨架 + 避坑墓碑 + 关键决策
 - **特点**：手动生成，手动加载
 
 ### 冷轨 (Cold Track)
 - **容量**：无限
-- **形式**：`.claude/context/COLD_TRACK.md`
+- **形式**：`docs/context/COLD_TRACK.md`
 - **内容**：完整历史 + 墓碑详情
-- **特点**：按需查询（通过 /query-cold）
+- **特点**：按需查询（通过对话触发）
 
 ## 文件结构
 
 ```
 # 项目目录（每个项目独立）
-your-project/.claude/
-└── context/                   # 手动创建
+your-project/docs/
+└── context/                   # 上下文管理目录
     ├── HOT_TRACK.md           # 热轨快照（手动生成）
     └── COLD_TRACK.md          # 冷轨归档（手动生成）
 ```
@@ -160,8 +160,8 @@ def estimate_tokens(text: str) -> int:
 1. 组装热轨快照（项目状态 + 接口骨架 + 墓碑 + 决策）
 2. 估算 Token 数
 3. 如果超限，按优先级裁剪
-4. 写入 `.claude/context/HOT_TRACK.md`
-5. 追加完整历史到 `.claude/context/COLD_TRACK.md`
+4. 写入 `docs/context/HOT_TRACK.md`
+5. 追加完整历史到 `docs/context/COLD_TRACK.md`
 
 ## 热轨快照模板
 
@@ -288,7 +288,7 @@ _创建时间: YYYY-MM-DD_
 - 手动调用：`/smart-context "关键词"` 或 `/query-cold "关键词"`
 
 **执行步骤**：
-1. 读取 `.claude/context/COLD_TRACK.md` 文件
+1. 读取 `docs/context/COLD_TRACK.md` 文件
 2. 使用 Grep 搜索指定关键词
 3. 格式化输出匹配结果
 

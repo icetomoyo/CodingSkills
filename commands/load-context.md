@@ -1,11 +1,10 @@
+---
+description: 手动加载热轨快照到当前会话。当需要在压缩后的新会话恢复上下文，或查看当前快照内容时使用。
+---
+
 # Load Context - 手动加载快照
 
----
-name: load-context
-description: 手动加载热轨快照到当前会话
-triggers:
-  - load-context|加载快照|恢复上下文|load snapshot
----
+手动读取并显示热轨快照内容。
 
 ## 使用方式
 
@@ -13,18 +12,15 @@ triggers:
 /load-context
 ```
 
-## 功能
+## 适用场景
 
-手动读取并显示热轨快照内容。
-
-**适用场景**：
 - 压缩后的新会话恢复上下文
 - 查看当前快照内容
 - 调试快照生成结果
 
 ## 执行步骤
 
-1. 读取 `.claude/context/HOT_TRACK.md`
+1. 读取 `docs/context/HOT_TRACK.md`
 2. 如果存在，输出快照内容
 3. 如果不存在，提示用户先执行 /context-snapshot
 

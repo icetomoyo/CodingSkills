@@ -1,11 +1,8 @@
-# Context Snapshot - 手动生成快照
-
 ---
-name: context-snapshot
 description: 手动生成上下文快照，通过三步清洗法压缩对话为高信噪比快照
-triggers:
-  - context-snapshot|生成快照|预览快照|手动快照
 ---
+
+# Context Snapshot - 手动生成快照
 
 ## 使用方式
 
@@ -106,8 +103,8 @@ triggers:
 1. 组装热轨快照（项目状态 + 接口骨架 + 墓碑 + 决策）
 2. 估算 Token 数
 3. 如果超限，按优先级裁剪
-4. 写入 `.claude/context/HOT_TRACK.md`
-5. 追加完整历史到 `.claude/context/COLD_TRACK.md`
+4. 写入 `docs/context/HOT_TRACK.md`
+5. 追加完整历史到 `docs/context/COLD_TRACK.md`
 
 ---
 
@@ -203,8 +200,8 @@ _创建时间: YYYY-MM-DD_
 快照生成完成！
 
 文件位置：
-- 热轨快照: .claude/context/HOT_TRACK.md (~1,500 Token)
-- 冷轨归档: .claude/context/COLD_TRACK.md
+- 热轨快照: docs/context/HOT_TRACK.md (~1,500 Token)
+- 冷轨归档: docs/context/COLD_TRACK.md
 
 包含内容：
 - 项目状态: 1 个目标, 1 个阻塞
