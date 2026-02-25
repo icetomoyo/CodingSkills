@@ -62,6 +62,62 @@ Version is **automatically detected** from project configuration files:
 5. Git tag (`git describe --tags --abbrev=0`)
 6. Fallback: `unknown`
 
+## Listing Issues
+
+当用户请求列出/查看 issues 时（如 "列出所有 issues"、"有哪些 open 的 issue"），自动执行此功能。
+
+### 过滤选项
+
+| 选项 | 说明 |
+|------|------|
+| --open, -o | 只显示 Open 状态（默认） |
+| --resolved, -r | 只显示 Resolved 状态 |
+| --all, -a | 显示所有 issues |
+| --high | 过滤 High 优先级 |
+| --medium | 过滤 Medium 优先级 |
+| --low | 过滤 Low 优先级 |
+| --stats | 只显示统计摘要 |
+
+### 输出格式
+
+```markdown
+=== KNOWN ISSUES ===
+Last Updated: 2024-01-20 15:30
+
+--- OPEN ISSUES (5) ---
+
+[HIGH] 001: API returns 500 on /users endpoint
+  Introduced: v1.2.0
+  Created: 2024-01-15
+  Description: GET /api/users fails with 500 when query param filter contains special characters
+
+[MEDIUM] 002: Search results slow on large datasets
+  Introduced: v1.0.0
+  Created: 2024-01-16
+  Description: Search takes 5+ seconds when filtering 100k+ records
+
+--- RESOLVED ISSUES (2) ---
+
+[MEDIUM] 006: Mobile login button unresponsive (RESOLVED 2024-01-20)
+  Introduced: v1.1.0 → Fixed: v1.3.0
+  Resolution: Added touch-action CSS property
+
+=== SUMMARY ===
+Total: 7 | Open: 5 | Resolved: 2
+High: 2 | Medium: 2 | Low: 1
+Next to resolve: 001 (High priority, oldest)
+```
+
+### 执行步骤
+
+1. 使用 Glob 查找 `**/KNOWN_ISSUES.md`
+2. 读取并解析文件
+3. 根据用户请求应用过滤
+4. 按状态（Open 优先）→ 优先级 → 创建日期排序
+5. 格式化输出
+
+---
+
 ## Core Actions
 
 ### 1. Find or Create KNOWN_ISSUES.md
@@ -183,6 +239,7 @@ Required fields:
 |---------|---------|
 | `/add-issue "problem description"` | Add a new issue (Claude generates title, details, context) |
 | `/add-issue -f [file]` | Add issue from file content |
-| `/list-issues` | List issues with filtering |
 | `/resolve-next-issue [id]` | Resolve issue (omit ID for auto-select highest priority) |
 | `/archive-issues` | Archive resolved issues to reduce file size |
+
+> **Note**: 列出 issues 的功能已整合到此 skill 中。直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可。
