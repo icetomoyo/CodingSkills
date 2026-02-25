@@ -32,181 +32,15 @@ This skill should be automatically activated when the user message contains:
 - User is asking for code explanation
 - User uses "issue" in a different context (e.g., "git issue" meaning GitHub issue)
 
-## When to Activate
-
-- When you discover a bug or issue in the codebase
-- When a user reports a problem (auto-trigger from conversation)
-- When you need to track technical debt
-- When you want to automatically resolve the highest priority issue
-- When starting a new session to check for known issues
-
 ## KNOWN_ISSUES.md File Structure
 
 The file is divided into THREE sections:
 
-```markdown
-# Known Issues
+1. **Issue Index** - Quick reference table for all issues
+2. **Issue Details** - Full details for each issue (REQUIRED for all issues)
+3. **Summary** - Total counts and highest priority open issue
 
-_Last Updated: YYYY-MM-DD HH:MM_
-
----
-
-## Issue Index
-<!-- Quick reference table for all issues -->
-
-| ID | Priority | Status | Title | Introduced | Fixed | Created | Resolved |
-|----|----------|--------|-------|------------|-------|---------|----------|
-| 001 | High | Open | [Issue title] | v1.2.0 | - | YYYY-MM-DD | - |
-| 002 | Medium | Resolved | [Issue title] | v1.1.0 | v1.3.0 | YYYY-MM-DD | YYYY-MM-DD |
-
----
-
-## Issue Details
-<!-- Full details for each issue - REQUIRED for all issues -->
-
-### 001: [Issue Title]
-- **Priority**: High
-- **Status**: Open
-- **Introduced**: v1.2.0 (auto-detected)
-- **Created**: YYYY-MM-DD
-- **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
-- **Context**: [Where/when this occurs, affected components]
-- **Root Cause**: [Analysis of why this happens - if known]
-- **Proposed Solution**: [Optional: how to fix it]
-
-### 002: [Issue Title] (RESOLVED)
-- **Priority**: Medium
-- **Status**: Resolved
-- **Introduced**: v1.1.0 (auto-detected)
-- **Fixed**: v1.3.0 (auto-detected)
-- **Created**: YYYY-MM-DD
-- **Original Problem**: [DETAILED description of what was wrong - MUST be preserved]
-- **Context**: [Where/when this occurs, affected components]
-- **Root Cause**: [Analysis of why this happens]
-- **Resolution**: [DETAILED explanation of how it was fixed - REQUIRED for resolved issues]
-- **Resolution Date**: YYYY-MM-DD
-- **Files Changed**: [List of files modified to fix this issue]
-- **Tests Added**: [Any tests added to prevent regression]
-
----
-
-## Summary
-- Total: X (Y Open, Z Resolved)
-- Highest Priority Open: [Issue ID] - [Title] (or "None")
-```
-
-## Version Tracking
-
-This skill automatically tracks version information for all issues:
-
-### Version Fields
-
-| Field | When Set | Description |
-|-------|----------|-------------|
-| **Introduced** | When issue is added | The version where this bug first appeared |
-| **Fixed** | When issue is resolved | The version where this bug was fixed |
-
-### Automatic Version Detection
-
-Version is **automatically detected** from project configuration files. Users do NOT need to manually specify versions.
-
-#### Detection Priority (in order)
-
-1. **package.json** → `version` field
-   ```json
-   { "version": "1.2.0" }
-   ```
-
-2. **VERSION** file (single line, semver format)
-   ```
-   1.2.0
-   ```
-
-3. **pyproject.toml** → `project.version`
-   ```toml
-   [project]
-   version = "1.2.0"
-   ```
-
-4. **Cargo.toml** → `package.version`
-   ```toml
-   [package]
-   version = "1.2.0"
-   ```
-
-5. **Git tag** (nearest tag on current branch)
-   ```bash
-   git describe --tags --abbrev=0
-   ```
-
-6. **Fallback**: If no version can be detected, use `unknown`
-
-#### Detection Workflow
-
-```
-When adding/resolving an issue:
-1. Search for version source files (package.json, VERSION, etc.)
-2. Read and parse the version
-3. If found: Use detected version
-4. If not found: Use "unknown"
-5. Log the detection result to user
-```
-
-## CRITICAL: Issue Details Maintenance
-
-**Every issue MUST have a corresponding entry in the "Issue Details" section.**
-
-### For OPEN Issues (Unresolved)
-
-The issue detail MUST include:
-
-```markdown
-### [ID]: [Issue Title]
-- **Priority**: High / Medium / Low
-- **Status**: Open
-- **Introduced**: [Auto-detected version, e.g., v1.2.0]
-- **Created**: YYYY-MM-DD
-- **Original Problem**: [REQUIRED - Detailed description of what's wrong]
-  - What is the current (broken) behavior?
-  - What is the expected behavior?
-  - How to reproduce the issue?
-- **Context**: [Where/when this occurs]
-- **Root Cause**: [If known - analysis of why this happens]
-- **Proposed Solution**: [Optional - suggested fix approach]
-```
-
-### For RESOLVED Issues
-
-The issue detail MUST preserve the original problem AND add resolution info:
-
-```markdown
-### [ID]: [Issue Title] (RESOLVED)
-- **Priority**: High / Medium / Low
-- **Status**: Resolved
-- **Introduced**: [Auto-detected version when issue was added]
-- **Fixed**: [Auto-detected version when issue was resolved]
-- **Created**: YYYY-MM-DD
-- **Original Problem**: [MUST be preserved - do NOT delete or summarize]
-  - What was wrong?
-  - What was the expected behavior?
-- **Context**: [Where/when it occurred]
-- **Root Cause**: [Analysis of why it happened]
-- **Resolution**: [REQUIRED - Detailed explanation of the fix]
-  - What was changed?
-  - Why this approach was chosen?
-  - Any trade-offs or limitations?
-- **Resolution Date**: YYYY-MM-DD
-- **Files Changed**: [List of files modified]
-- **Tests Added**: [Any tests to prevent regression]
-```
-
-### IMPORTANT: Never Delete Original Problem
-
-When resolving an issue:
-- **PRESERVE** the Original Problem description completely
-- **DO NOT** summarize or shorten it
-- **ADD** Resolution section below it
-- This ensures future readers understand both the problem AND the solution
+> **格式示例请参考**: [examples/sample.md](examples/sample.md)
 
 ## Priority Levels
 
@@ -216,343 +50,118 @@ When resolving an issue:
 | **Medium** | Functional issues, performance problems, workarounds exist | Resolve within session if possible |
 | **Low** | Minor issues, cosmetic problems, technical debt | Schedule for future work |
 
-## Issue ID Convention
+## Version Tracking
 
-- **###** = Sequential number (e.g., 001, 002, 003)
+Version is **automatically detected** from project configuration files:
 
-IDs are sequential and never reused. All issues follow the same format and process.
+**Detection Priority**:
+1. `package.json` → `version` field
+2. `VERSION` file (single line, semver format)
+3. `pyproject.toml` → `project.version`
+4. `Cargo.toml` → `package.version`
+5. Git tag (`git describe --tags --abbrev=0`)
+6. Fallback: `unknown`
 
-## Actions
+## Core Actions
 
 ### 1. Find or Create KNOWN_ISSUES.md
 
-**CRITICAL**: Before any operation, locate or create the file following this process:
+**CRITICAL**: Before any operation, locate or create the file:
 
-#### Step 1: Scan for Existing File
-```
-Search entire project for KNOWN_ISSUES.md (case-insensitive):
-- Use Glob to find **/KNOWN_ISSUES.md, **/known_issues.md
-- Also check docs/, documentation/, .claude/ directories
-```
+1. **Scan for existing file**: Use Glob to find `**/KNOWN_ISSUES.md`
+2. **If found**: Use existing location, proceed with operation
+3. **If not found**: Ask user for location preference:
+   - `docs/KNOWN_ISSUES.md` (recommended)
+   - `.claude/KNOWN_ISSUES.md` (private)
+4. **Create directory if needed**, then initialize with empty template
 
-#### Step 2: If File Exists
-```
-Use the existing file location
-No need to ask user
-Proceed with the operation
-```
-
-#### Step 3: If File Does NOT Exist - Ask User
-```
-Ask user:
-"KNOWN_ISSUES.md not found. Where should I create it?
-1. docs/KNOWN_ISSUES.md (recommended for project documentation)
-2. .claude/KNOWN_ISSUES.md (keeps it private to Claude Code)
-
-Reply 1 or 2, or specify a custom path."
-```
-
-#### Step 4: Create Based on User Choice
-```
-If user chooses "1" or "docs": Create at docs/KNOWN_ISSUES.md
-If user chooses "2" or ".claude": Create at .claude/KNOWN_ISSUES.md
-If user specifies path: Create at that location
-If no response (timeout): Default to .claude/KNOWN_ISSUES.md
-```
-
-#### Step 5: Create Directory If Needed
-```
-If docs/ doesn't exist: Create docs/ directory first
-If .claude/ doesn't exist: Create .claude/ directory first
-```
-
-#### Step 6: Initialize with Template
-```markdown
-# Known Issues
-
-_Last Updated: [Current DateTime]_
-
----
-
-## Issue Index
-<!-- Quick reference table for all issues -->
-
-| ID | Priority | Status | Title | Introduced | Fixed | Created | Resolved |
-|----|----------|--------|-------|------------|-------|---------|----------|
-_No issues tracked yet_
-
----
-
-## Issue Details
-<!-- Full details for each issue - REQUIRED for all issues -->
-
-_No issue details yet_
-
----
-
-## Summary
-- Total: 0 (0 Open, 0 Resolved)
-- Highest Priority Open: None
-```
-
-### 2. Auto-Add Issue from Conversation
-
-When triggered by user conversation (automatic activation):
-
-1. **Parse the user's message** to extract:
-   - Problem description (what's wrong - the actual phenomenon)
-   - Context (where/when it happens, if mentioned)
-
-2. **Automatically generate:**
-   - **Title**: Concise summary of the problem
-   - **Detailed description**: Current behavior, expected behavior, reproduction steps
-   - **Context**: Affected components, scenarios, environments
-   - **Priority** (based on severity keywords):
-     - **High**: "critical", "blocking", "urgent", "crash", "security", "data loss", "production down"
-     - **Medium**: Default for most bugs
-     - **Low**: "minor", "cosmetic", "nice to fix", "when you have time"
-
-3. **Detect current version** (for Introduced field):
-   - Search for version source files
-   - Parse and extract version
-   - Use "unknown" if detection fails
-
-4. **Add to KNOWN_ISSUES.md (BOTH sections required):**
-   - Read current file (create if not exists)
-   - Generate next sequential ID (001, 002, etc.)
-   - Add entry to **Issue Index** table (with Introduced version)
-   - Add full details to **Issue Details** section with:
-     - Generated title
-     - Priority, Status, Introduced, Created
-     - **Original Problem** (structured description)
-     - Context, Root Cause (if known)
-   - Update timestamp and summary
-   - Write the file
-
-5. **Confirm with user:**
-   ```
-   Added issue ###: [Title] (Priority)
-   Version: Introduced in [detected version]
-   Use /add-issue for more control, or /resolve-next-issue to fix it.
-   ```
-
-### 3. Add Issue (General Process)
-
-When adding an issue (via /add-issue command, auto-triggered from conversation, or Claude discovered):
+### 2. Add Issue
 
 **Input**: Problem description / actual phenomenon (from text or file)
 
 **Claude automatically generates**:
 1. **Title**: Concise summary
-2. **Detailed description**:
-   - Current behavior (what's happening)
-   - Expected behavior (what should happen)
-   - Reproduction steps (if inferable)
+2. **Detailed description**: Current behavior, expected behavior, reproduction steps
 3. **Context**: Affected components, scenarios, environments
-4. **Priority**: Based on severity analysis (unless user specified)
+4. **Priority**: Based on severity analysis
 5. **Introduced version**: Auto-detected from project
 
 **Process**:
-1. **Detect current version** for Introduced field
-2. Read the current KNOWN_ISSUES.md
-3. Generate the next available sequential ID (001, 002, etc.)
-4. **Add to Issue Index table** (quick reference with Introduced)
-5. **Add full details to Issue Details section:**
-   - Generated title
-   - Priority, Status, Introduced, Created
-   - **Original Problem**: Structured description
-   - Context: Where/when this occurs
-   - Root Cause: Analysis (if known)
-   - Proposed Solution (optional)
-6. Update timestamp and summary
-7. Write the updated file
+1. Detect current version for Introduced field
+2. Generate next sequential ID (001, 002, etc.)
+3. Add to BOTH Issue Index table AND Issue Details section
+4. Update timestamp and summary
 
-### 4. Mark Issue as Resolved
+### 3. Resolve Issue (`/resolve-next-issue`)
 
-When an issue is fixed:
+**Selection Logic**:
+- With ID: Find and validate issue is "Open"
+- Without ID: Auto-select highest priority Open issue (by Priority → Created date → ID)
 
-1. Read the current KNOWN_ISSUES.md
-2. Find the issue by ID in BOTH sections
-3. **Detect current version** (for Fixed field):
-   - Search for version source files
-   - Parse and extract version
-   - Use "unknown" if detection fails
-4. **Update Issue Index:** Change status to "Resolved", add Fixed version, add Resolved date
-5. **Update Issue Details (CRITICAL):**
-   - Change status to "Resolved"
-   - Add **Fixed** version (auto-detected)
-   - **PRESERVE** Original Problem description (do NOT delete)
-   - **ADD** Resolution section with:
-     - Detailed explanation of the fix
-     - Why this approach was chosen
-     - Any trade-offs
-   - Add Resolution Date
-   - Add Files Changed list
-   - Add Tests Added (if any)
-6. Update timestamp and summary
-7. Write the updated file
-8. **Check file size and auto-archive if needed:**
-   - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
-   - If file > 2000 lines or > 50KB: Notify user to consider archiving
+**Implementation Guidelines (CRITICAL)**:
 
-### 5. Resolve Issue
+**Before Any Modification**:
+1. Read ALL related code thoroughly
+2. Understand the exact root cause
+3. Identify ALL files that need changes
+4. Check for existing tests
+5. Plan the MINIMAL fix needed
 
-Use the /resolve-next-issue command:
+**For Each File - Document**:
+- Changes summary, Reason, Expected outcome, Risks, Affected components, Tests to run
 
-```
-/resolve-next-issue [id]
-```
+**Mandatory Checklist Per File**:
+- [ ] Expected outcome is clearly defined
+- [ ] No existing functionality will break
+- [ ] All callers/dependents are considered
+- [ ] Edge cases are handled
+- [ ] This is the MINIMAL change needed
+- [ ] Error handling is preserved
 
-- **With ID**: Resolve the specified issue
-- **Without ID**: Auto-select and resolve highest priority Open issue
+**FORBIDDEN Actions**:
+- Change unrelated code "while you're at it"
+- Refactor code not directly related to the fix
+- Add features beyond the issue scope
+- Modify tests to make them pass (fix the code!)
 
-**Selection Logic:**
+**After Resolution**:
+1. Detect current version for Fixed field
+2. Update BOTH sections in KNOWN_ISSUES.md
+3. **PRESERVE** Original Problem description
+4. **ADD** Resolution section with details
 
-**If ID specified:**
-1. Find issue by ID
-2. Validate status is "Open"
-3. If not found/resolved: Report appropriate error
+### 4. Archive Issues
 
-**If no ID specified (auto-select):**
-1. Read KNOWN_ISSUES.md
-2. Find all Open issues
-3. Sort by priority (High > Medium > Low)
-4. Select the highest priority issue (oldest if tie)
+When KNOWN_ISSUES.md exceeds thresholds:
+- **Warning**: > 2000 lines or > 50KB → Notify user
+- **Critical**: > 5000 lines or > 100KB → Auto-archive resolved issues > 30 days old
 
-**After selection:**
-5. Analyze the issue and implement a fix
-6. **Detect current version** (for Fixed field)
-7. **Mark resolved in BOTH sections:**
-   - Update Issue Index: status → Resolved, add Fixed version, add Resolved date
-   - Update Issue Details: **PRESERVE** Original Problem, **ADD** Fixed version and Resolution details
-   - Include: what was fixed, why, files changed, tests added
-8. **Check file size and auto-archive if needed:**
-   - If file > 5000 lines or > 100KB: Auto-archive resolved issues older than 30 days
-   - If file > 2000 lines or > 50KB: Notify user to consider archiving
+Archive to `ISSUES_ARCHIVED.md`, grouped by month.
 
-## CRITICAL: Cautious Fix Implementation
+**Important**:
+- Never auto-archive OPEN issues
+- Always keep recent resolutions (last 30 days)
+- Preserve all details in archive
 
-When implementing any fix, you MUST follow these strict guidelines:
+## CRITICAL: Issue Details Maintenance
 
-### Before Making Any Change
+**Every issue MUST have a corresponding entry in the "Issue Details" section.**
 
-1. **Understand the Problem Completely**
-   - Read all related code thoroughly
-   - Identify the exact root cause
-   - Understand the expected behavior vs actual behavior
-   - Check if there are any tests related to this code
+### For OPEN Issues (Unresolved)
 
-2. **Plan the Fix**
-   - Document what needs to change and why
-   - Identify ALL files that need modification
-   - Consider edge cases and potential side effects
-   - Think about backward compatibility
+Required fields:
+- Priority, Status, Introduced, Created
+- **Original Problem** (REQUIRED): Current behavior, expected behavior, reproduction steps
+- Context, Root Cause (if known), Proposed Solution (optional)
 
-### For Every File Modified
+### For RESOLVED Issues
 
-**MANDATORY CHECKLIST** - Before modifying each file, document:
-
-```markdown
-## File: [path/to/file.ts]
-
-- **Changes summary**: [What will be changed in this file]
-- **Reason**: [Why this file needs modification]
-- **Expected outcome**: [What this should achieve]
-- **Risk assessment**: [Potential side effects or issues]
-- **Affected components**: [Other code/modules that depend on this file]
-- **Tests to run**: [Which tests cover this file]
-```
-
-**Before proceeding, verify:**
-```
-[ ] Expected outcome is clearly defined
-[ ] No existing functionality will break
-[ ] All callers/dependents are considered
-[ ] Edge cases are handled
-[ ] This is the MINIMAL change needed
-[ ] Error handling is preserved
-```
-
-### Verification After Each File
-
-After modifying each file:
-
-1. **Immediate verification:**
-   - Does the code compile/transpile without errors?
-   - Are there any type errors?
-   - Does the syntax look correct?
-
-2. **Run related tests:**
-   - Run any tests for the modified file
-   - Run integration tests if the change affects multiple components
-   - If no tests exist, manually verify the fix works
-
-3. **Check for regressions:**
-   - Does the original issue still need to be fixed?
-   - Did any new issues appear?
-   - Are all existing features still working?
-
-### Forbidden Actions During Fix
-
-**NEVER:**
-- Make changes to unrelated code "while you're at it"
-- Refactor code that isn't directly related to the fix
-- Add features or improvements beyond the scope of the issue
-- Change formatting or style in unrelated areas
-- Update dependencies unless the fix requires it
-- Remove code comments unless they're factually wrong
-- Modify test expectations to make tests pass (fix the code, not the tests)
-
-### If the Fix Is Complex
-
-If the fix requires changes to more than 3 files or is architecturally significant:
-
-1. **STOP and plan first:**
-   - Use `/plan` command to create a detailed plan
-   - Get user approval before proceeding
-   - Consider breaking into smaller, safer changes
-
-2. **Implement incrementally:**
-   - Make one file change at a time
-   - Verify after each file
-   - Commit working states if using version control
-
-3. **Request review:**
-   - After implementing, use `/code-review` to review changes
-   - Address any issues found before marking resolved
-
-## Workflow Integration
-
-### During Development
-
-1. **Before starting work**: Check KNOWN_ISSUES.md for relevant issues
-2. **When finding a bug**: Add it to auto-tracked issues
-3. **After fixing a bug**: Mark the issue as resolved
-4. **At session end**: Review open issues and priorities
-
-## File Location Priority
-
-When looking for or creating KNOWN_ISSUES.md, follow this order:
-
-1. **Existing file**: Use the current location if file already exists
-2. **docs/KNOWN_ISSUES.md**: Preferred for team visibility (ask user first)
-3. **.claude/KNOWN_ISSUES.md**: Default fallback, private to Claude Code
-
-**Important**: Always scan the entire project first before asking to create.
-
-## Best Practices
-
-### Writing Good Issue Descriptions
-
-Bad: Bug - Doesn't work
-
-Good: API returns 500 on /users endpoint - GET /api/users fails with 500 when query param filter contains special characters
-
-### Setting Correct Priority
-
-- **High**: Blocks users, security risk, data loss possible
-- **Medium**: Feature broken but workaround exists, performance degraded
-- **Low**: Cosmetic, nice-to-have fix, technical debt
+**MUST preserve** the original problem AND add:
+- Fixed version (auto-detected)
+- Resolution (detailed explanation of the fix)
+- Resolution Date
+- Files Changed
+- Tests Added
 
 ## Error Handling
 
@@ -567,139 +176,6 @@ Good: API returns 500 on /users endpoint - GET /api/users fails with 500 when qu
 - Works with /tdd for test-driven bug fixes
 - Works with /code-review for reviewing fixes
 - Works with /security-scan for security-related issues
-
-## File Size Management
-
-### Automatic Size Check and Auto-Archive
-
-After each operation (add, resolve, etc.), check if KNOWN_ISSUES.md needs archiving:
-
-#### Size Thresholds
-
-| Threshold | Lines | Size | Action |
-|-----------|-------|------|--------|
-| Warning | > 2000 | > 50KB | Notify user, suggest archiving |
-| Critical | > 5000 | > 100KB | **Auto-archive** resolved issues older than 30 days |
-
-#### Auto-Archive Logic
-
-When file exceeds critical threshold (>5000 lines or >100KB):
-
-```
-1. Calculate file size
-2. If exceeds critical threshold:
-   a. Parse all resolved issues
-   b. Identify issues resolved > 30 days ago
-   c. If found:
-      - Execute auto-archive (same as /archive-issues --days 30)
-      - Log: "Auto-archived X issues to ISSUES_ARCHIVED.md (file size: A → B)"
-   d. If no issues to archive (all recent):
-      - Notify user: "File is large but all resolved issues are recent. Consider manual review."
-3. If exceeds warning threshold only:
-   - Notify user: "KNOWN_ISSUES.md is getting large ([size]). Consider /archive-issues."
-```
-
-#### Auto-Archive Execution
-
-When auto-archiving triggers:
-
-```
-1. Create/append to ISSUES_ARCHIVED.md:
-   - Group by month: ## YYYY-MM Archived Issues
-   - Preserve full issue details
-
-2. Update KNOWN_ISSUES.md:
-   - Remove archived issues from Issue Index
-   - Remove archived issues from Issue Details
-   - Add note: "Auto-archived X issues on YYYY-MM-DD"
-   - Update Summary
-
-3. Confirm to user:
-   "Auto-archived X resolved issues (>30 days old) to ISSUES_ARCHIVED.md
-    File size reduced: [before] → [after]
-    Remaining: Y open issues, Z recent resolved issues"
-```
-
-#### Important Notes
-
-- **Never auto-archive OPEN issues** - Only resolved issues
-- **Always keep recent resolutions** - Last 30 days by default
-- **Preserve all details** - No information loss
-- **Log the action** - User should know what happened
-
-### Archiving Strategy
-
-Resolved issues should be archived to maintain file size:
-
-**Archive File**: `ISSUES_ARCHIVED.md` (same directory as KNOWN_ISSUES.md)
-
-**Archive Structure**:
-```markdown
-# Archived Issues
-
-_Archive Created: YYYY-MM-DD_
-
----
-
-## 2024-01 Archived Issues
-
-### 001: [Issue Title] (RESOLVED 2024-01-15)
-[Full issue details preserved]
-
-### 003: [Issue Title] (RESOLVED 2024-01-18)
-[Full issue details preserved]
-
----
-
-## 2024-02 Archived Issues
-...
-```
-
-### Retention Policy
-
-When archiving:
-1. **Keep in KNOWN_ISSUES.md**:
-   - All OPEN issues (never archive)
-   - Recently resolved issues (last 7 days)
-   - Issues resolved in current month (configurable)
-
-2. **Move to ISSUES_ARCHIVED.md**:
-   - Issues resolved more than [X] days ago
-   - Default: 30 days
-
-### Manual Archive Command
-
-Use `/archive-issues` to manually trigger archiving:
-- Archive all resolved issues older than [days]
-- Default: archive all resolved issues
-- Option to keep recent ones
-
-### After Archiving
-
-Update KNOWN_ISSUES.md:
-1. Remove archived issues from Issue Index table
-2. Remove archived issues from Issue Details section
-3. Update Summary counts
-4. Add note: "X issues archived to ISSUES_ARCHIVED.md on [date]"
-
-## Context Optimization
-
-### For Large Projects
-
-If the project has many issues, consider:
-
-1. **Use focused commands**: `/list-issues --open` instead of reading full file
-2. **Regular archiving**: Archive resolved issues weekly/monthly
-3. **Separate by component**: For very large projects, consider component-specific issue files
-
-### Future: Dedicated Agent (Optional)
-
-For projects with heavy issue tracking needs, a dedicated agent could:
-- Handle all KNOWN_ISSUES.md operations
-- Keep main conversation context clean
-- Manage archiving automatically
-
-Currently not required, but can be added if needed.
 
 ## Commands Summary
 
