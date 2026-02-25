@@ -11,19 +11,16 @@ CodingSkills/
 │   ├── feature-list-tracker/  # Feature 功能管理
 │   ├── human-test-guide/      # 人工测试指导生成
 │   └── smart-context/         # 智能上下文管理
-├── commands/            # 自定义命令
+├── commands/            # 自定义命令（写入操作）
 │   ├── add-issue.md          # 添加 issue
-│   ├── list-issues.md        # 列出 issues
 │   ├── resolve-next-issue.md # 修复 issue
 │   ├── archive-issues.md     # 归档已解决的 issues
 │   ├── add-feature.md        # 添加 feature
-│   ├── list-features.md      # 列出 features
 │   ├── start-next-feature.md # 自动开发 feature
 │   ├── complete-feature.md   # 完成 feature
 │   ├── archive-features.md   # 归档已完成的 features
 │   ├── context-snapshot.md   # 手动生成快照
-│   ├── load-context.md       # 手动加载快照
-│   └── query-cold.md         # 查询冷轨历史
+│   └── load-context.md       # 手动加载快照
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
@@ -38,7 +35,10 @@ docs/
 ├── test-guides/          # 测试指导文档
 │   └── FEATURE_001_TEST_GUIDE.md
 ├── KNOWN_ISSUES.md       # Issue 索引
-└── ISSUES_ARCHIVED.md    # 归档的 issues
+├── ISSUES_ARCHIVED.md    # 归档的 issues
+└── context/              # 上下文管理（smart-context）
+    ├── HOT_TRACK.md      # 热轨快照（< 6k Token）
+    └── COLD_TRACK.md     # 冷轨归档（完整历史）
 ```
 
 ## 已有 Skills
@@ -66,9 +66,10 @@ docs/
 |------|------|
 | `/add-issue "问题描述"` | 添加新 issue（Claude 自动生成标题和详情） |
 | `/add-issue -f [filepath]` | 从文件读取问题并添加为 issue |
-| `/list-issues [--open/--resolved/--all]` | 查看 issues |
 | `/resolve-next-issue [id]` | 修复 issue（指定 ID 或自动选择最高优先级） |
 | `/archive-issues [--days N]` | 归档已解决的 issues |
+
+> **Note**: 列出 issues 的功能已整合到 skill 中，直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可。
 
 **KNOWN_ISSUES.md 文件结构：**
 ```
@@ -120,10 +121,11 @@ docs/
 | `/add-feature "功能描述"` | 添加新 feature（智能版本分配） |
 | `/add-feature -v [version]` | 添加 feature 并指定版本 |
 | `/add-feature -f [filepath]` | 从文件读取功能需求 |
-| `/list-features [--planned/--in-progress/--completed]` | 查看 features |
 | `/start-next-feature [id]` | **自动化开发流程**（可跨版本，会提示确认） |
 | `/complete-feature [id]` | 完成 feature（更新设计和状态） |
 | `/archive-features [--days N]` | 归档已完成的 features |
+
+> **Note**: 列出 features 的功能已整合到 skill 中，直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
 
 **FEATURE_LIST.md 文件结构：**
 ```
@@ -236,7 +238,8 @@ docs/features/
 |------|------|
 | `/context-snapshot` | 生成快照（三步清洗法） |
 | `/load-context` | 加载快照到当前会话 |
-| `/query-cold "关键词"` | 查询冷轨历史 |
+
+> **Note**: 查询冷轨的功能已整合到 skill 中，直接说 "之前试过什么方案" 或调用 `/smart-context "关键词"` 即可。
 
 **工作流程：**
 ```
@@ -248,11 +251,10 @@ docs/features/
 **文件结构：**
 ```
 # 项目目录
-your-project/.claude/
-└── context/                   # 手动创建
+your-project/docs/
+└── context/                   # 上下文管理目录
     ├── HOT_TRACK.md           # 热轨快照（< 6k Token）
     └── COLD_TRACK.md          # 冷轨归档（完整历史）
-    └── COMPACT_LOG.md         # 压缩日志（可选）
 ```
 
 **热轨快照示例：**
@@ -281,12 +283,13 @@ function logout(): void
 
 ## 已有 Commands
 
+> **Note**: 查询类命令（list-issues、list-features、query-cold）已合并到对应的 skill 中，直接对话或调用 skill 即可。
+
 ### Issue 管理
 
 | 命令 | 说明 |
 |------|------|
 | `/add-issue` | 精准添加 issue 到 KNOWN_ISSUES.md |
-| `/list-issues` | 列出所有 issues，支持过滤 |
 | `/resolve-next-issue [id]` | 修复 issue（指定 ID 或自动选择最高优先级） |
 | `/archive-issues` | 归档已解决的 issues 到 ISSUES_ARCHIVED.md |
 
@@ -297,7 +300,6 @@ function logout(): void
 | `/add-feature "描述"` | 添加新 feature（智能版本分配） |
 | `/add-feature -v [version]` | 添加 feature 并指定版本 |
 | `/add-feature -f [file]` | 从文件添加 feature |
-| `/list-features` | 列出所有 features，支持状态/优先级/版本过滤 |
 | `/start-next-feature [id]` | 自动化开发：Plan → 设计 → TDD → 测试 → 测试指导 |
 | `/complete-feature [id]` | 完成 feature，更新设计和版本状态 |
 | `/archive-features` | 归档已完成的 features 到 FEATURES_ARCHIVED.md |
@@ -308,7 +310,6 @@ function logout(): void
 |------|------|
 | `/context-snapshot` | 生成快照（三步清洗法） |
 | `/load-context` | 加载快照到当前会话 |
-| `/query-cold "关键词"` | 查询冷轨历史（墓碑和详细记录） |
 
 ## 安装使用
 
