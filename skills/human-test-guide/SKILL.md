@@ -1,6 +1,6 @@
 ---
 name: human-test-guide
-description: Generate comprehensive human testing guides with test cases, steps, and expected results. Automatically activates when users ask about testing, test cases, or test guides. Works for features, bug fixes, and general functionality verification.
+description: Generate human testing guides with test cases. Auto-activates on "test guide/测试指导/测试用例" keywords.
 ---
 
 # Human Test Guide Generator

@@ -1,6 +1,6 @@
 ---
 name: known-issues-tracker
-description: Maintain a KNOWN_ISSUES.md file to track, prioritize, and resolve issues in any project. All issues are tracked uniformly with Claude's assistance for comprehensive documentation. Automatically activates when users mention bugs, issues, errors, or problems.
+description: Track issues with KNOWN_ISSUES.md. Auto-activates on "bug/issue/error/问题/报错/错误" keywords. Use /add-issue, /resolve-next-issue.
 ---
 
 # Known Issues Tracker
@@ -12,12 +12,12 @@ This skill provides a standardized way to track, prioritize, and resolve known i
 This skill should be automatically activated when the user message contains:
 
 **Keywords:**
-- bug, issue, problem, error, crash, failure
-- doesn't work, broken, not working, failing
-- there is a, we have a, I found a (followed by bug/issue/problem)
-- need to fix, should fix, have to fix
-- workaround, temporary fix, hack
-- technical debt, TODO, FIXME (when describing problems)
+- bug, issue, problem, error, crash, failure, 问题, 报错, 错误, 崩溃, 故障
+- doesn't work, broken, not working, failing, 不工作, 坏了, 失败
+- there is a, we have a, I found a, 有个, 发现一个
+- need to fix, should fix, have to fix, 需要修复, 修复
+- workaround, temporary fix, hack, 临时方案, 绕过
+- technical debt, TODO, FIXME, 技术债
 
 **Example User Messages:**
 - "There is a bug in the login flow"

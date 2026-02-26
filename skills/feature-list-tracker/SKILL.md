@@ -1,6 +1,6 @@
 ---
 name: feature-list-tracker
-description: Maintain a FEATURE_LIST.md file and docs/features/ directory to track, plan, and implement software features. Features are tracked with lifecycle status (Planned/InProgress/Completed), priority levels, version tracking, and design documentation. Automatically activates when users mention features, functionality, enhancements, or planning. Supports automated development workflow via /start-next-feature command.
+description: Track features with FEATURE_LIST.md. Auto-activates on "feature/functionality/功能/特性" keywords. Use /add-feature, /start-next-feature.
 ---
 
 # Feature List Tracker
@@ -12,14 +12,14 @@ This skill provides a standardized way to track, plan, and implement software fe
 This skill should be automatically activated when the user message contains:
 
 **Keywords:**
-- feature, functionality, capability
-- add, implement, create, build, develop
-- support, enable, allow
-- enhancement, improvement, upgrade
-- roadmap, backlog, sprint, milestone
-- user story, user need
-- "plan to add", "going to", "will add", "should have"
-- "in the future", "upcoming", "next version"
+- feature, functionality, capability, 功能, 特性, 新功能
+- add, implement, create, build, develop, 添加, 开发, 实现
+- support, enable, allow, 支持, 启用
+- enhancement, improvement, upgrade, 增强, 改进, 升级
+- roadmap, backlog, sprint, milestone, 路线图, 里程碑
+- user story, user need, 用户故事, 需求
+- "plan to add", "going to", "will add", "should have", 计划添加, 准备开发
+- "in the future", "upcoming", "next version", 下一版本, 未来
 
 **Example User Messages:**
 - "We need to add a feature for user profiles"
