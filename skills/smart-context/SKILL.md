@@ -1,6 +1,6 @@
 ---
 name: smart-context
-description: 智能上下文管理，通过双轨记忆（热轨/冷轨）和三步清洗法解决注意力稀释问题。手动生成高信噪比快照，需要时手动加载。自动激活于压缩相关场景。
+description: Context management via dual-track memory (hot/cold track). Auto-activates on "compact/context/snapshot/压缩/上下文/快照" keywords. Use /context-snapshot, /load-context.
 ---
 
 # Smart Context - 智能上下文管理
