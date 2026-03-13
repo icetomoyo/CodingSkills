@@ -33,7 +33,7 @@ docs/
 │   ├── v1.1.0.md         # v1.1.0 版本设计
 │   └── unplanned.md      # 未确定版本的设计草案
 ├── test-guides/          # 测试指导文档
-│   └── FEATURE_001_TEST_GUIDE.md
+│   └── FEATURE_001_v1.1.0_TEST_GUIDE.md
 ├── KNOWN_ISSUES.md       # Issue 索引
 ├── ISSUES_ARCHIVED.md    # 归档的 issues
 └── context/              # 上下文管理（smart-context）

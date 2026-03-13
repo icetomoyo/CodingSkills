@@ -272,7 +272,7 @@ User: /complete-feature 004
 - 使用 JWT 认证，access token 有效期 15 分钟
 - 支持 Google 和 GitHub OAuth
 - 测试覆盖率 91%，30 个测试用例全部通过
-- 人工测试指导: docs/test-guides/FEATURE_001_TEST_GUIDE.md
+- 人工测试指导: docs/test-guides/FEATURE_001_v1.1.0_TEST_GUIDE.md
 ```
 
 ## Design Document After Completion

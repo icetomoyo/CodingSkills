@@ -192,7 +192,7 @@ Highest Priority InProgress: 001 (用户登录系统)
 
 **Phase 5 - Generate Test Guide**:
 - Call `human-test-guide` skill
-- Output: `docs/test-guides/FEATURE_XXX_TEST_GUIDE.md`
+- Output: `docs/test-guides/FEATURE_{ID}_{VERSION}_TEST_GUIDE.md`
 
 ### 4. Complete Feature
 

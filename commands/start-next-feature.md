@@ -387,7 +387,7 @@ Creating: docs/test-guides/FEATURE_001_TEST_GUIDE.md
 - 自动化测试用例（从 Phase 3-4 获取）
 
 **输出**:
-- `docs/test-guides/FEATURE_XXX_TEST_GUIDE.md`
+- `docs/test-guides/FEATURE_{ID}_{VERSION}_TEST_GUIDE.md`
 
 详见：[human-test-guide skill](../skills/human-test-guide/SKILL.md)
 
@@ -412,7 +412,7 @@ What was done:
 
 Files:
 - Design: docs/features/v1.1.0.md#001
-- Test Guide: docs/test-guides/FEATURE_001_TEST_GUIDE.md
+- Test Guide: docs/test-guides/FEATURE_001_v1.1.0_TEST_GUIDE.md
 
 Next Steps:
 1. Review design document

@@ -5,7 +5,7 @@ description: Generate human testing guides with test cases. Auto-activates on "t
 
 # Human Test Guide Generator
 
-This skill generates comprehensive human testing guides for software features, bug fixes, and functionality verification.
+This skill generates comprehensive human testing guides for software features, issue fixes, and functionality verification.
 
 ## Automatic Activation Triggers
 
@@ -34,7 +34,7 @@ This skill should be automatically activated when the user message contains:
 ## When to Use
 
 - After implementing a new feature
-- After fixing a bug (regression testing)
+- After fixing an issue (regression testing)
 - When documenting existing functionality
 - When preparing for QA review
 - When onboarding new team members
@@ -124,7 +124,7 @@ The generated test guide follows this structure:
 ---
 
 *测试指导生成时间: [Date]*
-*Feature/Bug ID: [ID]*
+*Feature/Issue ID: [ID]*
 ```
 
 ## Test Case Types
@@ -258,15 +258,23 @@ Test the feature across different platforms and browsers.
 4. 生成测试文档
    - 使用标准模板
    - 输出到 docs/test-guides/ 目录
-   - 文件名：FEATURE_XXX_TEST_GUIDE.md 或 BUG_XXX_TEST_GUIDE.md
+   - 文件名：FEATURE_{ID}_{VERSION}_TEST_GUIDE.md 或 ISSUE_{ID}_{VERSION}_REGRESSION_GUIDE.md
 ```
 
-### Output Location
+### Output Location and File Naming Standards
+
+**CRITICAL CONSTRAINT**: All test guide files MUST be generated in the project root's `docs/test-guides/` directory. NEVER create test guides in any other location.
 
 **文件路径**:
-- Feature 测试指导: `docs/test-guides/FEATURE_XXX_TEST_GUIDE.md`
-- Bug 回归测试指导: `docs/test-guides/BUG_XXX_REGRESSION_GUIDE.md`
-- 通用测试指导: `docs/test-guides/[NAME]_TEST_GUIDE.md`
+```
+项目根目录/
+└── docs/
+    └── test-guides/
+        ├── FEATURE_001_v1.1.0_TEST_GUIDE.md
+        ├── FEATURE_002_v1.1.0_TEST_GUIDE.md
+        ├── ISSUE_003_v1.0.2_REGRESSION_GUIDE.md
+        └── FEATURE_006_v1.2.0_TEST_GUIDE.md
+```
 
 **目录创建逻辑**:
 ```
@@ -278,10 +286,47 @@ Test the feature across different platforms and browsers.
 3. 在 docs/test-guides/ 目录下创建测试指导文件
 ```
 
-**文件命名规则**:
-- Feature: `FEATURE_{ID}_TEST_GUIDE.md`（如 `FEATURE_001_TEST_GUIDE.md`）
-- Bug: `BUG_{ID}_REGRESSION_GUIDE.md`（如 `BUG_003_REGRESSION_GUIDE.md`）
-- 通用: `{NAME}_TEST_GUIDE.md`（如 `LOGIN_TEST_GUIDE.md`）
+**标准化文件命名规则**:
+
+文件名格式：`{TYPE}_{ID}_{VERSION}_{SUFFIX}.md`
+
+| 组成部分 | 说明 | 示例 |
+|---------|------|------|
+| **TYPE** | 测试类型 | `FEATURE` 或 `ISSUE` |
+| **ID** | 功能或问题的唯一标识符 | `001`, `002`, `003` |
+| **VERSION** | 目标发布版本（从 feature/issue 获取） | `v1.1.0`, `v2.0.0` |
+| **SUFFIX** | 文件类型后缀 | `TEST_GUIDE` 或 `REGRESSION_GUIDE` |
+
+**命名模板**:
+```
+Feature 测试指导:
+  FEATURE_{ID}_{VERSION}_TEST_GUIDE.md
+  示例: FEATURE_001_v1.1.0_TEST_GUIDE.md
+
+Issue 回归测试指导:
+  ISSUE_{ID}_{VERSION}_REGRESSION_GUIDE.md
+  示例: ISSUE_003_v1.0.2_REGRESSION_GUIDE.md
+
+通用功能测试指导:
+  FEATURE_{NAME}_{VERSION}_TEST_GUIDE.md
+  示例: FEATURE_LOGIN_v1.1.0_TEST_GUIDE.md
+```
+
+**版本信息获取**:
+```
+1. 从 FEATURE_LIST.md 获取 feature 的 Planned 版本
+2. 从 KNOWN_ISSUES.md 获取 issue 的 Target 版本
+3. 如果无法获取版本，使用 "vX.X.X" 作为占位符
+```
+
+**文件名验证**:
+```
+✓ 正确: docs/test-guides/FEATURE_001_v1.1.0_TEST_GUIDE.md
+✓ 正确: docs/test-guides/ISSUE_003_v1.0.2_REGRESSION_GUIDE.md
+✗ 错误: test-guides/FEATURE_001_TEST_GUIDE.md (缺少版本)
+✗ 错误: docs/FEATURE_001_v1.1.0_TEST_GUIDE.md (路径错误)
+✗ 错误: docs/test-guides/login_test.md (不符合命名规范)
+```
 
 ## Best Practices
 
@@ -336,4 +381,4 @@ For each feature, ensure coverage of:
 ## Related Commands
 
 - `/start-next-feature` - Automated feature development with test guide generation
-- `/resolve-next-issue` - Bug fix with optional regression test guide
+- `/resolve-next-issue` - Issue fix with optional regression test guide
