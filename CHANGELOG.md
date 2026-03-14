@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-03-14
+
+### Bug Fixes
+- **Commands**: 修复 `start-next-feature.md` 的 YAML frontmatter 语法错误
+  - 为 `description` 字段添加双引号包裹
+  - 避免文本中的冒号 (`: `) 被 YAML 解析器误认为 key-value 分隔符
+  - 修复前：`description: ... Runs complete workflow: Plan → ...`
+  - 修复后：`description: "... Runs complete workflow: Plan → ..."`
+
 ## [0.2.7] - 2026-03-14
 
 ### Documentation
@@ -120,8 +129,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/username/CodingSkills/compare/v0.2.7...HEAD
-[0.2.7]: https://github.com/username/CodingSkills/compare/v0.2.6...v0.2.7
+[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.8...HEAD
+[0.2.8]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.7...v0.2.8
+[0.2.7]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/username/CodingSkills/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/username/CodingSkills/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/username/CodingSkills/compare/v0.2.3...v0.2.4
