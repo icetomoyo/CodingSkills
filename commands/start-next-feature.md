@@ -1,5 +1,5 @@
 ---
-description: Implement a feature from FEATURE_LIST.md. Specify a feature ID to implement that specific feature, or omit to automatically implement the highest priority planned feature. Runs complete workflow: Plan → TDD Development → Automated Testing → Generate Human Test Guide.
+description: "Implement a feature from FEATURE_LIST.md. Specify a feature ID to implement that specific feature, or omit to automatically implement the highest priority planned feature. Runs complete workflow: Plan → TDD Development → Automated Testing → Generate Human Test Guide."
 ---
 
 # Start Next Feature
