@@ -309,7 +309,7 @@ Description: Connection to database times out after 30 seconds of inactivity
 ```
 If the specified ID doesn't exist:
 - Report "Issue [id] not found in KNOWN_ISSUES.md"
-- Suggest using /list-issues to see available issues
+- 提示用户直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可
 ```
 
 ### Issue Already Resolved (When ID Specified)

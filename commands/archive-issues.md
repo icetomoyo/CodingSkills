@@ -201,9 +201,10 @@ File size: 85KB → 32KB (62% reduction)
 
 ## Related Commands
 
-- `/list-issues` - View issues before archiving
 - `/add-issue` - Add new issues
 - `/resolve-next-issue` - Resolve issues
+
+> **Note**: 列出 issues 的功能已整合到 skill 中，直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可。
 
 ## Related Skills
 

@@ -236,8 +236,9 @@ Introduced in: v1.2.0
 ## Related Commands
 
 - `/resolve-next-issue` - Fix the highest priority issue
-- `/list-issues` - View all issues
 - `/archive-issues` - Archive resolved issues
+
+> **Note**: 列出 issues 的功能已整合到 skill 中，直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可。
 
 ## Related Skills
 

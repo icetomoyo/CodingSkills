@@ -212,7 +212,7 @@ User: /complete-feature 999
 Finding feature 999...
 ✗ Feature 999 not found in FEATURE_LIST.md
 
-Use /list-features to see all available features.
+直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
 ```
 
 #### Feature Already Completed
@@ -299,9 +299,10 @@ User: /complete-feature 004
 ## Related Commands
 
 - `/add-feature` - Add a new feature
-- `/list-features` - View all features
 - `/start-next-feature` - Begin implementing a feature
 - `/archive-features` - Archive completed features
+
+> **Note**: 列出 features 的功能已整合到 skill 中，直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
 
 ## Related Skills
 

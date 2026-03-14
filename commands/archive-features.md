@@ -315,9 +315,10 @@ Good times to manually archive:
 ## Related Commands
 
 - `/add-feature` - Add a new feature
-- `/list-features` - View all features
 - `/start-next-feature` - Begin implementing highest priority feature
 - `/complete-feature [id]` - Mark feature as completed
+
+> **Note**: 列出 features 的功能已整合到 skill 中，直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
 
 ## Related Skills
 
