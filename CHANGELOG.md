@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.2.9] - 2026-03-15
+
+### Features
+- **smart-changelog**: 智能 changelog 管理技能
+  - 从 git 历史增量同步到 CHANGELOG.md
+  - 支持语义化版本发布 (patch/minor/major)
+  - 自动同步版本号、打 Tag、推送
+
+---
+
 ## [0.2.8] - 2026-03-14
 
 ### Bug Fixes
@@ -15,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 避免文本中的冒号 (`: `) 被 YAML 解析器误认为 key-value 分隔符
   - 修复前：`description: ... Runs complete workflow: Plan → ...`
   - 修复后：`description: "... Runs complete workflow: Plan → ..."`
+
+---
 
 ## [0.2.7] - 2026-03-14
 
@@ -31,11 +45,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `commands/archive-issues.md`
     - `commands/resolve-next-issue.md`
 
+---
+
 ## [0.2.6] - 2026-03-14
 
 ### Features
 - **Testing**: 标准化测试指南文件命名规范
   - 测试指南文件名格式统一为 `FEATURE_{ID}_{VERSION}_TEST_GUIDE.md`
+
+---
 
 ## [0.2.5] - 2026-03-13
 
@@ -60,11 +78,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Context**: 将上下文快照路径从 `.claude/context` 改为 `docs/context`
   - 统一文档结构，所有生成的文档都在 `docs/` 目录下
 
+---
+
 ## [0.2.4] - 2026-03-12
 
 ### Chores
 - 移除 hooks 文件夹
 - 移除 Git 追踪中的 `.claude` 目录
+
+---
 
 ## [0.2.3] - 2026-03-12
 
@@ -74,6 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 移除自动归档功能
   - 保留 `/context-snapshot` 和 `/load-context` 手动命令
 
+---
+
 ## [0.1.2] - 2026-03-11
 
 ### Refactoring
@@ -82,12 +106,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/list-issues` 功能整合到 `known-issues-tracker` skill
   - 用户可以直接对话或调用 skill 来列出 features/issues
 
+---
+
 ## [0.1.1] - 2026-03-11
 
 ### Refactoring
 - **Skills**: 重构 skill 目录结构符合官方规范
   - 将 skill 定义文件从 `skill.md` 重命名为 `SKILL.md`
   - 确保所有 skill 文件名符合 Claude Code 官方规范
+
+---
 
 ## [0.2.2] - 2026-03-11
 
@@ -98,6 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 完全手动流程：`/context-snapshot` + `/load-context`
   - 避坑墓碑：记录失败尝试
 
+---
+
 ## [0.2.1] - 2026-03-10
 
 ### Features
@@ -105,6 +135,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 自动生成包含测试用例和预期效果的测试文档
   - 支持 7 种测试类型
   - 与 `feature-list-tracker` 集成
+
+---
 
 ## [0.2.0] - 2026-03-09
 
@@ -114,6 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 版本规划与管理
   - 自动化开发流程：Plan → TDD → 测试 → 生成测试指导
   - `/add-feature`, `/start-next-feature`, `/complete-feature` 命令
+
+---
 
 ## [0.1.0] - 2026-03-08
 
@@ -129,16 +163,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.8...HEAD
+[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.9...HEAD
+[0.2.9]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.6...v0.2.7
-[0.2.6]: https://github.com/username/CodingSkills/compare/v0.2.5...v0.2.6
-[0.2.5]: https://github.com/username/CodingSkills/compare/v0.2.4...v0.2.5
-[0.2.4]: https://github.com/username/CodingSkills/compare/v0.2.3...v0.2.4
-[0.2.3]: https://github.com/username/CodingSkills/compare/v0.1.2...v0.2.3
-[0.1.2]: https://github.com/username/CodingSkills/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/username/CodingSkills/compare/v0.2.2...v0.1.1
-[0.2.2]: https://github.com/username/CodingSkills/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/username/CodingSkills/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/username/CodingSkills/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/username/CodingSkills/releases/tag/v0.1.0
+[0.2.6]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.5...v0.2.6
+[0.2.5]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.2...v0.2.3
+[0.1.2]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.2...v0.1.1
+[0.2.2]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/icetomoyo/CodingSkills/releases/tag/v0.1.0
