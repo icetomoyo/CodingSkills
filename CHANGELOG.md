@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.10] - 2026-03-15
+
+### Documentation
+- **Skills**: 为所有技能添加 `argument-hint` 字段符合官方规范
+  - smart-changelog: `"[--release] [patch|minor|major|vX.Y.Z]"`
+  - known-issues-tracker: `"[description] | [id]"`
+  - smart-context: `"[keyword] | --snapshot | --load"`
+  - human-test-guide: `"[feature-name] | [-f file]"`
+  - feature-list-tracker: `"[description] | [id] | [-v version]"`
+
+### Refactoring
+- **smart-changelog**: 重构发布流程支持模块化操作
+  - 支持自然语言和斜杠命令双重触发方式
+  - 添加 Tag 相关触发词
+  - Monorepo 检测和版本策略选择
+  - 版本号确认机制
+  - 文档更新检测
+
+---
+
 ## [0.2.9] - 2026-03-15
 
 ### Features
@@ -163,8 +183,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.9...HEAD
-[0.2.9]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.8...v0.2.9
+[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.10...HEAD
+[0.2.10]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.9...v0.2.10
+[0.2.9]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.5...v0.2.6

@@ -1,6 +1,7 @@
 ---
 name: feature-list-tracker
 description: Track features with FEATURE_LIST.md. Auto-activates on "feature/functionality/功能/特性" keywords. Use /add-feature, /start-next-feature.
+argument-hint: "[description] | [id] | [-v version]"
 ---
 
 # Feature List Tracker

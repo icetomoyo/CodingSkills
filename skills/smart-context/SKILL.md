@@ -1,6 +1,7 @@
 ---
 name: smart-context
 description: Context management via dual-track memory (hot/cold track). Auto-activates on "compact/context/snapshot/压缩/上下文/快照" keywords. Use /context-snapshot, /load-context.
+argument-hint: "[keyword] | --snapshot | --load"
 ---
 
 # Smart Context - 智能上下文管理

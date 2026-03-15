@@ -1,6 +1,7 @@
 ---
 name: human-test-guide
 description: Generate human testing guides with test cases. Auto-activates on "test guide/测试指导/测试用例" keywords.
+argument-hint: "[feature-name] | [-f file]"
 ---
 
 # Human Test Guide Generator

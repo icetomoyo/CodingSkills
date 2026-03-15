@@ -1,6 +1,7 @@
 ---
 name: known-issues-tracker
 description: Track issues with KNOWN_ISSUES.md. Auto-activates on "bug/issue/error/问题/报错/错误" keywords. Use /add-issue, /resolve-next-issue.
+argument-hint: "[description] | [id]"
 ---
 
 # Known Issues Tracker
