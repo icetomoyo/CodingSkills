@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Refactoring
+- **smart-context**: 基于 Factory.ai 压缩评估研究进行重大改进
+  - 引入增量合并机制（anchored iterative summarization）替代全量重新生成
+  - 新增文件操作日志 section（Artifact tracking），只追加不删除
+  - 新增 Step 4 Probe 自验证（Recall/Artifact/Continuation/Decision）
+  - 优化目标从固定 6k Token 限制改为 Tokens-per-Task 恢复成本加权裁剪
+  - 强化原始意图 section（首次写入后冻结）和下一步 section（可执行步骤）
+  - 上下文路径从 `docs/context/` 迁移至 `.agent/`
+  - 同步更新 `/context-snapshot` 和 `/load-context` 命令
+  - 三步清洗法升级为四步清洗法（Step 3 改为增量合并）
+
 ---
 
 ## [0.2.10] - 2026-03-15
