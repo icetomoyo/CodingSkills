@@ -36,9 +36,7 @@ docs/
 │   └── FEATURE_001_v1.1.0_TEST_GUIDE.md
 ├── KNOWN_ISSUES.md       # Issue 索引
 ├── ISSUES_ARCHIVED.md    # 归档的 issues
-└── context/              # 上下文管理（smart-context）
-    ├── HOT_TRACK.md      # 热轨快照（< 6k Token）
-    └── COLD_TRACK.md     # 冷轨归档（完整历史）
+└── context/              # 上下文管理（smart-context，已迁移至 .agent/）
 ```
 
 ## 已有 Skills
@@ -210,22 +208,20 @@ docs/features/
 
 ### smart-context
 
-智能上下文管理技能，通过双轨记忆解决长对话中的注意力稀释问题。
+智能上下文管理技能，通过双轨记忆和增量合并解决长对话中的注意力稀释问题。
 
 **功能：**
-- **双轨制记忆**：热轨（< 6k Token）+ 冷轨（无限）
-- **三步清洗法**：无损提取接口骨架 → 有损修剪生成墓碑 → 生成快照
-- **完全手动流程**：手动生成快照 + 手动加载
+- **双轨制记忆**：热轨（~6k Token 软目标）+ 冷轨（无限）
+- **四步清洗法**：无损提取骨架 → 有损修剪立墓碑 → 增量合并 → Probe 自验证
+- **增量合并机制**：基于已有快照进行增量合并，而非全量重新生成
+- **文件操作日志**：追踪所有读取/修改/创建的文件，只追加不删除
+- **Probe 自验证**：Recall/Artifact/Continuation/Decision 四维验证快照质量
+- **恢复成本加权裁剪**：以 Tokens-per-Task 为优化目标，优先保留高恢复成本信息
 - **避坑墓碑**：记录失败尝试，避免重复踩坑
 
 **核心概念：**
 ```
-增量日志（几万 Token）──压缩──▶ 热轨快照（< 6k Token）
-                                    │
-                                    ├── 项目状态（目标、阻塞）
-                                    ├── 接口骨架（签名，无实现）
-                                    ├── 避坑墓碑（死胡同记录）
-                                    └── 关键决策
+已有快照（anchor）+ 新对话内容 ──Incremental Merge──▶ 更新后热轨快照
 ```
 
 **自动触发条件：**
@@ -236,14 +232,14 @@ docs/features/
 
 | 命令 | 说明 |
 |------|------|
-| `/context-snapshot` | 生成快照（三步清洗法） |
+| `/context-snapshot` | 增量合并生成快照（四步清洗法 + Probe 自验证） |
 | `/load-context` | 加载快照到当前会话 |
 
 > **Note**: 查询冷轨的功能已整合到 skill 中，直接说 "之前试过什么方案" 或调用 `/smart-context "关键词"` 即可。
 
 **工作流程：**
 ```
-1. /context-snapshot  →  生成快照
+1. /context-snapshot  →  增量合并生成快照（含自验证）
 2. /compact           →  执行压缩
 3. /load-context      →  新会话需要时加载快照
 ```
@@ -251,34 +247,23 @@ docs/features/
 **文件结构：**
 ```
 # 项目目录
-your-project/docs/
-└── context/                   # 上下文管理目录
-    ├── HOT_TRACK.md           # 热轨快照（< 6k Token）
-    └── COLD_TRACK.md          # 冷轨归档（完整历史）
+your-project/
+└── .agent/                    # 智能代理上下文目录
+    ├── HOT_TRACK.md           # 热轨快照（增量合并）
+    └── COLD_TRACK.md          # 冷轨归档（追加）
 ```
 
-**热轨快照示例：**
+**热轨快照结构：**
 ```markdown
 # 热轨快照
 
-## 1. 项目状态
-### 当前目标：实现用户登录系统
-### 当下阻塞：OAuth-GitHub 403 错误
-
-## 2. 已确定接口（骨架）
-### auth.ts
-function login(provider: string): Promise<User>
-function logout(): void
-
-## 3. 避坑墓碑
-| 死胡同 | 失败原因 | 日期 |
-|--------|----------|------|
-| Session 存储 | 分布式同步问题 | 2026-02-21 |
-
-## 4. 关键决策
-| 决策 | 理由 | 日期 |
-|------|------|------|
-| 使用 JWT | 无状态，易扩展 | 2026-02-22 |
+## 0. 原始意图（永不修改）
+## 1. 项目状态（目标、阻塞、进度）
+## 2. 已确定接口（骨架，无实现体）
+## 3. 文件操作日志（只追加不删除）
+## 4. 避坑墓碑
+## 5. 关键决策
+## 6. 下一步（可执行步骤）
 ```
 
 ## 已有 Commands
@@ -308,7 +293,7 @@ function logout(): void
 
 | 命令 | 说明 |
 |------|------|
-| `/context-snapshot` | 生成快照（三步清洗法） |
+| `/context-snapshot` | 增量合并生成快照（四步清洗法 + Probe 自验证） |
 | `/load-context` | 加载快照到当前会话 |
 
 ## 安装使用

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] - 2026-03-28
+
 ### Refactoring
 - **smart-context**: 基于 Factory.ai 压缩评估研究进行重大改进
   - 引入增量合并机制（anchored iterative summarization）替代全量重新生成
@@ -194,7 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.10...HEAD
+[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.10...v0.3.0
 [0.2.10]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.7...v0.2.8
