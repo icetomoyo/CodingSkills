@@ -2,6 +2,8 @@
 
 Claude Code 自定义 Skills、Commands、Agents 和 Rules 仓库。
 
+**当前版本：v0.3.0**
+
 ## 项目结构
 
 ```
@@ -10,6 +12,7 @@ CodingSkills/
 │   ├── known-issues-tracker/  # Issue 追踪管理
 │   ├── feature-list-tracker/  # Feature 功能管理
 │   ├── human-test-guide/      # 人工测试指导生成
+│   ├── smart-changelog/       # CHANGELOG 版本管理
 │   └── smart-context/         # 智能上下文管理
 ├── commands/            # 自定义命令（写入操作）
 │   ├── add-issue.md          # 添加 issue
@@ -24,19 +27,26 @@ CodingSkills/
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
+```
 
-# 使用 skill 后生成的文件结构：
+## 使用 skill 后生成的文件结构
+
+```
 docs/
-├── FEATURE_LIST.md        # Feature 索引和状态
-├── features/              # Feature 设计文档
-│   ├── v1.0.0.md         # v1.0.0 版本设计
-│   ├── v1.1.0.md         # v1.1.0 版本设计
-│   └── unplanned.md      # 未确定版本的设计草案
-├── test-guides/          # 测试指导文档
+├── CHANGELOG.md            # 变更日志（smart-changelog）
+├── FEATURE_LIST.md         # Feature 索引和状态
+├── features/               # Feature 设计文档
+│   ├── v1.0.0.md           # v1.0.0 版本设计
+│   ├── v1.1.0.md           # v1.1.0 版本设计
+│   └── unplanned.md        # 未确定版本的设计草案
+├── test-guides/            # 测试指导文档
 │   └── FEATURE_001_v1.1.0_TEST_GUIDE.md
-├── KNOWN_ISSUES.md       # Issue 索引
-├── ISSUES_ARCHIVED.md    # 归档的 issues
-└── context/              # 上下文管理（smart-context，已迁移至 .agent/）
+├── KNOWN_ISSUES.md         # Issue 索引
+└── ISSUES_ARCHIVED.md      # 归档的 issues
+
+.agent/                     # 智能代理上下文（smart-context）
+├── HOT_TRACK.md            # 热轨快照（增量合并）
+└── COLD_TRACK.md           # 冷轨归档（追加）
 ```
 
 ## 已有 Skills
@@ -206,6 +216,52 @@ docs/features/
 - 被 `feature-list-tracker` 的 `/start-next-feature` 命令调用
 - 可与 `known-issues-tracker` 配合生成 Bug 回归测试
 
+### smart-changelog
+
+智能 CHANGELOG 管理和版本发布技能。
+
+**功能：**
+- 从 git 历史增量同步到 CHANGELOG.md
+- 支持语义化版本发布（patch/minor/major）
+- 自动检测项目版本号（支持 package.json、VERSION、pyproject.toml、Cargo.toml）
+- Monorepo 检测和多包版本策略
+- 模块化发布步骤选择（更新文档、创建 Tag、GitHub Release 等）
+- 自然语言和斜杠命令双重触发
+
+**自动触发条件：**
+- 用户提到 changelog, release, tag, 版本发布, 更新日志, 打tag
+- 用户说 "发布", "ship", "bump version"
+
+**使用方式：**
+
+| 触发方式 | 说明 |
+|---------|------|
+| `/smart-changelog` | 仅同步 git 提交到 CHANGELOG |
+| `/smart-changelog --release` | 发布新版本（交互式选择步骤） |
+| `/smart-changelog --release patch` | 发布 patch 版本 |
+| `/smart-changelog --release minor` | 发布 minor 版本 |
+| "更新 changelog" | 同步并推送 |
+| "完整发布" | 执行所有发布步骤 |
+
+**发布步骤（可选择性执行）：**
+1. 更新 CHANGELOG.md
+2. 同步版本号到项目文件
+3. 创建 Git Tag
+4. 推送 commits 和 tags
+5. 创建 GitHub Release
+6. 更新相关文档
+
+**提交分类规则：**
+
+| 前缀 | 分类 |
+|------|------|
+| `feat:`, `feature:` | Added |
+| `fix:`, `bugfix:` | Fixed |
+| `refactor:` | Changed |
+| `docs:` | Documentation |
+| `perf:` | Performance |
+| `test:`, `chore:`, `ci:` | Skip |
+
 ### smart-context
 
 智能上下文管理技能，通过双轨记忆和增量合并解决长对话中的注意力稀释问题。
@@ -296,6 +352,13 @@ your-project/
 | `/context-snapshot` | 增量合并生成快照（四步清洗法 + Probe 自验证） |
 | `/load-context` | 加载快照到当前会话 |
 
+### 版本管理
+
+| 命令 | 说明 |
+|------|------|
+| `/smart-changelog` | 同步 git 提交到 CHANGELOG |
+| `/smart-changelog --release [type]` | 发布新版本（交互式选择步骤） |
+
 ## 安装使用
 
 ### 方式一：复制到用户目录
@@ -354,6 +417,7 @@ KNOWN_ISSUES.md 会随着时间变大，影响 LLM 上下文效率：
 - [x] 自动化开发流程（/start-next-feature）
 - [x] 人工测试指导文档生成
 - [x] 智能上下文管理（smart-context）
+- [x] CHANGELOG 版本管理（smart-changelog）
 - [ ] 添加更多实用 skills
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules
