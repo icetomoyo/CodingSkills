@@ -131,10 +131,113 @@ Description:
 12. Update Version Summary (status may change to InDevelopment)
 ```
 
-### Phase 2: Plan Implementation & Update Design Doc
+### Phase 2: Ensure Feature Design Block & Plan Implementation
+
+#### 2.1 Locate Feature Design Block
+
+在开始规划之前，**必须先确认** `docs/features/v{VERSION}.md` 里存在对应的 `## FEATURE_{ID}` 设计块。这一步是为了防止 coding agent 只读到"版本级叙事"而错把整版意图当成单个 feature 的需求实现。
+
+```
+=== LOCATING FEATURE DESIGN BLOCK ===
+
+1. Read docs/features/v{VERSION}.md
+2. Search for heading: ## FEATURE_{ID}  或  ## FEATURE_{ID}:
+3. Classify document into one of三种形态:
+
+Case A - 设计块存在且已填充（6 节均有实质内容，不是 "_待 ... 填充_"）
+  → Use as-is. Skip to 2.3 (Plan Implementation).
+
+Case B - 设计块存在但为占位（6 节均为 "_待 ... 填充_" 或 add-feature 初始状态）
+  → Skip to 2.3. 规划后在 "Update Design Document" 步骤填充。
+
+Case C - 设计块不存在（版本文档只有版本级叙事，例如"版本目标/范围/主流程/验收标准/前端基线"等整版内容，但没有 per-feature 块）
+  → 必须先执行 2.2 EXTRACTION，再进入 2.3。
+```
+
+#### 2.2 Extract Feature Design from Version Narrative（仅 Case C）
+
+当版本文档是"版本级叙事"格式（例如整版只列了 feature 标题清单，其余内容都是整版通用的目标/范围/UI 规范/验收标准），必须先把本 feature 的设计从版本叙事里**抽取**出来，形成独立的 `## FEATURE_{ID}` 块。
+
+```
+=== EXTRACTING FEATURE DESIGN ===
+
+检测到版本文档为"版本级叙事"格式，缺少 FEATURE_{ID} 的独立设计块。
+正在从版本叙事中抽取本 feature 设计草案...
+
+1. Read 整个 docs/features/v{VERSION}.md
+2. 识别与本 feature 相关的内容碎片：
+   - "本版本包含的 Feature" / "实施顺序" 中对应的条目
+   - 直接点名本 feature 的章节（标题/正文）
+   - 版本级 UI/产品/验收章节中可归因到本 feature 的段落
+   - 版本级技术基线（如前端框架、架构指引）里适用于本 feature 的部分
+   - 关键交互流、布局草图中本 feature 职责对应的部分
+
+3. 起草 FEATURE_{ID} 的 6 节：
+
+   ### 1. 需求概述
+   从版本范围 + feature 标题 + 版本叙事中直接点名本 feature 的段落组合得出。
+   必须明确：本 feature 独立的目标是什么，不是整版的目标是什么。
+
+   ### 2. 影响范围
+   若版本叙事中有明确的文件/模块/页面范围，抽取到此；否则写 "_待 Plan 阶段细化_"。
+
+   ### 3. 技术方案
+   抽取版本叙事中适用于本 feature 的技术方向（框架、依赖、视觉基线等）。
+   不把整版通用的技术基线全复制进来，只保留本 feature 用得到的部分。
+
+   ### 4. 接口契约
+   若版本叙事中有本 feature 相关的 API/数据模型/页面契约/状态机，抽取到此；
+   否则写 "_待 Plan 阶段细化_"。
+
+   ### 5. 实现步骤
+   一般留 "_待 Plan 阶段细化_"（Phase 2.3 会基于本草案制定具体实施计划）。
+
+   ### 6. 验收标准
+   从版本级"验收标准 / 通过标准"章节中挑出仅适用于本 feature 的条目。
+   不把整版所有验收标准照搬进来。
+
+4. 展示草案给用户:
+
+┌──────────────────────────────────────────────────────────────┐
+│ 从版本叙事中抽取 FEATURE_{ID} 设计草案                        │
+│                                                              │
+│ 来源: docs/features/v{VERSION}.md                            │
+│ 归因章节: [列出抽取时引用的章节号，如 2.1, 3.1, 5.1, 7.3]    │
+│                                                              │
+│ [展示 6 节草案内容]                                          │
+│                                                              │
+│ 是否采纳？(Y/n/edit)                                         │
+│   Y    采纳并写回版本文档                                    │
+│   n    终止，我手动处理                                      │
+│   edit 我改一下再采纳                                        │
+└──────────────────────────────────────────────────────────────┘
+
+5. 用户 Y: 将 ## FEATURE_{ID} 块追加到 docs/features/v{VERSION}.md
+   - 位置: 版本级叙事之后，按 ID 顺序排列
+   - 若已有其他 feature 块，按 ID 升序插入到正确位置
+   - 不删除或改写原版本级叙事内容
+   - 更新 FEATURE_LIST.md 的 Design 链接确保锚点对应
+   → 继续 2.3
+
+6. 用户 n: STOP
+   提示: "请手动补充 FEATURE_{ID} 设计块，或使用 /add-feature -f 导入后重试"
+
+7. 用户 edit: 展示草案供编辑，按编辑后内容写回，然后继续 2.3
+```
+
+**抽取原则**:
+- **不发明**: 只从版本叙事里抽取，不凭空补充版本文档没写的内容
+- **不越界**: 不要把整版通用叙事照搬到单个 feature 块里
+- **可归因**: 在展示草案时列出"归因章节"，便于用户核验
+- **不破坏**: 抽取过程不修改版本级叙事原文，仅追加新块
+
+#### 2.3 Plan Implementation
 
 ```
 === ANALYZING FEATURE ===
+
+前置条件: 本 feature 已有 ## FEATURE_{ID} 设计块（2.1 Case A / B / 2.2 抽取产物）
+输入: 该设计块的 6 节内容 + 版本级叙事中的相关上下文
 
 1. Search codebase for related code:
    - Existing auth code
@@ -200,6 +303,11 @@ Proceed with implementation? (Y/n/edit):
 ```
 
 **After user approval, update design document:**
+
+根据 2.1 判定的形态决定写入策略：
+- **Case A（已填充）**: 不覆盖原内容。仅在"实现步骤"中追加本次 Plan 细化的步骤（必要时）。
+- **Case B（占位）**: 把 Plan 产出填入 6 节对应位置（当前行为）。
+- **Case C（抽取产物）**: 在 2.2 已写回草案的基础上，将 Plan 细化后的"实现步骤"、"影响范围"等补完到原有草案块中，不另起新块。
 
 ```
 === UPDATING DESIGN DOCUMENT ===

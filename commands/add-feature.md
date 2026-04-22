@@ -176,7 +176,28 @@ Add this feature? (Y/n/edit):
    **状态**: Planned
    **Feature 数量**: 0
 
-4. Append feature section:
+4. 分析已存在文件的形态（若文件已存在）:
+   - **Standard format**: 已含至少一个 ## FEATURE_ 块 → 正常追加
+   - **Narrative-only format**: 文件有版本级叙事内容（例如"版本目标/本版本范围/验收标准/前端基线"等章节），但无任何 ## FEATURE_ 块
+     → 向用户给出警告:
+
+     ┌─────────────────────────────────────────────────────────────┐
+     │ 检测到 v{VERSION}.md 当前为"版本级叙事"格式，                │
+     │ 没有 per-feature 设计块。                                    │
+     │                                                             │
+     │ 新 feature 将以 ## FEATURE_{ID} 块形式追加在文档末尾，      │
+     │ 与已有版本级叙事并存。                                       │
+     │                                                             │
+     │ 提示: 该版本已列出但尚未拥有独立设计块的其他 feature，       │
+     │ 会在 /start-next-feature 时按需从版本叙事中自动抽取。        │
+     │                                                             │
+     │ 继续？(Y/n)                                                 │
+     └─────────────────────────────────────────────────────────────┘
+
+     用户 Y → 继续步骤 5
+     用户 n → STOP
+
+5. Append feature section:
    ## FEATURE_{ID}: {Title}
 
    **Status**: Planned
@@ -201,7 +222,7 @@ Add this feature? (Y/n/edit):
    ### 6. 验收标准
    _待 /start-next-feature Phase 2 填充_
 
-5. Update feature count in header
+6. Update feature count in header
 ```
 
 ### Step 8: Confirm

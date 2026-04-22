@@ -49,6 +49,37 @@ docs/
 
 > **格式示例请参考**: [examples/sample.md](examples/sample.md)
 
+## Design Document Structure（重要）
+
+`docs/features/v{VERSION}.md` 采用**双层结构**，两层必须同时存在：
+
+### Part A - 版本级叙事（可选但常见）
+
+描述"这个版本整体要做什么"：版本目标、本版本范围、MVP 主流程、验收标准、前端/架构基线等。很多项目习惯先手写这部分。
+
+### Part B - Per-Feature 设计块（必须）
+
+每个 feature 一个独立的 `## FEATURE_{ID}: {Title}` 块，含 6 节：
+1. 需求概述
+2. 影响范围
+3. 技术方案
+4. 接口契约
+5. 实现步骤
+6. 验收标准
+
+### 为什么两层都要有
+
+仅有 Part A 的"纯版本级叙事"格式（例如只在 2.1 节列了 feature 标题清单，其余全是整版通用内容）会导致：
+- `FEATURE_LIST.md` 中 `docs/features/v{VERSION}.md#{ID}` 锚点不存在
+- 实施时 coding agent 只能从散落在多个章节的叙事里推测单个 feature 的意图
+- 不同 feature 边界模糊、共享版本级叙事 → **实现明显偏离**
+
+### 自动抽取机制
+
+当 `/start-next-feature` 或 Start Next Feature 动作发现目标 feature 缺少 Part B 的独立设计块时，**必须**先从 Part A 版本叙事中抽取本 feature 的 6 节草案，经用户确认后追加到文档末尾，再进入规划。详见 Core Actions #3 Phase 2。
+
+`/add-feature` 向"纯版本级叙事"格式的文档追加新 feature 时，会发出一次性警告，提示同版本已有 feature 会在 `/start-next-feature` 时被按需抽取。
+
 ## Feature Categories
 
 | Category | Description | Example |
@@ -166,7 +197,10 @@ Highest Priority InProgress: 001 (用户登录系统)
 2. Generate next sequential ID (001, 002, etc.)
 3. Generate feature metadata (Title, Description, Category, Priority)
 4. Update FEATURE_LIST.md (Index + Details sections)
-5. Create/update design document at `docs/features/v{VERSION}.md`
+5. Create/update design document at `docs/features/v{VERSION}.md`:
+   - 若文件不存在: 按标准模板创建
+   - 若文件存在且已含 `## FEATURE_` 块: 按 ID 顺序追加新 feature 块
+   - 若文件存在但为**纯版本级叙事**（有版本目标/范围/验收等章节，但无任何 `## FEATURE_` 块）: 发出一次性警告，告知新 feature 将以独立块形式追加，且同版本已列出但无独立块的其他 features 将在 `/start-next-feature` 时按需抽取，用户确认后继续
 6. Update timestamp
 
 ### 3. Start Next Feature (`/start-next-feature`)
@@ -175,10 +209,40 @@ Highest Priority InProgress: 001 (用户登录系统)
 - With ID: Find and validate feature is "Planned"
 - Without ID: Auto-select highest priority Planned feature from next release version
 
-**Phase 2 - Plan Implementation**:
+**Phase 2 - Ensure Feature Design Block & Plan Implementation**:
+
+*2.1 Locate Feature Design Block*
+
+在规划前先读 `docs/features/v{VERSION}.md`，查找 `## FEATURE_{ID}` 标题，分三种形态处理：
+
+- **Case A** 设计块存在且 6 节已填充 → 作为规划输入，跳到 2.3
+- **Case B** 设计块存在但 6 节为 `_待 ... 填充_` 占位 → 跳到 2.3，在规划后填充
+- **Case C** 设计块**不存在**（文档为纯版本级叙事）→ 进入 2.2 抽取
+
+*2.2 Extract Feature Design from Version Narrative（仅 Case C）*
+
+必须执行，不可跳过：
+
+1. 读整份 `docs/features/v{VERSION}.md`
+2. 识别与本 feature 相关的内容碎片（feature 标题、点名段落、适用的验收标准、适用的技术基线等）
+3. 起草 6 节内容（**不发明、不越界、可归因**）：
+   - 需求概述: 从版本范围 + feature 标题 + 点名段落得出本 feature 独立目标
+   - 影响范围 / 接口契约: 有就抽，没有就写 `_待 Plan 阶段细化_`
+   - 技术方案: 只保留本 feature 用得到的版本技术基线部分
+   - 实现步骤: 通常留 `_待 Plan 阶段细化_`
+   - 验收标准: 从版本级"验收标准 / 通过标准"中挑出仅适用于本 feature 的条目
+4. 展示草案给用户（附**归因章节**列表，便于核验），Y 采纳 / n 终止 / edit 编辑
+5. 采纳后追加到 `docs/features/v{VERSION}.md` 末尾（按 ID 排序插入），**不修改原版本级叙事**
+6. 更新 `FEATURE_LIST.md` 中 Design 链接确保锚点对应
+
+*2.3 Plan Implementation*
+
+前置: 已有 `## FEATURE_{ID}` 设计块（A / B / 2.2 抽取产物）
+输入: 该设计块 6 节 + 版本级叙事中的相关上下文
+
 - Analyze codebase for related code
 - Create detailed implementation plan
-- Update design document with full details
+- Update design document：Case A 不覆盖原内容、Case B/C 补完 Plan 细化后的"影响范围/实现步骤"等
 - Get user approval before proceeding
 
 **Phase 3 - TDD Development**:
