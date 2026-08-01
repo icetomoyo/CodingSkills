@@ -17,7 +17,7 @@
 
 ## Skill 清单(16 个)
 
-### Model-invoked 原语(5 个,自然语言触发)
+### Model-invoked(7 个,自然语言触发)
 
 | skill | 用途 |
 |------|------|
@@ -26,16 +26,16 @@
 | code-review | 双轴代码评审(Standards + Spec) |
 | diagnosing-bugs | 诊断原语(反馈循环→复现→假设→探针→修→清理) |
 | domain-modeling | 领域建模原语(挑战术语,写 CONTEXT.md / ADR) |
+| feature-manager | 管 FEATURE_LIST.md + 设计块生命周期(Add → 指向链 → Complete) |
+| issue-manager | 管 KNOWN_ISSUES.md + 修复流程(Add → 指向链 → Archive) |
 
-### User-invoked(11 个,人敲 `/name`)
+### User-invoked(9 个,人敲 `/name`)
 
 | skill | 用途 |
 |------|------|
 | to-spec | 综合 spec → 写入设计块 Part B |
 | to-tickets | 拆 tracer-bullet 垂直切片票 → 写入设计块实现步骤 |
 | implement | 构建(调 tdd + code-review + 提交) |
-| feature-manager | 管 FEATURE_LIST.md + 设计块生命周期(Add → 指向链 → Complete) |
-| issue-manager | 管 KNOWN_ISSUES.md + 修复流程(Add → 指向链 → Archive) |
 | smart-release | 管 CHANGELOG.md + 版本发布 |
 | human-test-guide | 人工测试指导生成 |
 | grill-me | ad-hoc 质询入口(薄委托 grilling) |
@@ -46,11 +46,11 @@
 ## 链路
 
 ```
-FEATURE: /feature-manager(add) → 建设计块
+FEATURE: feature-manager(add) → 建设计块
   → /to-spec → /to-tickets → /implement(tdd + code-review) → 提交
-  → /human-test-guide(可选) → /feature-manager(complete) → /smart-release
+  → /human-test-guide(可选) → feature-manager(complete) → /smart-release
 
-ISSUE:   /issue-manager(add) → /diagnosing-bugs(hard bug) → /implement → /issue-manager(resolve)
+ISSUE:   issue-manager(add) → /diagnosing-bugs(hard bug) → /implement → issue-manager(resolve)
 
 META:    router(导航) · grill-me(质询) · handoff(交接) · writing-great-skills(审计)
 ```
@@ -68,8 +68,8 @@ CodingSkills/
 │   ├── to-spec/               # user
 │   ├── to-tickets/            # user
 │   ├── implement/             # user
-│   ├── feature-manager/       # user
-│   ├── issue-manager/         # user
+│   ├── feature-manager/       # model(含 DESIGN-BLOCK-FORMAT.md, REFERENCE.md)
+│   ├── issue-manager/         # model(含 REFERENCE.md)
 │   ├── smart-release/         # user
 │   ├── human-test-guide/      # user(含 REFERENCE.md)
 │   ├── grill-me/              # user

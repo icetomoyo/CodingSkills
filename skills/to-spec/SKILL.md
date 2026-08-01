@@ -58,7 +58,7 @@ seam 与用户预期对齐后再写 spec——这让 Testing Decisions 一节有
 
 ## 产出位置
 
-写好的 spec 融进 **feature 设计块**(`docs/features/v{VERSION}.md` 的 Part B `## FEATURE_{ID}` 块):Problem Statement+Solution→需求概述、Implementation Decisions→影响范围/技术方案/接口契约、User Stories+Testing Decisions→验收标准。写完即终——本 skill 不负责拆票,那是 `to-tickets` 的事。
+写好的 spec 融进 **feature 设计块**。设计块路径、Part B 结构与 spec→设计块节的映射见 `feature-manager/DESIGN-BLOCK-FORMAT.md`。写完即终——本 skill 不负责拆票,那是 `to-tickets` 的事。
 
 ## 完成判据
 
@@ -66,7 +66,7 @@ spec 综合完毕的标志(全部满足):
 
 - [ ] spec 模板所有节已填充(Problem Statement / Solution / User Stories / Implementation Decisions / Testing Decisions / Out of Scope)
 - [ ] Testing Decisions 中的 seam 已与用户对齐
-- [ ] spec 已写入 feature 设计块 Part B(Problem Statement+Solution→需求概述、Implementation Decisions→影响范围/技术方案/接口契约、User Stories+Testing Decisions→验收标准)
+- [ ] spec 已写入 feature 设计块 Part B(节映射见 `feature-manager/DESIGN-BLOCK-FORMAT.md`)
 
 ## 与其他 skill 的关系
 

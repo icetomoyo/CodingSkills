@@ -49,7 +49,7 @@ disable-model-invocation: true
 
 ## 产出
 
-批准后的票写入 feature 设计块(`docs/features/v{VERSION}.md` 的 Part B `## FEATURE_{ID}` 实现步骤节),供 `/implement` 消费。路径与代码片段规则同 `to-spec`。
+批准后的票写入 feature 设计块的**实现步骤**节。设计块格式见 `feature-manager/DESIGN-BLOCK-FORMAT.md`。供 `/implement` 消费。
 
 ## 与其他 skill 的关系
 
