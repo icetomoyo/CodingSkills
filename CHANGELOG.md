@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-08-01
+
+### Added
+- **两层架构**: 对齐 [mattpocock/skills](https://github.com/mattpocock/skills) 的 model-invoked 原语 / user-invoked 设计
+- **人驱动构建链**: `/to-spec` → `/to-tickets` → `/implement`(tdd + code-review) → 提交
+- **5 个 model-invoked 原语**（自然语言触发）:
+  - `grilling` — 质询原语（一次一问，附推荐答案，决策才问人）
+  - `tdd` — 测试先行原语（pre-agreed seams，red-green，重构不在循环内）
+  - `code-review` — 双轴代码评审（Standards + Spec）
+  - `diagnosing-bugs` — 诊断原语（反馈循环→复现→假设→探针→修→清理）
+  - `domain-modeling` — 领域建模原语（挑战术语，写 CONTEXT.md / ADR）
+- **11 个 user-invoked skill**（人敲 `/name`）:
+  - `to-spec` / `to-tickets` / `implement` — 构建链三步
+  - `feature-manager` / `issue-manager` — 生命周期管理（替代旧 tracker）
+  - `smart-release` — CHANGELOG + 版本发布
+  - `human-test-guide` — 人工测试指导（重写为渐进披露）
+  - `grill-me` — ad-hoc 质询入口（薄委托 grilling）
+  - `handoff` — 会话交接
+  - `router` — skill 导航中心
+  - `writing-great-skills` — 写/审计 skill 的方法论（含 GLOSSARY.md）
+- **方法论审计**: 全部 16 个 skill 按 writing-great-skills 方法论审计通过
+
+### Changed
+- **README 完全重写**（424 → 123 行）: 从逐 skill 文档 → 架构总览
+- **smart-changelog → smart-release** 重命名
+- **human-test-guide 重写**: 385 → 49 行 SKILL + 236 行 REFERENCE（渐进披露）
+- **feature-manager / issue-manager**: 重构为构建链/修复链人驱动流程 + 双层设计文档 + 状态流转
+
+### Removed
+- **commands/ 目录**（9 个命令全部移除，操作并入 skill）
+- **smart-context** 技能（已无价值）
+- **feature-list-tracker** / **known-issues-tracker**（被 feature-manager / issue-manager 替代）
+
+---
+
 ## [0.3.0] - 2026-03-28
 
 ### Refactoring
@@ -198,19 +233,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/icetomoyo/CodingSkills/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/icetomoyo/CodingSkills/compare/v0.3.0...v0.5.0
 [0.3.0]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.10...v0.3.0
 [0.2.10]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.8...v0.2.9
-[0.2.8]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.7...v0.2.8
-[0.2.7]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.6...v0.2.7
+[0.2.8]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.7...v0.2.8
+[0.2.7]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.5...v0.2.6
-[0.2.5]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.4...v0.2.5
+[0.2.5]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.2...v0.2.3
-[0.1.2]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.2...v0.1.1
-[0.2.2]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/icetomoyo/CodingSkills/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/icetomoyo/CodingSkills/compare/v0.1.0...v0.2.0
+[0.1.2]: https://github.com/icetomuyo/CodingSkills/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.2...v0.1.1
+[0.2.2]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/icetomuyo/CodingSkills/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/icetomuyo/CodingSkills/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/icetomoyo/CodingSkills/releases/tag/v0.1.0

@@ -1,39 +1,15 @@
 ---
-name: feature-list-tracker
-description: Track features with FEATURE_LIST.md. Auto-activates on "feature/functionality/功能/特性" keywords. Use /add-feature, /start-next-feature.
+name: feature-manager
+description: 管理 feature 全生命周期:登记到 FEATURE_LIST.md、建设计块、指向构建链、完成收尾。
+disable-model-invocation: true
 argument-hint: "[description] | [id] | [-v version]"
 ---
 
-# Feature List Tracker
+# Feature Manager(feature 管理)
 
-This skill provides a standardized way to track, plan, and implement software features using a FEATURE_LIST.md file and docs/features/ design documents.
+用 FEATURE_LIST.md 和 docs/features/ 设计文档追踪、规划、管理软件 feature 的生命周期。
 
-## Automatic Activation Triggers
-
-This skill should be automatically activated when the user message contains:
-
-**Keywords:**
-- feature, functionality, capability, 功能, 特性, 新功能
-- add, implement, create, build, develop, 添加, 开发, 实现
-- support, enable, allow, 支持, 启用
-- enhancement, improvement, upgrade, 增强, 改进, 升级
-- roadmap, backlog, sprint, milestone, 路线图, 里程碑
-- user story, user need, 用户故事, 需求
-- "plan to add", "going to", "will add", "should have", 计划添加, 准备开发
-- "in the future", "upcoming", "next version", 下一版本, 未来
-
-**Example User Messages:**
-- "We need to add a feature for user profiles"
-- "The app should support dark mode"
-- "Can you implement file upload functionality?"
-- "Plan to add OAuth login in the next release"
-- "Users are requesting password recovery feature"
-
-**When NOT to Activate:**
-- User is asking about existing features (questions, not requests)
-- User is reporting bugs (use known-issues-tracker)
-- User is asking general questions
-- User uses "feature" in a non-development context
+> 报 bug / issue → 转 `issue-manager`;问已有功能(非新需求)→ 不激活。
 
 ## File Structure
 
@@ -44,10 +20,8 @@ docs/
 │   ├── v1.0.0.md         # v1.0.0 版本所有 feature 设计
 │   ├── v1.1.0.md         # v1.1.0 版本所有 feature 设计
 │   └── unplanned.md      # 未确定版本的设计草案
-└── test-guides/          # 测试指导文档（由 human-test-guide 生成）
+└── test-guides/          # 测试指导文档(由 human-test-guide 生成)
 ```
-
-> **格式示例请参考**: [examples/sample.md](examples/sample.md)
 
 ## Design Document Structure（重要）
 
@@ -76,9 +50,9 @@ docs/
 
 ### 自动抽取机制
 
-当 `/start-next-feature` 或 Start Next Feature 动作发现目标 feature 缺少 Part B 的独立设计块时，**必须**先从 Part A 版本叙事中抽取本 feature 的 6 节草案，经用户确认后追加到文档末尾，再进入规划。详见 Core Actions #3 Phase 2。
+当 Start Next Feature 动作发现目标 feature 缺少 Part B 的独立设计块时，**必须**先从 Part A 版本叙事中抽取本 feature 的 6 节草案，经用户确认后追加到文档末尾，再进入规划。详见 Core Actions #3 Phase 2。
 
-`/add-feature` 向"纯版本级叙事"格式的文档追加新 feature 时，会发出一次性警告，提示同版本已有 feature 会在 `/start-next-feature` 时被按需抽取。
+Add Feature 动作向"纯版本级叙事"格式的文档追加新 feature 时，会发出一次性警告，提示同版本已有 feature 会在 Start Next Feature 时被按需抽取。
 
 ## Feature Categories
 
@@ -174,42 +148,47 @@ Highest Priority InProgress: 001 (用户登录系统)
 
 ### 1. Find or Create FEATURE_LIST.md
 
-**CRITICAL**: Before any operation, locate or create the file:
+任何操作前先定位或创建文件:
 
-1. **Scan for existing file**: Use Glob to find `**/FEATURE_LIST.md`
-2. **If found**: Use existing location, proceed with operation
-3. **If not found**: Ask user for location preference:
-   - `docs/FEATURE_LIST.md` (recommended)
-   - `.claude/FEATURE_LIST.md` (private)
-4. **Create directory if needed**, then initialize with empty template
+1. **扫描现有文件**: 用 Glob 查找 `**/FEATURE_LIST.md`
+2. **找到**: 用现有位置,继续操作
+3. **未找到**: 询问用户位置偏好:
+   - `docs/FEATURE_LIST.md`（推荐）
+   - `.claude/FEATURE_LIST.md`（private）
+4. **按需创建目录**,然后初始化空模板
+5. **文件损坏**: 尝试恢复并修格式
+
+**完成判据**: FEATURE_LIST.md 存在且可读写,或已确认沿用现有文件位置。
 
 ### 2. Add Feature
 
-**Input**: Feature description / requirements (from text or file)
+**输入**: Feature 描述 / 需求(来自文本或文件)
 
-**Version Assignment Logic**:
-- **User specifies -v**: Use that version directly
-- **Planned version exists**: Use it (notify user)
-- **No Planned version**: Detect current release, suggest next version, ask user to confirm
+**版本分配逻辑**:
+- **用户指定 -v**: 直接用该版本
+- **有 Planned 版本**: 用它(通知用户)
+- **无 Planned 版本**: 检测当前版本,建议下一版本,请用户确认(版本检测优先级见 `smart-release` 的 Version Detection Priority)
 
-**Process**:
-1. Detect version for the feature
-2. Generate next sequential ID (001, 002, etc.)
-3. Generate feature metadata (Title, Description, Category, Priority)
-4. Update FEATURE_LIST.md (Index + Details sections)
-5. Create/update design document at `docs/features/v{VERSION}.md`:
+**流程**:
+1. 检测版本填入 feature
+2. 生成下一个顺序 ID(001, 002, …)
+3. 生成 feature 元数据(Title, Description, Category, Priority)
+4. 更新 FEATURE_LIST.md(Index + Details 段)
+5. 创建/更新设计文档 `docs/features/v{VERSION}.md`:
    - 若文件不存在: 按标准模板创建
    - 若文件存在且已含 `## FEATURE_` 块: 按 ID 顺序追加新 feature 块
-   - 若文件存在但为**纯版本级叙事**（有版本目标/范围/验收等章节，但无任何 `## FEATURE_` 块）: 发出一次性警告，告知新 feature 将以独立块形式追加，且同版本已列出但无独立块的其他 features 将在 `/start-next-feature` 时按需抽取，用户确认后继续
-6. Update timestamp
+   - 若文件存在但为**纯版本级叙事**(有版本目标/范围/验收等章节,但无任何 `## FEATURE_` 块): 发出一次性警告,告知新 feature 将以独立块形式追加,且同版本已列出但无独立块的其他 features 将在 Start Next Feature 时按需抽取,用户确认后继续
+6. 更新时间戳
 
-### 3. Start Next Feature (`/start-next-feature`)
+**完成判据**: 新 feature 同时出现在 FEATURE_LIST.md 的 Index 与 Details;设计文档 `docs/features/v{VERSION}.md` 已含该 feature 的 `## FEATURE_{ID}` 块(或纯叙事警告已发);ID 无冲突;时间戳已更新。
+
+### 3. Start Next Feature
 
 **Phase 1 - Select Feature**:
 - With ID: Find and validate feature is "Planned"
 - Without ID: Auto-select highest priority Planned feature from next release version
 
-**Phase 2 - Ensure Feature Design Block & Plan Implementation**:
+**Phase 2 - Ensure Feature Design Block**:
 
 *2.1 Locate Feature Design Block*
 
@@ -235,29 +214,11 @@ Highest Priority InProgress: 001 (用户登录系统)
 5. 采纳后追加到 `docs/features/v{VERSION}.md` 末尾（按 ID 排序插入），**不修改原版本级叙事**
 6. 更新 `FEATURE_LIST.md` 中 Design 链接确保锚点对应
 
-*2.3 Plan Implementation*
+*2.3 Point to Build Chain*
 
-前置: 已有 `## FEATURE_{ID}` 设计块（A / B / 2.2 抽取产物）
-输入: 该设计块 6 节 + 版本级叙事中的相关上下文
+设计块就绪后，本 skill 的工作结束。告诉用户按「构建链（人驱动）」节敲构建链，全部完成后运行 `/feature-manager` Complete。
 
-- Analyze codebase for related code
-- Create detailed implementation plan
-- Update design document：Case A 不覆盖原内容、Case B/C 补完 Plan 细化后的"影响范围/实现步骤"等
-- Get user approval before proceeding
-
-**Phase 3 - TDD Development**:
-- RED: Write tests first (should fail)
-- GREEN: Implement minimum code to pass
-- REFACTOR: Clean up code
-- Verify 80%+ test coverage
-
-**Phase 4 - Automated Testing**:
-- Run all tests until 100% pass
-- Type check, lint, build
-
-**Phase 5 - Generate Test Guide**:
-- Call `human-test-guide` skill
-- Output: `docs/test-guides/FEATURE_{ID}_{VERSION}_TEST_GUIDE.md`
+**完成判据**: 设计块已就绪（Case A/B/C 处理完毕）；用户已被告知构建链步骤。
 
 ### 4. Complete Feature
 
@@ -265,40 +226,51 @@ Highest Priority InProgress: 001 (用户登录系统)
 2. Validate status is "InProgress"
 3. Auto-detect current version for Released field
 4. Update FEATURE_LIST.md and design document
-5. Check if version is complete (notify if all features done)
+5. Check if version is complete (notify if all features done → 提醒运行 `/smart-release` 发布)
+
+**完成判据**: feature 状态已转 Completed;Released 版本已填;FEATURE_LIST.md 与设计文档两处均已更新;版本完成度已检查(全部完成时已提醒发布)。
 
 ### 5. Archive Features
 
 When FEATURE_LIST.md exceeds thresholds:
 - **Warning**: > 2000 lines or > 50KB → Notify user
-- **Critical**: > 5000 lines or > 100KB → Auto-archive resolved issues > 30 days old
+- **Critical**: > 5000 lines or > 100KB → Auto-archive completed features > 30 days old
 
 Archive to `FEATURES_ARCHIVED.md`, grouped by month.
 
-## Error Handling
+**完成判据**: 归档后 FEATURE_LIST.md 行数/体积降至阈值以下;被归档 feature 在 FEATURES_ARCHIVED.md 中按月分组且详情完整。
 
-- If FEATURE_LIST.md does not exist, create it
-- If the file is corrupted, attempt to recover and fix the format
-- If an ID conflict occurs, increment to the next available ID
-- If docs/features/ directory doesn't exist, create it
+## 构建链（人驱动）
+
+本 skill **不自动跑构建链**。Start 登记后，人逐个敲：
+
+```
+/to-spec → /to-tickets → /implement → /human-test-guide(可选)
+```
+
+- `to-spec`：综合 spec，调 grilling 对齐关键决策，写入设计块 Part B
+- `to-tickets`：拆成 tracer-bullet 垂直切片票，写入设计块实现步骤
+- `implement`：逐票构建（调 tdd 测试先行 + code-review 双轴评审），提交
+- `human-test-guide`：生成测试指导文档
+
+每步产出流入设计块。人 review 后敲下一个。全部完成后 `/feature-manager` Complete，再 `/smart-release` 发布。
 
 ## Integration with Other Skills
 
-- Works with /plan for feature implementation planning
-- Works with /tdd for test-driven feature development
-- Works with known-issues-tracker for related bugs
-- Works with human-test-guide for generating test guides
-- Works with /code-review for reviewing implementations
+构建链见上「构建链（人驱动）」节。其余关系:
 
-## Commands Summary
+- `grilling`：to-spec 内部调，对齐关键决策
+- `tdd` / `code-review`：implement 内部调
+- `issue-manager`：feature 开发中发现的 bug 转交
 
-| Command | Purpose |
-|---------|---------|
-| `/add-feature "description"` | Add a new feature with version assignment |
-| `/add-feature -f [file]` | Add feature from file content |
-| `/add-feature -v [version]` | Add feature with specified version |
-| `/start-next-feature [id]` | Automated workflow: Plan → TDD → Test → Generate Test Guide |
-| `/complete-feature [id]` | Mark feature as completed |
-| `/archive-features` | Archive completed features to reduce file size |
+## Operations
 
-> **Note**: 列出 features 的功能已整合到此 skill 中。直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
+通过 `/feature-manager` 触发以下操作:
+
+| 操作 | 示例 |
+|------|------|
+| 添加 feature | "添加一个 feature:用户登录" |
+| 开始下一个 feature | "开始下一个 feature"(可带 ID:"开始 feature 001") |
+| 完成 feature | "完成 feature 001" |
+| 归档 | "归档已完成的 features" |
+| 列出 | "列出所有 features" / "有哪些 in progress 的 feature" |

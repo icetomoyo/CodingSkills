@@ -1,35 +1,21 @@
 ---
-name: smart-changelog
-description: Manage CHANGELOG.md from git history. Auto-activates on "changelog/release/tag/更新日志/版本发布/打tag" keywords. Use /smart-changelog for updates, /smart-changelog --release for publishing.
+name: smart-release
+description: 从 git 提交同步到 CHANGELOG.md,可选版本 bump 与发布。
+disable-model-invocation: true
 argument-hint: "[--release] [patch|minor|major|vX.Y.Z]"
 ---
 
-# Smart Changelog
+# Smart Release(智能发布)
 
-Intelligent CHANGELOG management: sync git commits → update CHANGELOG.md → optional version bump & release.
-
-## Automatic Activation
-
-Claude loads this skill when you mention:
-- changelog, release, tag, 版本发布, 更新日志, 打tag
-- publish, ship, bump version, 发布
-- what's changed, 变更记录
-
-**Both natural language and `/smart-changelog` command work identically.**
-
----
+从 git 提交同步到 CHANGELOG.md,可选版本 bump 与发布(release)。
 
 ## Usage Patterns
 
 ### Pattern 1: Sync Only (Daily Updates)
 
-**Triggers:**
-- `/smart-changelog`
-- "更新 changelog"
-- "同步 changelog"
-- "生成 release notes"
+**触发**: "更新 changelog" / "同步 changelog" / "生成 release notes"
 
-**Workflow:**
+**流程**:
 1. Read CHANGELOG.md → find last synced commit
 2. `git log <last-commit>..HEAD` → get new commits
 3. Categorize and append to [Unreleased]
@@ -38,17 +24,9 @@ Claude loads this skill when you mention:
 
 ### Pattern 2: Version Release
 
-**Triggers:**
-- `/smart-changelog --release`
-- `/smart-changelog --release patch`
-- `/smart-changelog --release minor`
-- `/smart-changelog --release major`
-- `/smart-changelog --release v1.2.0`
-- "发布新版本"
-- "发布一个 patch 版本"
-- "打 tag 发布"
+**触发**: "发布新版本" / "发布一个 patch 版本" / "打 tag 发布" / `--release [type]`
 
-**Workflow:**
+**流程**:
 1. Calculate/confirm version number
 2. Ask which steps to execute
 3. Perform selected operations
@@ -99,8 +77,9 @@ If user intent is clear, skip selection:
 3. ⚠️ ASK USER: "Confirm release version X.Y.Z?"
    - Confirmed → Continue
    - Rejected → Ask for specific version or abort
-4. Never proceed without user confirmation
 ```
+
+**完成判据**: 用户已确认发布版本号(或已明确中止)。
 
 ### Step 2: Monorepo Detection (For Version Sync)
 
@@ -124,6 +103,8 @@ Monorepo detected. Select version update strategy:
 Select [1-4]:
 ```
 
+**完成判据**: 已判定是否 monorepo;若是,已选定版本策略;若无 monorepo,跳过本步。
+
 ### Step 3: Version Sync
 
 **Standard Files:**
@@ -138,12 +119,16 @@ Select [1-4]:
 - `libs/*/package.json`
 - `lerna.json`
 
+**完成判据**: 所有目标文件的 version 字段已更新到新版本号。
+
 ### Step 4: Update CHANGELOG
 
 1. Move [Unreleased] content to new version section
 2. Add release date
 3. Clean empty categories
 4. Ensure proper formatting
+
+**完成判据**: [Unreleased] 内容已移入新版本段;新版本段含日期;空分类已清;格式符合 CHANGELOG.md Format 规则。
 
 ### Step 5: Update Documentation
 
@@ -161,6 +146,8 @@ These documentation files may contain outdated version info:
 Update version references? [Yes/No/Select]
 ```
 
+**完成判据**: 已识别含过期版本信息的文档;用户已决定是否更新;若更新则版本引用已同步。
+
 ### Step 6: Git Operations
 
 ```bash
@@ -175,6 +162,8 @@ git tag v{version}
 git push origin <branch>
 git push origin v{version}
 ```
+
+**完成判据**: release commit 已创建;tag v{version} 已打;commits 与 tags 已推送(或推送失败已告知用户)。
 
 ### Step 7: GitHub Release
 
@@ -191,6 +180,8 @@ gh release create v{version} \
 ```
 
 If `gh` CLI unavailable, provide manual instructions.
+
+**完成判据**: GitHub Release 已创建(或 gh 不可用时已提供手动指引)。
 
 ---
 
@@ -253,6 +244,8 @@ If `gh` CLI unavailable, provide manual instructions.
 4. `Cargo.toml` → package.version
 5. Git tag (`git describe --tags --abbrev=0`)
 
+> 本表是版本检测的**唯一源**;`issue-manager` 等其他 skill 需要版本检测时引用此处,不重复。
+
 ---
 
 ## Error Handling
@@ -269,33 +262,8 @@ If `gh` CLI unavailable, provide manual instructions.
 
 ---
 
-## Examples
-
-```
-User: 更新 changelog
-→ Update CHANGELOG only, then push
-
-User: 发布一个 patch 版本
-→ Ask release options
-
-User: 完整发布 minor 版本
-→ Execute all release steps
-
-User: /smart-changelog --release patch
-→ Ask release options (same as "发布一个 patch 版本")
-
-User: 更新版本号并打 tag
-→ CHANGELOG + version sync + tag + push
-
-User: 打 tag 发布
-→ CHANGELOG + version sync + tag + push
-```
-
----
-
 ## Integration
 
-- **feature-list-tracker** - Reference feature IDs
-- **known-issues-tracker** - Link fixed issues
-- **git-workflow** - commit/tag/push
-- **doc-updater** - Update documentation
+- **feature-manager** - 引用 feature ID
+- **issue-manager** - 关联已修复的 issue
+- (git 提交 / tag / 推送与文档更新是本 skill 的内部 Step 5/6,不另设独立 skill)

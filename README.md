@@ -1,29 +1,81 @@
 # CodingSkills
 
-Claude Code 自定义 Skills、Commands、Agents 和 Rules 仓库。
+借鉴 [mattpocock/skills](https://github.com/mattpocock/skills) 的两层架构 + 人驱动构建链 + tracker 文件持久化。
 
-**当前版本：v0.3.0**
+**当前版本：v0.5.0**
+
+## 设计理念
+
+- **调用二分**(对齐 mattpocock):model-invoked(原语,自然语言触发,可被 user-invoked 调)/ user-invoked(人敲 `/name`,不被自然语言触发)。
+- **人驱动主链**:构建链 `/to-spec` → `/to-tickets` → `/implement` 人逐个敲,每步产出流入设计块。
+- **tracker 持久化**:FEATURE_LIST.md / KNOWN_ISSUES.md / CHANGELOG.md 管理生命周期,构建链产出流入设计块。
+- **方法论驱动**:所有 skill 按 `writing-great-skills` 编写与审计——可预测性根原则、完成判据、锚词、no-op/negation 审计、反蔓生。
+
+## 致谢
+
+本仓库的 `implement`、`diagnosing-bugs`、`domain-modeling` skill 改编自 [mattpocock/skills](https://github.com/mattpocock/skills)(MIT License)。感谢 Matt Pocock 的工程纪律启发。
+
+## Skill 清单(16 个)
+
+### Model-invoked 原语(5 个,自然语言触发)
+
+| skill | 用途 |
+|------|------|
+| grilling | 质询原语(一次一问,附推荐答案,决策才问人) |
+| tdd | 测试先行原语(pre-agreed seams,red-green,重构不在循环内) |
+| code-review | 双轴代码评审(Standards + Spec) |
+| diagnosing-bugs | 诊断原语(反馈循环→复现→假设→探针→修→清理) |
+| domain-modeling | 领域建模原语(挑战术语,写 CONTEXT.md / ADR) |
+
+### User-invoked(11 个,人敲 `/name`)
+
+| skill | 用途 |
+|------|------|
+| to-spec | 综合 spec → 写入设计块 Part B |
+| to-tickets | 拆 tracer-bullet 垂直切片票 → 写入设计块实现步骤 |
+| implement | 构建(调 tdd + code-review + 提交) |
+| feature-manager | 管 FEATURE_LIST.md + 设计块生命周期(Add → 指向链 → Complete) |
+| issue-manager | 管 KNOWN_ISSUES.md + 修复流程(Add → 指向链 → Archive) |
+| smart-release | 管 CHANGELOG.md + 版本发布 |
+| human-test-guide | 人工测试指导生成 |
+| grill-me | ad-hoc 质询入口(薄委托 grilling) |
+| handoff | 会话交接(替代上下文压缩的轻量方案) |
+| router | skill 导航(不知道用哪个时问它) |
+| writing-great-skills | 写 / 审计 skill 的方法论(含 GLOSSARY.md) |
+
+## 链路
+
+```
+FEATURE: /feature-manager(add) → 建设计块
+  → /to-spec → /to-tickets → /implement(tdd + code-review) → 提交
+  → /human-test-guide(可选) → /feature-manager(complete) → /smart-release
+
+ISSUE:   /issue-manager(add) → /diagnosing-bugs(hard bug) → /implement → /issue-manager(resolve)
+
+META:    router(导航) · grill-me(质询) · handoff(交接) · writing-great-skills(审计)
+```
 
 ## 项目结构
 
 ```
 CodingSkills/
-├── skills/              # 自定义技能
-│   ├── known-issues-tracker/  # Issue 追踪管理
-│   ├── feature-list-tracker/  # Feature 功能管理
-│   ├── human-test-guide/      # 人工测试指导生成
-│   ├── smart-changelog/       # CHANGELOG 版本管理
-│   └── smart-context/         # 智能上下文管理
-├── commands/            # 自定义命令（写入操作）
-│   ├── add-issue.md          # 添加 issue
-│   ├── resolve-next-issue.md # 修复 issue
-│   ├── archive-issues.md     # 归档已解决的 issues
-│   ├── add-feature.md        # 添加 feature
-│   ├── start-next-feature.md # 自动开发 feature
-│   ├── complete-feature.md   # 完成 feature
-│   ├── archive-features.md   # 归档已完成的 features
-│   ├── context-snapshot.md   # 手动生成快照
-│   └── load-context.md       # 手动加载快照
+├── skills/              # 16 个 skill(每个一个目录,含 SKILL.md)
+│   ├── grilling/              # model 原语
+│   ├── tdd/                   # model 原语
+│   ├── code-review/           # model 原语
+│   ├── diagnosing-bugs/       # model 原语
+│   ├── domain-modeling/       # model 原语(含 CONTEXT-FORMAT.md, ADR-FORMAT.md)
+│   ├── to-spec/               # user
+│   ├── to-tickets/            # user
+│   ├── implement/             # user
+│   ├── feature-manager/       # user
+│   ├── issue-manager/         # user
+│   ├── smart-release/         # user
+│   ├── human-test-guide/      # user(含 REFERENCE.md)
+│   ├── grill-me/              # user
+│   ├── handoff/               # user
+│   ├── router/                # user
+│   └── writing-great-skills/  # user(含 GLOSSARY.md)
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
@@ -33,392 +85,39 @@ CodingSkills/
 
 ```
 docs/
-├── CHANGELOG.md            # 变更日志（smart-changelog）
-├── FEATURE_LIST.md         # Feature 索引和状态
-├── features/               # Feature 设计文档
-│   ├── v1.0.0.md           # v1.0.0 版本设计
-│   ├── v1.1.0.md           # v1.1.0 版本设计
-│   └── unplanned.md        # 未确定版本的设计草案
-├── test-guides/            # 测试指导文档
-│   └── FEATURE_001_v1.1.0_TEST_GUIDE.md
-├── KNOWN_ISSUES.md         # Issue 索引
+├── CHANGELOG.md            # 变更日志(smart-release)
+├── FEATURE_LIST.md         # Feature 索引和状态(feature-manager)
+├── features/               # Feature 设计文档(按版本,Part A 版本叙事 + Part B per-feature 设计块)
+│   ├── v1.0.0.md
+│   └── unplanned.md
+├── test-guides/            # 测试指导文档(human-test-guide)
+├── KNOWN_ISSUES.md         # Issue 索引(issue-manager)
 └── ISSUES_ARCHIVED.md      # 归档的 issues
-
-.agent/                     # 智能代理上下文（smart-context）
-├── HOT_TRACK.md            # 热轨快照（增量合并）
-└── COLD_TRACK.md           # 冷轨归档（追加）
+CONTEXT.md                  # 领域词汇表(domain-modeling)
+docs/adr/                   # 架构决策记录(domain-modeling)
+.agent/handoff/HANDOFF.md   # 会话交接文档(handoff)
 ```
-
-## 已有 Skills
-
-### known-issues-tracker
-
-项目中 Issue 的追踪和管理技能。
-
-**功能：**
-- 自动维护 `KNOWN_ISSUES.md` 文件
-- 统一的 Issue 格式（通过 `/add-issue` 命令添加）
-- High/Medium/Low 三级优先级
-- **版本自动追踪**：自动检测并记录 Introduced/Fixed 版本
-- 自动检测并解决最高优先级 issue
-- **Issue 详情保留**：完整记录原问题和解决方案
-- **文件大小管理**：自动检测文件大小，支持归档
-
-**自动触发条件：**
-- 用户提到 bug, issue, problem, error, crash, failure 等关键词
-- 用户说 "doesn't work", "broken", "not working" 等
-
-**Commands：**
-
-| 命令 | 说明 |
-|------|------|
-| `/add-issue "问题描述"` | 添加新 issue（Claude 自动生成标题和详情） |
-| `/add-issue -f [filepath]` | 从文件读取问题并添加为 issue |
-| `/resolve-next-issue [id]` | 修复 issue（指定 ID 或自动选择最高优先级） |
-| `/archive-issues [--days N]` | 归档已解决的 issues |
-
-> **Note**: 列出 issues 的功能已整合到 skill 中，直接说 "列出所有 issues" 或调用 `/known-issues-tracker` 即可。
-
-**KNOWN_ISSUES.md 文件结构：**
-```
-## Issue Index        # 快速索引表（含版本信息）
-## Issue Details      # 完整详情（包含原问题和解决方案）
-## Summary            # 统计摘要
-```
-
-**版本追踪：**
-- **Introduced**：Issue 添加时自动检测当前版本
-- **Fixed**：Issue 修复时自动检测当前版本
-- 支持从 package.json、VERSION、pyproject.toml、Cargo.toml、Git tag 自动检测
-- 无需用户手动填写版本信息
-
-**文件位置：**
-1. 自动扫描项目查找现有文件
-2. 未找到时询问用户：`docs/KNOWN_ISSUES.md` 或 `.claude/KNOWN_ISSUES.md`
-
-### feature-list-tracker
-
-项目功能的追踪、规划和自动化开发技能。
-
-**功能：**
-- 自动维护 `FEATURE_LIST.md` 文件和 `docs/features/` 设计文档
-- 统一的 Feature 格式（通过 `/add-feature` 命令添加）
-- Critical/High/Medium/Low 四级优先级
-- Planned/InProgress/Completed 三状态生命周期
-- **版本规划与管理**：
-  - 智能版本分配（有 Planned 版本时自动加入，无则提示用户确认）
-  - 版本状态追踪（Planned/InDevelopment/Released）
-  - 跨版本实现提醒（自动询问是否移动 feature）
-- **设计文档管理**：
-  - `docs/features/v{VERSION}.md` 按版本组织设计文档
-  - 包含：需求概述、影响范围、技术方案、接口契约、实现步骤、验收标准
-  - `/start-next-feature` 时自动填充详细设计
-- **自动化开发流程**：Plan → TDD → 测试 → 生成测试指导
-- **人工测试指导**：自动生成包含测试用例和预期效果的测试文档
-- **文件大小管理**：自动检测文件大小，支持归档
-
-**自动触发条件：**
-- 用户提到 feature, functionality, enhancement 等关键词
-- 用户说 "add", "implement", "build" 等动词
-- 用户讨论 roadmap, backlog, sprint 等规划内容
-
-**Commands：**
-
-| 命令 | 说明 |
-|------|------|
-| `/add-feature "功能描述"` | 添加新 feature（智能版本分配） |
-| `/add-feature -v [version]` | 添加 feature 并指定版本 |
-| `/add-feature -f [filepath]` | 从文件读取功能需求 |
-| `/start-next-feature [id]` | **自动化开发流程**（可跨版本，会提示确认） |
-| `/complete-feature [id]` | 完成 feature（更新设计和状态） |
-| `/archive-features [--days N]` | 归档已完成的 features |
-
-> **Note**: 列出 features 的功能已整合到 skill 中，直接说 "列出所有 features" 或调用 `/feature-list-tracker` 即可。
-
-**FEATURE_LIST.md 文件结构：**
-```
-## Version Info       # 版本信息（Current Release, Planned Version）
-## Version Summary    # 版本概览（状态、进度）
-## Feature Index      # 快速索引表（含 Design 链接）
-## Feature Details    # 完整详情
-## Summary            # 统计摘要
-```
-
-**docs/features/ 设计文档结构：**
-```
-docs/features/
-├── v1.1.0.md         # v1.1.0 版本所有 feature 设计
-├── v1.2.0.md         # v1.2.0 版本所有 feature 设计
-└── unplanned.md      # 未确定版本的设计草案
-```
-
-**每个 Feature 设计包含：**
-1. 需求概述
-2. 影响范围（需创建/修改的文件）
-3. 技术方案（依赖、架构模式）
-4. 接口契约（API、数据模型）
-5. 实现步骤
-6. 验收标准
-
-**/add-feature 版本分配逻辑：**
-- 用户指定 `-v`：直接使用
-- 有 Planned 版本：自动加入，提示可指定其他
-- 无 Planned 版本：显示当前版本，建议下一版本，用户确认
-
-**/start-next-feature 自动化流程：**
-1. **Phase 1**: 选择 feature（检查版本兼容性，必要时提示移动）
-2. **Phase 2**: Plan 并更新设计文档（填充详细设计）
-3. **Phase 3**: TDD 开发（RED → GREEN → REFACTOR）
-4. **Phase 4**: 运行自动化测试，确保 100% 通过
-5. **Phase 5**: 生成人工测试指导文档
-
-**/complete-feature 功能：**
-- 更新 FEATURE_LIST.md 状态
-- 更新设计文档状态
-- 检查版本完成度（全部完成时提醒发布）
-
-**文件位置：**
-1. 自动扫描项目查找现有文件
-2. 未找到时询问用户：`docs/FEATURE_LIST.md` 或 `.claude/FEATURE_LIST.md`
-
-### human-test-guide
-
-人工测试指导生成技能。
-
-**功能：**
-- 生成完整的人工测试指导文档
-- 包含测试用例、测试步骤、预期效果
-- 支持 7 种测试类型：正向/负向/边界/UI/性能/安全/兼容性
-- 针对不同功能类型提供测试重点建议
-
-**自动触发条件：**
-- 用户提到"测试指导"、"测试用例"、"人工测试"、"手动测试"
-- 用户说"怎么测试"、"帮我写测试"、"如何验证"
-
-**使用场景：**
-- 新功能开发完成后
-- Bug 修复后生成回归测试
-- 为已有功能补充测试文档
-- QA 准备和代码审查
-
-**输出格式：**
-```markdown
-# [功能名称] - 人工测试指导
-
-## 功能概述
-## 测试环境
-## 测试用例（每个包含：优先级、类型、前置条件、步骤、预期效果）
-## 边界用例
-## 测试总结
-```
-
-**与其他 Skill 的关系：**
-- 被 `feature-list-tracker` 的 `/start-next-feature` 命令调用
-- 可与 `known-issues-tracker` 配合生成 Bug 回归测试
-
-### smart-changelog
-
-智能 CHANGELOG 管理和版本发布技能。
-
-**功能：**
-- 从 git 历史增量同步到 CHANGELOG.md
-- 支持语义化版本发布（patch/minor/major）
-- 自动检测项目版本号（支持 package.json、VERSION、pyproject.toml、Cargo.toml）
-- Monorepo 检测和多包版本策略
-- 模块化发布步骤选择（更新文档、创建 Tag、GitHub Release 等）
-- 自然语言和斜杠命令双重触发
-
-**自动触发条件：**
-- 用户提到 changelog, release, tag, 版本发布, 更新日志, 打tag
-- 用户说 "发布", "ship", "bump version"
-
-**使用方式：**
-
-| 触发方式 | 说明 |
-|---------|------|
-| `/smart-changelog` | 仅同步 git 提交到 CHANGELOG |
-| `/smart-changelog --release` | 发布新版本（交互式选择步骤） |
-| `/smart-changelog --release patch` | 发布 patch 版本 |
-| `/smart-changelog --release minor` | 发布 minor 版本 |
-| "更新 changelog" | 同步并推送 |
-| "完整发布" | 执行所有发布步骤 |
-
-**发布步骤（可选择性执行）：**
-1. 更新 CHANGELOG.md
-2. 同步版本号到项目文件
-3. 创建 Git Tag
-4. 推送 commits 和 tags
-5. 创建 GitHub Release
-6. 更新相关文档
-
-**提交分类规则：**
-
-| 前缀 | 分类 |
-|------|------|
-| `feat:`, `feature:` | Added |
-| `fix:`, `bugfix:` | Fixed |
-| `refactor:` | Changed |
-| `docs:` | Documentation |
-| `perf:` | Performance |
-| `test:`, `chore:`, `ci:` | Skip |
-
-### smart-context
-
-智能上下文管理技能，通过双轨记忆和增量合并解决长对话中的注意力稀释问题。
-
-**功能：**
-- **双轨制记忆**：热轨（~6k Token 软目标）+ 冷轨（无限）
-- **四步清洗法**：无损提取骨架 → 有损修剪立墓碑 → 增量合并 → Probe 自验证
-- **增量合并机制**：基于已有快照进行增量合并，而非全量重新生成
-- **文件操作日志**：追踪所有读取/修改/创建的文件，只追加不删除
-- **Probe 自验证**：Recall/Artifact/Continuation/Decision 四维验证快照质量
-- **恢复成本加权裁剪**：以 Tokens-per-Task 为优化目标，优先保留高恢复成本信息
-- **避坑墓碑**：记录失败尝试，避免重复踩坑
-
-**核心概念：**
-```
-已有快照（anchor）+ 新对话内容 ──Incremental Merge──▶ 更新后热轨快照
-```
-
-**自动触发条件：**
-- 用户执行 `/compact` 命令
-- 用户提到"压缩"、"上下文"、"快照"、"墓碑"等关键词
-
-**Commands：**
-
-| 命令 | 说明 |
-|------|------|
-| `/context-snapshot` | 增量合并生成快照（四步清洗法 + Probe 自验证） |
-| `/load-context` | 加载快照到当前会话 |
-
-> **Note**: 查询冷轨的功能已整合到 skill 中，直接说 "之前试过什么方案" 或调用 `/smart-context "关键词"` 即可。
-
-**工作流程：**
-```
-1. /context-snapshot  →  增量合并生成快照（含自验证）
-2. /compact           →  执行压缩
-3. /load-context      →  新会话需要时加载快照
-```
-
-**文件结构：**
-```
-# 项目目录
-your-project/
-└── .agent/                    # 智能代理上下文目录
-    ├── HOT_TRACK.md           # 热轨快照（增量合并）
-    └── COLD_TRACK.md          # 冷轨归档（追加）
-```
-
-**热轨快照结构：**
-```markdown
-# 热轨快照
-
-## 0. 原始意图（永不修改）
-## 1. 项目状态（目标、阻塞、进度）
-## 2. 已确定接口（骨架，无实现体）
-## 3. 文件操作日志（只追加不删除）
-## 4. 避坑墓碑
-## 5. 关键决策
-## 6. 下一步（可执行步骤）
-```
-
-## 已有 Commands
-
-> **Note**: 查询类命令（list-issues、list-features、query-cold）已合并到对应的 skill 中，直接对话或调用 skill 即可。
-
-### Issue 管理
-
-| 命令 | 说明 |
-|------|------|
-| `/add-issue` | 精准添加 issue 到 KNOWN_ISSUES.md |
-| `/resolve-next-issue [id]` | 修复 issue（指定 ID 或自动选择最高优先级） |
-| `/archive-issues` | 归档已解决的 issues 到 ISSUES_ARCHIVED.md |
-
-### Feature 管理
-
-| 命令 | 说明 |
-|------|------|
-| `/add-feature "描述"` | 添加新 feature（智能版本分配） |
-| `/add-feature -v [version]` | 添加 feature 并指定版本 |
-| `/add-feature -f [file]` | 从文件添加 feature |
-| `/start-next-feature [id]` | 自动化开发：Plan → 设计 → TDD → 测试 → 测试指导 |
-| `/complete-feature [id]` | 完成 feature，更新设计和版本状态 |
-| `/archive-features` | 归档已完成的 features 到 FEATURES_ARCHIVED.md |
-
-### 上下文管理
-
-| 命令 | 说明 |
-|------|------|
-| `/context-snapshot` | 增量合并生成快照（四步清洗法 + Probe 自验证） |
-| `/load-context` | 加载快照到当前会话 |
-
-### 版本管理
-
-| 命令 | 说明 |
-|------|------|
-| `/smart-changelog` | 同步 git 提交到 CHANGELOG |
-| `/smart-changelog --release [type]` | 发布新版本（交互式选择步骤） |
 
 ## 安装使用
 
-### 方式一：复制到用户目录
-
+### 方式一:复制到用户目录
 ```bash
-# 复制 skills
 cp -r skills/* ~/.claude/skills/
-
-# 复制 commands
-cp -r commands/* ~/.claude/commands/
 ```
 
-### 方式二：在项目中使用
-
-直接在项目根目录保持此结构，Claude Code 会自动识别。
-
-## 修复 Issue 的谨慎性要求
-
-在使用 `/resolve-next-issue` 时，Claude Code 会遵循严格的谨慎性要求：
-
-**每个文件修改前需要填写：**
-```markdown
-## File: [path/to/file.ts]
-
-- **Changes summary**: [这个文件会改什么]
-- **Reason**: [为什么需要改这个文件]
-- **Expected outcome**: [预期达到什么效果]
-- **Risk assessment**: [潜在风险]
-- **Affected components**: [依赖此文件的其他模块]
-- **Tests to run**: [需要运行的测试]
-```
-
-**禁止操作：**
-- 禁止"顺手"修改无关代码
-- 禁止重构与修复无关的代码
-- 禁止添加超出 issue 范围的功能
-- 禁止修改测试让它通过（应该修代码）
-
-## 文件大小管理
-
-KNOWN_ISSUES.md 会随着时间变大，影响 LLM 上下文效率：
-
-**自动检测：**
-- 文件 > 2000 行或 > 50KB：提示用户归档
-- 文件 > 5000 行或 > 100KB：强烈建议归档
-
-**归档策略：**
-- 使用 `/archive-issues` 归档已解决的 issues
-- 归档文件：`ISSUES_ARCHIVED.md`（与 KNOWN_ISSUES.md 同目录）
-- 默认保留最近 30 天内解决的 issues
+### 方式二:在项目中使用
+直接在项目根目录保持此结构,Claude Code 会自动识别。
 
 ## 开发计划
 
-- [x] 版本追踪功能（Introduced/Fixed 自动检测）
-- [x] Feature 管理技能（feature-list-tracker）
-- [x] 自动化开发流程（/start-next-feature）
-- [x] 人工测试指导文档生成
-- [x] 智能上下文管理（smart-context）
-- [x] CHANGELOG 版本管理（smart-changelog）
-- [ ] 添加更多实用 skills
+- [x] 两层架构对齐 mattpocock(model-invoked 原语 / user-invoked 其他)
+- [x] 人驱动构建链(to-spec → to-tickets → implement → code-review)
+- [x] tracker 文件架构保留(FEATURE_LIST.md / KNOWN_ISSUES.md / 设计块 / CHANGELOG.md)
+- [x] 新增 implement / diagnosing-bugs / domain-modeling(改编自 mattpocock,致谢)
+- [x] 改名 feature-manager / issue-manager / smart-release
+- [x] to-spec / to-tickets / human-test-guide / smart-release 改为 user-invoked
+- [x] commands/ 移除,操作并入 skill
+- [ ] 持续按 writing-great-skills 方法论审计
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules
 
