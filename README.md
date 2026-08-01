@@ -40,7 +40,7 @@
 | human-test-guide | 人工测试指导生成 |
 | grill-me | ad-hoc 质询入口(薄委托 grilling) |
 | handoff | 会话交接(替代上下文压缩的轻量方案) |
-| router | skill 导航(不知道用哪个时问它) |
+| which-skill | skill 导航(不知道用哪个时问它) |
 | writing-great-skills | 写 / 审计 skill 的方法论(含 GLOSSARY.md) |
 
 ## 链路
@@ -52,7 +52,7 @@ FEATURE: feature-manager(add) → 建设计块
 
 ISSUE:   issue-manager(add) → /diagnosing-bugs(hard bug) → /implement → issue-manager(resolve)
 
-META:    router(导航) · grill-me(质询) · handoff(交接) · writing-great-skills(审计)
+META:    which-skill(导航) · grill-me(质询) · handoff(交接) · writing-great-skills(审计)
 ```
 
 ## 项目结构
@@ -74,7 +74,7 @@ CodingSkills/
 │   ├── human-test-guide/      # user(含 REFERENCE.md)
 │   ├── grill-me/              # user
 │   ├── handoff/               # user
-│   ├── router/                # user
+│   ├── which-skill/           # user
 │   └── writing-great-skills/  # user(含 GLOSSARY.md)
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）

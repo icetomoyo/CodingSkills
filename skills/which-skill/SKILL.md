@@ -1,10 +1,10 @@
 ---
-name: router
+name: which-skill
 description: CodingSkills 导航。不知道该用哪个 skill 时,描述你的场景,我告诉你该用哪个 skill 或操作。
 disable-model-invocation: true
 ---
 
-# Router(导航)
+# Which Skill(用哪个 skill)
 
 CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 skill。
 
@@ -74,9 +74,9 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | human-test-guide | user | 人工测试指导生成 |
 | grill-me | user | ad-hoc 质询入口 |
 | handoff | user | 会话交接 |
-| router | user | 本 skill,导航 |
+| which-skill | user | 本 skill,导航 |
 | writing-great-skills | user | 写 / 审计 skill 的方法论 |
 
 ## 维护
 
-本表是 skill 速查的权威映射。新增 / 重命名 / 删除任何 skill 时,必须同步更新本表与场景映射,避免"说谎的路由器"——一个指向已删或不存在 skill 的路由器比没有还糟。
+本表是 skill 速查的权威映射。新增 / 重命名 / 删除任何 skill 时,必须同步更新本表与场景映射,避免"说谎的导航"——一个指向已删或不存在 skill 的导航比没有还糟。
