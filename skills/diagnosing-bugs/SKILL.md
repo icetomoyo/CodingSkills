@@ -9,6 +9,12 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 探索代码库时,若项目有 `CONTEXT.md`(领域词汇表),先读它建立相关模块的心智模型,并查阅你触碰区域的 ADR。
 
+## 脱敏(Redact)
+
+本 skill 会让你展示命令、输出与捕获的产物。**先脱敏再展示**:密钥所在位置一律写 `<REDACTED>`。构造循环时用环境变量引用凭据,让凭据留在环境里,而不是出现在你展示的内容中。捕获的产物(HAR、日志转储)常带 auth header:只引用携带信号的那几行。
+
+若脱敏后的输出不足以诊断 bug,明说并请用户提供。
+
 ## Phase 1 — 建反馈循环(Build a feedback loop)
 
 **Build a feedback loop. This is the skill. Everything else is mechanical.** 拿到一个 **tight** 的 pass/fail 信号——能在 *这个* bug 上变 **red** 的信号——你就会找到原因;二分、假设检验、插桩都只是消费它。没有这个信号,盯着代码看再久也救不了你。
@@ -46,11 +52,11 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 ### 确实建不出循环时
 
-明确停下来说明。列出你试过什么。向用户要:(a) 能复现的环境访问,(b) 捕获的产物(HAR 文件、日志转储、core dump、带时间戳的录屏),或 (c) 添加临时生产插桩的许可。先有循环,再谈假设。
+明确停下来说明。列出你试过什么。向用户要:(a) 能复现的环境访问,(b) 已脱敏的捕获产物(HAR 文件、日志转储、core dump、带时间戳的录屏),或 (c) 添加临时生产插桩的许可。先有循环,再谈假设。
 
 ### 完成判据——一个 tight 且能 red 的循环
 
-Phase 1 完成当循环 **tight** 且**能 red**:你能说出**一条命令**——脚本路径、测试调用、curl——你**已经至少跑过一次**(贴出调用和输出),且它:
+Phase 1 完成当循环 **tight** 且**能 red**:你能说出**一条命令**——脚本路径、测试调用、curl——你**已经至少跑过一次**(展示调用和输出,已脱敏),且它:
 
 - [ ] **能 red**——驱动真实 bug 代码路径,断言**用户描述的确切症状**,因此能在本 bug 上 red、修复后 green。是"能抓住这个特定 bug",而非"跑起来不报错"。
 - [ ] **确定**——每次跑出同样判定(flaky bug:钉住的高复现率,见上)。
@@ -99,6 +105,7 @@ Phase 1 完成当循环 **tight** 且**能 red**:你能说出**一条命令**—
 
 1. **Debugger / REPL 检查**——若环境支持。一个断点胜过十条日志。
 2. **定向日志**——只放在区分假设的边界上,每条针对一个预测。
+3. **绝不"日志打满再 grep"**(log everything and grep)——撒一把日志指望事后搜出答案不是探针,等于把整个假设空间原样倒进输出。
 
 **给每条调试日志打唯一前缀标签**,如 `[DEBUG-a4f2]`。结尾清理变成一次 grep。无标签的日志会存活;有标签的会死。
 
@@ -129,10 +136,11 @@ Phase 1 完成当循环 **tight** 且**能 red**:你能说出**一条命令**—
 - [ ] **回归测试通过**(或 seam 缺失已文档化)
 - [ ] **探针已清理**——所有 `[DEBUG-...]` 插桩已移除(`grep` 前缀);一次性原型已删除或移到明确标记的调试位置
 
-**然后问:什么会阻止这个 bug?** 若答案涉及架构改动(没有好的测试 seam、纠缠的调用方、隐藏耦合),带着具体信息标记架构改进。在修复**之后**给建议,不是之前——你现在的信息比起步时多。
+**然后问:什么会阻止这个 bug?** 若答案涉及架构改动(没有好的测试 seam、纠缠的调用方、隐藏耦合),把架构改进候选连同具体信息写进 commit message 或 issue(用 `issue-manager` 登记):说清缺哪个 seam、什么耦合让这个 bug 无法被锁定。在修复**之后**给建议,不是之前——你现在的信息比起步时多。
 
 ## 与其他 skill 的关系
 
 - `tdd`:Phase 5 在正确 seam 上写回归测试并应用修复时调用。
+- `issue-manager`:Phase 6 发现的架构改进候选用它登记进 KNOWN_ISSUES.md。
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — diagnosing-bugs skill.

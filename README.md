@@ -2,7 +2,7 @@
 
 借鉴 [mattpocock/skills](https://github.com/mattpocock/skills) 的两层架构 + 人驱动构建链 + tracker 文件持久化。
 
-**当前版本：v0.5.0**
+**当前版本：v0.5.1**
 
 ## 设计理念
 
@@ -13,21 +13,23 @@
 
 ## 致谢
 
-本仓库的 `implement`、`diagnosing-bugs`、`domain-modeling` skill 改编自 [mattpocock/skills](https://github.com/mattpocock/skills)(MIT License)。感谢 Matt Pocock 的工程纪律启发。
+本仓库的 `implement`、`diagnosing-bugs`、`domain-modeling`、`code-review`、`grilling`、`grill-me`、`handoff`、`tdd`、`to-spec`、`to-tickets`、`research`、`resolving-merge-conflicts` skill 改编自 [mattpocock/skills](https://github.com/mattpocock/skills)(MIT License)。感谢 Matt Pocock 的工程纪律启发。
 
-## Skill 清单(16 个)
+## Skill 清单(18 个)
 
-### Model-invoked(7 个,自然语言触发)
+### Model-invoked(9 个,自然语言触发)
 
 | skill | 用途 |
 |------|------|
-| grilling | 质询原语(一次一问,附推荐答案,决策才问人) |
+| grilling | 质询原语(轮次批量问 frontier,每题编号附推荐答案) |
 | tdd | 测试先行原语(pre-agreed seams,red-green,重构不在循环内) |
 | code-review | 双轴代码评审(Standards + Spec) |
 | diagnosing-bugs | 诊断原语(反馈循环→复现→假设→探针→修→清理) |
 | domain-modeling | 领域建模原语(挑战术语,写 CONTEXT.md / ADR) |
 | feature-manager | 管 FEATURE_LIST.md + 设计块生命周期(Add → 指向链 → Complete) |
 | issue-manager | 管 KNOWN_ISSUES.md + 修复流程(Add → 指向链 → Archive) |
+| research | 对着 primary sources 调研,产出带引用的调研笔记 |
+| resolving-merge-conflicts | 解决 merge/rebase 冲突(按两侧意图融合,不挑行) |
 
 ### User-invoked(9 个,人敲 `/name`)
 
@@ -50,7 +52,9 @@ FEATURE: feature-manager(add) → 建设计块
   → /to-spec → /to-tickets → /implement(tdd + code-review) → 提交
   → /human-test-guide(可选) → feature-manager(complete) → /smart-release
 
-ISSUE:   issue-manager(add) → /diagnosing-bugs(hard bug) → /implement → issue-manager(resolve)
+ISSUE:   issue-manager(add) → diagnosing-bugs(hard bug,自动触发) → /implement → issue-manager(resolve)
+
+辅助:  research(primary sources 调研) · resolving-merge-conflicts(冲突按意图融合)
 
 META:    which-skill(导航) · grill-me(质询) · handoff(交接) · writing-great-skills(审计)
 ```
@@ -59,7 +63,7 @@ META:    which-skill(导航) · grill-me(质询) · handoff(交接) · writing-g
 
 ```
 CodingSkills/
-├── skills/              # 16 个 skill(每个一个目录,含 SKILL.md)
+├── skills/              # 18 个 skill(每个一个目录,含 SKILL.md)
 │   ├── grilling/              # model 原语
 │   ├── tdd/                   # model 原语
 │   ├── code-review/           # model 原语
@@ -75,6 +79,8 @@ CodingSkills/
 │   ├── grill-me/              # user
 │   ├── handoff/               # user
 │   ├── which-skill/           # user
+│   ├── research/              # model(调研)
+│   ├── resolving-merge-conflicts/  # model(冲突解决)
 │   └── writing-great-skills/  # user(含 GLOSSARY.md)
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
@@ -91,6 +97,7 @@ docs/
 │   ├── v1.0.0.md
 │   └── unplanned.md
 ├── test-guides/            # 测试指导文档(human-test-guide)
+├── research/               # 调研笔记(research)
 ├── KNOWN_ISSUES.md         # Issue 索引(issue-manager)
 └── ISSUES_ARCHIVED.md      # 归档的 issues
 CONTEXT.md                  # 领域词汇表(domain-modeling)
@@ -117,6 +124,7 @@ cp -r skills/* ~/.claude/skills/
 - [x] 改名 feature-manager / issue-manager / smart-release
 - [x] to-spec / to-tickets / human-test-guide / smart-release 改为 user-invoked
 - [x] commands/ 移除,操作并入 skill
+- [x] v0.5.1 同步上游:grilling 轮次模型 / code-review 坏味道基线 / diagnosing-bugs 脱敏,新增 research + resolving-merge-conflicts
 - [ ] 持续按 writing-great-skills 方法论审计
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules

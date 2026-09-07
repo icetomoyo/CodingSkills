@@ -30,6 +30,12 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 3. `/implement` —— 修复(调 tdd + code-review)→ 提交
 4. `issue-manager`(resolve)—— 更新状态
 
+### 我要调研一个主题
+`research` —— 派后台 agent 读 primary sources,产出带引用笔记(自然语言触发)
+
+### 我在合并/变基时遇到冲突
+`resolving-merge-conflicts` —— 还原两侧意图再融合,不挑行(自动触发)
+
 ### 我要对齐需求 / 理清思路
 `/grill-me` —— ad-hoc 质询(脱离 feature 流程)
 
@@ -66,6 +72,8 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | domain-modeling | model | 领域建模原语(术语,CONTEXT.md / ADR) |
 | feature-manager | model | 管 FEATURE_LIST.md + feature 生命周期 |
 | issue-manager | model | 管 KNOWN_ISSUES.md + issue 生命周期 |
+| research | model | primary sources 调研,带引用笔记 |
+| resolving-merge-conflicts | model | 合并冲突按意图融合 |
 | **User-invoked(人敲 /name)** | | |
 | to-spec | user | 综合 spec → 设计块 Part B |
 | to-tickets | user | 拆票 → 设计块实现步骤 |

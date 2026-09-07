@@ -1,13 +1,13 @@
 ---
 name: grill-me
-description: 对我当前的想法/计划/设计做一轮质询,直到每个决策分支都收敛。手动触发的无状态质询入口,薄委托 grilling 原语。
+description: 对我当前的想法/计划/设计做多轮质询,直到决策前沿清空。手动触发的无状态质询入口,薄委托 grilling 原语。
 disable-model-invocation: true
 argument-hint: "[要质询的主题]"
 ---
 
 # Grill Me(质询我)
 
-用户手动触发的无状态质询入口。你说"grill me / 质询我 / 追问一下我这个想法",本 skill 就对你当前的想法 / 计划 / 设计发起一轮穷追质询。
+用户手动触发的无状态质询入口。你说"grill me / 质询我 / 追问一下我这个想法",本 skill 就对你当前的想法 / 计划 / 设计发起穷追质询。
 
 本 skill 是 `grilling` 原语的**薄包装**——质询纪律全部在 `grilling` 里,本 skill 不重复。本 skill 只负责:把"用户想被质询"这个意图,接上 `grilling` 循环。
 

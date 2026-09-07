@@ -1,12 +1,12 @@
 ---
 name: to-spec
-description: 把对话与代码库理解综合成 spec(≈PRD),写入 feature 设计块 Part B。只综合不访谈,关键决策调 grilling。
+description: 把对话与代码库理解综合成 spec,写入 feature 设计块 Part B。只综合不访谈,关键决策调 grilling。
 disable-model-invocation: true
 ---
 
 # To Spec(规格综合)
 
-把当前对话上下文 + 代码库理解,**综合**成一份 spec(你也许称它 PRD)。核心原则是 **synthesize not interview / 只综合不访谈**:从已有对话和代码中提炼,不逐条追问用户——真正的决策分叉才交给 `grilling`。
+把当前对话上下文 + 代码库理解,**综合**成一份 spec。核心原则是 **synthesize not interview / 只综合不访谈**:从已有对话和代码中提炼,不逐条追问用户——真正的决策分叉才交给 `grilling`。
 
 ## 综合纪律
 

@@ -8,19 +8,30 @@ argument-hint: "[fixed-point-ref]"
 
 对自某个固定点以来的 diff 做评审。评审分两条**互不污染**的轴,各自独立给出发现:
 
-- **Standards(规范轴)**——diff 是否遵循仓库的编码规范?外加一个 Fowler 坏味道基线(长方法、重复、巨类、神秘命名、过深嵌套等)。
-- **Spec(需求轴)**——diff 是否忠实实现了它的来源需求(originating issue / PRD / feature 设计块)?
+- **Standards(规范轴)**——diff 是否遵循仓库的编码规范?外加一个 Fowler 坏味道基线(12 条固定 code smell,见 `SMELL-BASELINE.md`)。
+- **Spec(需求轴)**——diff 是否忠实实现了它的来源需求(originating issue / spec / feature 设计块)?
 
 两轴并行(各自独立 sub-agent 或独立遍历)。
 
 ## 工作流
 
 1. **钉住固定点。** 确认 ref(commit / branch / tag)有效、`git diff <fixed-point>...HEAD` 非空。在并行前就失败,别等评审跑完才发现没 diff。完成判据:fixed-point ref 有效且 git diff 非空。
-2. **识别 spec 来源。** 从 commit message 找 issue 引用、从 `docs/` 找 PRD / feature 设计块。若无 spec 来源,明确告知需求轴将"无 spec 可比对",只评 Standards。完成判据:已定位 spec 来源,或已明确告知“无 spec 可比对”。
-3. **双轴并行评审。**
-   - Standards:读仓库的编码规范文件(如 `CODING_STANDARDS.md` / `.editorconfig` / lint 配置,有则用,无则用语言通用规范),逐文件评 diff;叠加 Fowler 坏味道基线。
-   - Spec:对照 spec 来源,逐条核对 diff 是否覆盖、是否偏离、是否越界实现 spec 之外的东西。完成判据:每个改动文件均已逐条评 Standards + Spec。
-4. **并排报告,不合并不重排。** 输出 `## Standards` 与 `## Spec` 两节,各自列 finding(文件:行 + 问题 + 建议)。末行汇总每轴 finding 数 + 最严重项。**不要把两轴发现合并成一个列表**,也不要重排顺序——保持双轴分离是本 skill 的核心价值。完成判据:## Standards 与 ## Spec 两节各列齐 finding,末行汇总每轴 finding 数 + 最严重项。
+2. **识别 spec 来源(按此顺序搜,不得跳序)。**
+   1. commit message 里的 issue / spec 引用(`#123`、`Closes #45`、GitLab `!67` 等形式);
+   2. 用户作为参数传入的路径;
+   3. `docs/`、`specs/` 下按分支名或 feature 名匹配到的 spec / feature 设计块;
+   4. 前三步都没有 → **先问用户 spec 在哪**。只有用户明确说"没有 spec"时,Spec 轴才允许报"无 spec 可比对";**不得静默跳过 Spec 轴**。
+   完成判据:已定位 spec 来源,或已就"spec 在哪"问过用户并得到"没有"的答复。
+3. **识别规范来源。** 仓库里任何记录"代码该怎么写"的文件(`CODING_STANDARDS.md`、`CONTRIBUTING.md` 等)都算。在此之上,Standards 轴**固定携带**坏味道基线——即使仓库什么都没成文也照样带进评审。基线全文见 `SMELL-BASELINE.md`(Fowler《Refactoring》第 3 章 12 条),两条约束规则一并带走:
+   - **仓库成文规范优先**:仓库规范明确认可的写法,即使基线会标出来,也**压制**对应 smell 报告。
+   - **永远是判断题**:每条 smell 只是贴了标签的启发式("可能是 Feature Envy"),**不是硬违反**;工具已强制检查的内容跳过不报。
+   完成判据:已列出规范来源文件清单(可以为空——仓库无成文规范时只剩基线,这不算缺步骤)。
+4. **双轴并行派子代理。** 两轴各起一个独立子代理(互不污染上下文),两个 brief 各含:diff 命令 + commit 列表,输出**400 字以内**。
+   - **Standards 子代理**:brief 里额外粘上仓库规范文件清单,**并把 `SMELL-BASELINE.md` 那 12 条基线原文整段粘进去**(子代理没有其他途径拿到它)。brief 要求:"逐文件/逐 hunk 报告 (a) diff 违反成文规范之处:引用规范(文件 + 条款);(b) 发现的基线 smell:点名并引用对应 hunk。区分硬违反与判断题:违反成文规范可以是硬违反,基线 smell 永远是判断题,且仓库成文规范覆盖基线。工具已强制的跳过。400 字以内。"
+   - **Spec 子代理**:brief 里附上 spec 的路径或抓取到的正文。brief 要求:"报告 (a) spec 要了但缺失或只做了一半的需求;(b) diff 里没被要求的行为(scope creep);(c) 看起来实现了但实现方式可能错了的需求。**每条 finding 附上 spec 原文引用。** 400 字以内。"
+   spec 确实缺失时跳过 Spec 子代理,并在最终报告里注明原因(须是步骤 2 里用户确认过的"没有",不是你未搜到)。
+   完成判据:两个子代理均已返回报告,或 Spec 轴跳过的原因已记录;每份报告均在上限内。
+5. **并排报告,不合并不重排。** 把两份报告逐字或轻度清理后放在 `## Standards` 与 `## Spec` 两节下,各自列 finding(文件:行 + 问题 + 建议)。**不要把两轴发现合并成一个列表**,也不要重排顺序——保持双轴分离是本 skill 的核心价值。末行汇总**每轴各自**的 finding 数与该轴最严重项;**不要跨轴选出"最严重的一个"**——那正是双轴分离要防的重新排序。完成判据:## Standards 与 ## Spec 两节各列齐 finding,末行按轴分别汇总。
 
 ## 纪律
 

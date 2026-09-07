@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.1] - 2026-09-07
+
+### Added
+- **research skill**(model-invoked):只读 primary sources 的调研,产出带引用笔记(`docs/research/`)
+- **resolving-merge-conflicts skill**(model-invoked):冲突还原两侧意图再融合,不挑行
+- **code-review 坏味道基线**:Fowler 12 条(是什么→怎么改)+ 仓库成文规范优先 + 启发式非硬违反(`SMELL-BASELINE.md`)
+- **diagnosing-bugs 脱敏纪律**:展示命令/输出/捕获产物前先脱敏;补齐 `scripts/hitl-loop.template.sh`(修悬空引用)
+- **to-tickets 宽重构第三级兜底**:批共享集成分支 + 最终 integrate-and-verify 票
+
+### Changed
+- **grilling 轮次模型**:一次一问 → 一轮问完整条 frontier(编号 + 推荐答案 + 轮内 `---` 分隔);查证不阻塞整轮
+- **handoff**:必含项加「建议 skills」;写明刻意落工作区的取舍
+- **domain-modeling 触发面**:动词式(写/改 CONTEXT.md、记录/改 ADR),删除死分支
+- **to-spec**:清 PRD 残留,spec 为唯一术语
+- **code-review**:spec 来源有序四级搜索(找不到先问用户,不得静默跳过 Spec 轴);brief 400 字上限;finding 引 spec 原文
+- **README / which-skill**:索引更新(16 → 18 skill,model-invoked 7 → 9)
+
+---
 ## [0.5.0] - 2026-08-01
 
 ### Added
