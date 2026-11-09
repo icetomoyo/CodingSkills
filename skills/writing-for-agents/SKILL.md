@@ -1,7 +1,6 @@
 ---
 name: writing-for-agents
-description: 写给 agent 消费的文档——skill、AGENTS.md / CLAUDE.md、被指针指向的 docs——的写法与审计方法。
-disable-model-invocation: true
+description: 写与审计 agent 消费的文档(skill、AGENTS.md / CLAUDE.md、被指针指向的 docs)。当用户要创建/修改 skill、编辑 AGENTS.md 或 CLAUDE.md、审计一份 agent 文档时使用。
 ---
 
 # Writing for Agents(写给 agent 的文档)
@@ -97,7 +96,7 @@ disable-model-invocation: true
 
 ## 与其他 skill 的关系
 
-本 skill 是审计所有 agent 文档的**元工具**,自身是用户调用(`disable-model-invocation: true`)——审计是人工发起的判断,不需要 agent 自主触达。
+本 skill 是审计所有 agent 文档的**元工具**,自身是 model-invoked——其他 skill(`retro`)需要触达它,agent 在改 skill 或 `AGENTS.md` 时也应能自主取用。
 
 - `grilling`、`tdd`、`code-review`、`implement`、`domain-modeling`、`feature-manager` 等任何 skill,以及 `AGENTS.md` / `CLAUDE.md` 与它们指向的 doc,都可用本 skill 审计:逐句跑 no-op 测试,逐处否定转正面,检查完成判据是否可核对且穷尽,验证锚词是在招募先验还是只是重述。
 - 审计产出诊断报告,不直接改被审对象——改不改由其作者决定(与 `code-review` 同纪律)。

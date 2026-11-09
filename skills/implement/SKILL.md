@@ -19,6 +19,7 @@ argument-hint: "[ticket-ref | feature-id]"
 3. **收尾全量测试**——全部票做完后,跑一次完整测试套件 + typecheck + lint + build,确保全绿。
 4. **代码评审**——调用 `code-review`,对本次 diff 做双轴评审(Standards + Spec)。
 5. **提交**——评审通过后,提交到当前分支。
+6. **PR(可选)**——交付走 PR 时,调用 `pr` 写正文。
 
 ## 完成判据
 
@@ -31,6 +32,7 @@ argument-hint: "[ticket-ref | feature-id]"
 
 - `tdd`:逐票调用,在 pre-agreed seams 上测试先行
 - `code-review`:构建完成后调用,双轴评审
+- `pr`:交付走 PR 时,构建完成后调用它写 PR 正文
 - `to-spec` / `to-tickets`:产出本 skill 消费的 spec 和票
 - `feature-manager`:构建链的上一步(Start 指向本 skill),下一步(Complete)
 - `issue-manager`:修复链中本 skill 负责构建修复

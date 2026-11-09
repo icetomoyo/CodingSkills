@@ -48,6 +48,9 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 ### 我要建/磨领域模型
 `domain-modeling` —— 挑战术语,写 GLOSSARY.md / ADR(自然语言触发)
 
+### 我要写 PR 正文
+`pr` —— 三段式:Summary(最小可视化)+ Evidence(before/after)+ Merge Danger(自然语言触发)
+
 ### 我要发布版本 / 更新 changelog
 `/smart-release` —— 同步 CHANGELOG + 版本发布
 
@@ -55,7 +58,10 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 `/handoff` —— 压成交接文档
 
 ### 我要写 / 审计 agent 消费的文档
-`/writing-for-agents` —— 方法论参考
+`writing-for-agents` —— 方法论参考(自然语言触发)
+
+### 会话结束 / 想改进 agent 环境
+`/retro` —— 复盘七类环境改进,按严重度排序
 
 ## skill 速查
 
@@ -70,6 +76,8 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | feature-manager | model | 管 FEATURE_LIST.md + feature 生命周期 |
 | issue-manager | model | 管 KNOWN_ISSUES.md + issue 生命周期 |
 | research | model | primary sources 调研,带引用笔记 |
+| pr | model | PR 正文(Summary / Evidence / Merge Danger) |
+| writing-for-agents | model | 写 / 审计 agent 消费的文档 |
 | **User-invoked(人敲 /name)** | | |
 | to-spec | user | 综合 spec → 设计块 Part B |
 | to-tickets | user | 拆票 → 设计块实现步骤 |
@@ -79,7 +87,7 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | grill-me | user | ad-hoc 质询入口 |
 | handoff | user | 会话交接 |
 | which-skill | user | 本 skill,导航 |
-| writing-for-agents | user | 写 / 审计 agent 消费的文档 |
+| retro | user | 会话复盘,环境改进候选 |
 
 ## 维护
 

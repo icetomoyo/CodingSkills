@@ -2,7 +2,7 @@
 
 借鉴 [mattpocock/skills](https://github.com/mattpocock/skills) 的两层架构 + 人驱动构建链 + tracker 文件持久化。
 
-**当前版本：v0.5.2**
+**当前版本：v0.6.0**
 
 ## 设计理念
 
@@ -13,11 +13,11 @@
 
 ## 致谢
 
-本仓库的 `implement`、`diagnosing-bugs`、`domain-modeling`、`code-review`、`grilling`、`grill-me`、`handoff`、`tdd`、`to-spec`、`to-tickets`、`research` skill 改编自 [mattpocock/skills](https://github.com/mattpocock/skills)(MIT License)。感谢 Matt Pocock 的工程纪律启发。
+本仓库的 `implement`、`diagnosing-bugs`、`domain-modeling`、`code-review`、`grilling`、`grill-me`、`handoff`、`tdd`、`to-spec`、`to-tickets`、`research`、`pr`、`retro` skill 改编自 [mattpocock/skills](https://github.com/mattpocock/skills)(MIT License)。感谢 Matt Pocock 的工程纪律启发。
 
-## Skill 清单(17 个)
+## Skill 清单(19 个)
 
-### Model-invoked(8 个,自然语言触发)
+### Model-invoked(10 个,自然语言触发)
 
 | skill | 用途 |
 |------|------|
@@ -29,6 +29,8 @@
 | feature-manager | 管 FEATURE_LIST.md + 设计块生命周期(Add → 指向链 → Complete) |
 | issue-manager | 管 KNOWN_ISSUES.md + 修复流程(Add → 指向链 → Archive) |
 | research | 对着 primary sources 调研,产出带引用的调研笔记 |
+| pr | PR 正文三段式(Summary + Evidence + Merge Danger) |
+| writing-for-agents | 写 / 审计 agent 消费的文档(含 SKILL-MECHANICS.md) |
 
 ### User-invoked(9 个,人敲 `/name`)
 
@@ -42,27 +44,27 @@
 | grill-me | ad-hoc 质询入口(薄委托 grilling) |
 | handoff | 会话交接(替代上下文压缩的轻量方案) |
 | which-skill | skill 导航(不知道用哪个时问它) |
-| writing-for-agents | 写 / 审计 agent 消费的文档(含 SKILL-MECHANICS.md) |
+| retro | 会话复盘,产出 agent 环境改进候选 |
 
 ## 链路
 
 ```
 FEATURE: feature-manager(add) → 建设计块
   → /to-spec → /to-tickets → /implement(tdd + code-review) → 提交
-  → /human-test-guide(可选) → feature-manager(complete) → /smart-release
+  → pr(可选,走 PR 时) → /human-test-guide(可选) → feature-manager(complete) → /smart-release
 
 ISSUE:   issue-manager(add) → diagnosing-bugs(hard bug,自动触发) → /implement → issue-manager(resolve)
 
 辅助:  research(primary sources 调研)
 
-META:    which-skill(导航) · grill-me(质询) · handoff(交接) · writing-for-agents(审计)
+META:    which-skill(导航) · grill-me(质询) · handoff(交接) · writing-for-agents(审计) · retro(复盘)
 ```
 
 ## 项目结构
 
 ```
 CodingSkills/
-├── skills/              # 17 个 skill(每个一个目录,含 SKILL.md)
+├── skills/              # 19 个 skill(每个一个目录,含 SKILL.md)
 │   ├── grilling/              # model 原语
 │   ├── tdd/                   # model 原语
 │   ├── code-review/           # model 原语
@@ -79,7 +81,9 @@ CodingSkills/
 │   ├── handoff/               # user
 │   ├── which-skill/           # user
 │   ├── research/              # model(调研)
-│   └── writing-for-agents/    # user(含 SKILL-MECHANICS.md)
+│   ├── pr/                    # model(含 EXAMPLES.md)
+│   ├── retro/                 # user
+│   └── writing-for-agents/    # model(含 SKILL-MECHANICS.md)
 ├── agents/              # 自定义 Agents（预留）
 ├── rules/               # 自定义 Rules（预留）
 └── .claude/             # Claude Code 配置
@@ -124,6 +128,7 @@ cp -r skills/* ~/.claude/skills/
 - [x] commands/ 移除,操作并入 skill
 - [x] v0.5.1 同步上游:grilling 轮次模型 / code-review 坏味道基线 / diagnosing-bugs 脱敏,新增 research + resolving-merge-conflicts
 - [x] v0.5.2 同步上游:CONTEXT→GLOSSARY 改名 / writing-for-agents 重构 / 6 skill 补丁 / 删除 resolving-merge-conflicts
+- [x] v0.6.0 新增 pr + retro,writing-for-agents 改 model-invoked
 - [ ] 持续按 writing-for-agents 方法论审计
 - [ ] 添加自定义 agents
 - [ ] 添加项目特定的 rules

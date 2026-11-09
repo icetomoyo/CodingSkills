@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-11-09
+
+### Added
+- **pr skill**(model-invoked):PR 正文三段式模板——Summary(最小可视化:伪代码/调用树/组件树/文件树/Mermaid/diff/整块代码)、Evidence(before/after;截图 S 级、执行结果 A 级)、Merge Danger(单向门/双向门 + 爆炸半径);可视化形状收在 `EXAMPLES.md`
+- **retro skill**(user-invoked):一次编码会话的复盘,七类环境改进候选(导航 / 自动检查 / 编码规范 / 全局 AGENTS.md / 工具经济 / 空操作 / 信息获取),按严重度排序;含本仓库产物检查清单
+
+### Changed
+- **writing-for-agents 改为 model-invoked**:删除 `disable-model-invocation`,描述改为面向模型并按触发分支重写;常驻成本仅 description(约 111 字符),低于多数现有 model-invoked skill。`retro` 因此可调用它
+
+---
+
 ## [0.5.2] - 2026-11-09
 
 ### Changed
