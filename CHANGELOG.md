@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.2] - 2026-11-09
+
+### Changed
+- **domain-modeling 约定改名**:`CONTEXT.md` / `CONTEXT-MAP.md` / `CONTEXT-FORMAT.md` → `GLOSSARY.md` / `GLOSSARY-MAP.md` / `GLOSSARY-FORMAT.md`(对齐上游 `006a52b`);tdd、diagnosing-bugs、to-spec、research、which-skill、README 引用同步更新
+- **writing-great-skills → writing-for-agents**:吸收上游重构——GLOSSARY 合并进 SKILL.md、skill 专属机制拆到 `SKILL-MECHANICS.md`、适用范围扩展到任何 agent 消费的文档(skill / AGENTS.md / CLAUDE.md / 被指针指向的 docs)
+- **code-review**:子代理改用全新上下文窗口;规范来源改为主动搜索全仓(`CODING_STANDARDS.md` / `CONTRIBUTING.md` 必须在列);两轴子代理一起在前台发出
+- **diagnosing-bugs**:人为造红后先 `diff` 对照 pristine 副本,证明变更真的落地
+- **tdd**:每个提议 seam 附一行"抓住什么 / 漏掉什么"
+- **grilling**:问题措辞让"是"= 接受推荐答案;查证子代理全新上下文
+- **implement**:用户传入票引用时先抓取并报出标题
+- **research**:后台 agent 全新上下文窗口启动
+
+### Removed
+- **resolving-merge-conflicts skill**:跟随上游删除(`daa01d8`),通用 agent 已能处理 merge/rebase 冲突
+
+---
+
 ## [0.5.1] - 2026-09-07
 
 ### Added

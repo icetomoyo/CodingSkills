@@ -5,7 +5,7 @@ description: 对着 primary sources 调研问题,产出带引用的调研笔记�
 
 # Research(调研)
 
-把调研问题交给一个**后台 agent** 去读,你继续推进主线——读资料是腿活,不该占你的前台上下文。
+把调研问题交给一个**后台 agent** 去读,你继续推进主线——读资料是腿活,不该占你的前台上下文。后台 agent 以**全新上下文窗口**启动(不是 fork 当前对话)。
 
 ## 派发纪律
 
@@ -38,6 +38,6 @@ description: 对着 primary sources 调研问题,产出带引用的调研笔记�
 ## 与其他 skill 的关系
 
 - `to-spec`:调研结论作为 spec 的 Implementation Decisions 输入。
-- `domain-modeling`:调研定下的术语定型后,由它写进 `CONTEXT.md`。
+- `domain-modeling`:调研定下的术语定型后,由它写进 `GLOSSARY.md`。
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — research skill.

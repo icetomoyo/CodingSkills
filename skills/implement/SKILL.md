@@ -11,7 +11,7 @@ argument-hint: "[ticket-ref | feature-id]"
 
 ## 流程
 
-1. **读 spec/tickets**——从 feature 设计块(Part B,格式见 `feature-manager/DESIGN-BLOCK-FORMAT.md`)或 issue 详情中读出要构建的内容。
+1. **读 spec/tickets**——从 feature 设计块(Part B,格式见 `feature-manager/DESIGN-BLOCK-FORMAT.md`)或 issue 详情中读出要构建的内容。用户传入票引用(ticket-ref)时,**先抓取该票并报出它的标题**再开始;引用有歧义就问。
 2. **逐票构建**——对每张 tracer-bullet 票:
    - 在 pre-agreed seam 上调用 `tdd`(先红后绿,一个 seam 一个循环)
    - 定期跑 typecheck 和单测

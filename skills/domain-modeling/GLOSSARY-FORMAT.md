@@ -1,4 +1,4 @@
-# CONTEXT.md 格式
+# GLOSSARY.md 格式
 
 ## 结构
 
@@ -31,18 +31,18 @@ _Avoid_: Client, buyer, account
 
 ## 单上下文 vs 多上下文
 
-**单上下文(大多数仓库):** 根目录一个 `CONTEXT.md`。
+**单上下文(大多数仓库):** 根目录一个 `GLOSSARY.md`。
 
-**多上下文:** 根目录一个 `CONTEXT-MAP.md` 列出各上下文、位置及关系:
+**多上下文:** 根目录一个 `GLOSSARY-MAP.md` 列出各上下文、位置及关系:
 
 ```md
-# Context Map
+# Glossary Map
 
 ## Contexts
 
-- [Ordering](./src/ordering/CONTEXT.md) — receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md) — generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md) — manages warehouse picking and shipping
+- [Ordering](./src/ordering/GLOSSARY.md) — receives and tracks customer orders
+- [Billing](./src/billing/GLOSSARY.md) — generates invoices and processes payments
+- [Fulfillment](./src/fulfillment/GLOSSARY.md) — manages warehouse picking and shipping
 
 ## Relationships
 
@@ -53,8 +53,8 @@ _Avoid_: Client, buyer, account
 
 推断结构:
 
-- 有 `CONTEXT-MAP.md` → 读它找上下文
-- 只有根 `CONTEXT.md` → 单上下文
-- 都没有 → 在第一个术语解决时懒创建根 `CONTEXT.md`
+- 有 `GLOSSARY-MAP.md` → 读它找上下文
+- 只有根 `GLOSSARY.md` → 单上下文
+- 都没有 → 在第一个术语解决时懒创建根 `GLOSSARY.md`
 
 多上下文时,推断当前话题属于哪个上下文。不清楚就问。

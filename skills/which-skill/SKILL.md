@@ -33,9 +33,6 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 ### 我要调研一个主题
 `research` —— 派后台 agent 读 primary sources,产出带引用笔记(自然语言触发)
 
-### 我在合并/变基时遇到冲突
-`resolving-merge-conflicts` —— 还原两侧意图再融合,不挑行(自动触发)
-
 ### 我要对齐需求 / 理清思路
 `/grill-me` —— ad-hoc 质询(脱离 feature 流程)
 
@@ -49,7 +46,7 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 `diagnosing-bugs` —— 建反馈循环→复现→假设→探针→修(自然语言触发)
 
 ### 我要建/磨领域模型
-`domain-modeling` —— 挑战术语,写 CONTEXT.md / ADR(自然语言触发)
+`domain-modeling` —— 挑战术语,写 GLOSSARY.md / ADR(自然语言触发)
 
 ### 我要发布版本 / 更新 changelog
 `/smart-release` —— 同步 CHANGELOG + 版本发布
@@ -57,8 +54,8 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 ### 对话太长 / 要换会话继续
 `/handoff` —— 压成交接文档
 
-### 我要写 / 审计一个 skill
-`/writing-great-skills` —— 方法论参考
+### 我要写 / 审计 agent 消费的文档
+`/writing-for-agents` —— 方法论参考
 
 ## skill 速查
 
@@ -69,11 +66,10 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | tdd | model | 测试先行原语 |
 | code-review | model | 双轴代码评审 |
 | diagnosing-bugs | model | 诊断原语(反馈循环→复现→假设→修) |
-| domain-modeling | model | 领域建模原语(术语,CONTEXT.md / ADR) |
+| domain-modeling | model | 领域建模原语(术语,GLOSSARY.md / ADR) |
 | feature-manager | model | 管 FEATURE_LIST.md + feature 生命周期 |
 | issue-manager | model | 管 KNOWN_ISSUES.md + issue 生命周期 |
 | research | model | primary sources 调研,带引用笔记 |
-| resolving-merge-conflicts | model | 合并冲突按意图融合 |
 | **User-invoked(人敲 /name)** | | |
 | to-spec | user | 综合 spec → 设计块 Part B |
 | to-tickets | user | 拆票 → 设计块实现步骤 |
@@ -83,7 +79,7 @@ CodingSkills 的 skill 导航中心。说出你想做什么,我指向对应的 s
 | grill-me | user | ad-hoc 质询入口 |
 | handoff | user | 会话交接 |
 | which-skill | user | 本 skill,导航 |
-| writing-great-skills | user | 写 / 审计 skill 的方法论 |
+| writing-for-agents | user | 写 / 审计 agent 消费的文档 |
 
 ## 维护
 

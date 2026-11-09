@@ -7,7 +7,7 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 硬 bug 的纪律。仅在明确说明理由时跳过阶段。
 
-探索代码库时,若项目有 `CONTEXT.md`(领域词汇表),先读它建立相关模块的心智模型,并查阅你触碰区域的 ADR。
+探索代码库时,若项目有 `GLOSSARY.md`(领域词汇表),先读它建立相关模块的心智模型,并查阅你触碰区域的 ADR。
 
 ## 脱敏(Redact)
 
@@ -122,7 +122,7 @@ Phase 1 完成当循环 **tight** 且**能 red**:你能说出**一条命令**—
 若正确 seam 存在,调用 `tdd` skill:
 
 1. 把最小化复现转成该 seam 上的失败测试。
-2. 看它失败。
+2. 看它失败。若你靠改代码或 fixture **人为造红**,先 `diff` 对照 pristine 副本,证明变更真的落地,再信任这个红。
 3. 应用修复。
 4. 看它通过。
 5. 对原始(未最小化)场景重跑 Phase 1 反馈循环。
